@@ -7,7 +7,7 @@ export default defineConfig({
 	base: '/ws-course',
 	integrations: [
 		starlight({
-			title: 'My Docs',
+			title: '420-511-VA Web Services',
 			social: {
 				github: 'https://github.com/frostybee/ws-course',
 			},
@@ -28,6 +28,10 @@ export default defineConfig({
 				{
 					label: 'Lectures',
 					autogenerate: { directory: 'lectures' },
+				},
+				{
+					label: 'HTTP',
+					autogenerate: { directory: 'http' }
 				},
 				{
 					label: 'Reference',
