@@ -30,6 +30,14 @@ export default defineConfig({
 					autogenerate: { directory: 'lectures' },
 				},
 				{
+					label: 'Resources',
+					items: [
+						{ label: 'Resource Design', link: '/resources/resources'},
+						{ label: 'Collection Resources', link: '/resources/collection-resources'},
+						{ label: 'Sub-Resources', link: '/resources/relationships-and-sub-resources'}
+					]
+				},
+				{
 					label: 'HTTP',
 					autogenerate: { directory: 'http' }
 				},
