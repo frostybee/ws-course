@@ -1,0 +1,91 @@
+---
+title: Composite Resource
+description: Introducing composite resources
+---
+
+In RESTful web services, a composite resource refers to a resource that is a combination of multiple other resources. This is useful when you need to aggregate data from different sources into a single cohesive response. A composite resource allows you to present a unified interface to the client while fetching and combining data from various remote APIs behind the scenes.
+
+Composite resources are essentially a way to aggregate and present data from multiple endpoints in a cohesive manner.
+
+### Example Scenario
+
+Imagine an online travel booking service that provides information about flights, hotels, and car rentals. Each of these services could be managed by different APIs:
+
+1. **Flights API**: Provides information about available flights, airlines, schedules, etc.
+2. **Hotels API**: Provides information about hotel availability, room types, prices, etc.
+3. **Car Rentals API**: Provides information about car rental options, prices, car types, etc.
+
+A composite resource could be created to offer a unified search feature, allowing users to find flights, hotels, and car rentals in a single query. Here's how it might work:
+
+### Aggregating Data Example
+
+1. **Composite Resource Endpoint**: `/api/v1/travel-options`
+
+2. **Client Request**:
+
+   - The client sends a request to the composite resource endpoint with parameters like `destination`, `check-in date`, `check-out date`, and `number of travelers`.
+
+3. **Backend Processing**:
+
+   - The server-side logic calls the Flights API to get flight options to the specified destination.
+   - It then calls the Hotels API to check available accommodations for the specified dates.
+   - Finally, it queries the Car Rentals API to find available vehicles.
+
+4. **Aggregation**:
+
+   - The responses from the individual APIs are aggregated into a single, cohesive response. This may involve data transformation, filtering, or merging.
+
+5. **Unified Response**:
+
+   - The aggregated data is returned to the client as a single JSON response, which could look something like this:
+
+   ```json
+   {
+     "flights": [
+       {
+         "flight_id": "123",
+         "airline": "Airline A",
+         "price": 300,
+         "departure": "2024-09-01T10:00:00Z",
+         "arrival": "2024-09-01T14:00:00Z"
+       },
+       {
+         "flight_id": "456",
+         "airline": "Airline B",
+         "price": 350,
+         "departure": "2024-09-01T12:00:00Z",
+         "arrival": "2024-09-01T16:00:00Z"
+       }
+     ],
+     "hotels": [
+       {
+         "hotel_id": "789",
+         "name": "Hotel A",
+         "price_per_night": 120,
+         "rating": 4.5
+       },
+       {
+         "hotel_id": "101",
+         "name": "Hotel B",
+         "price_per_night": 150,
+         "rating": 4.0
+       }
+     ],
+     "car_rentals": [
+       {
+         "car_id": "111",
+         "company": "CarRentals A",
+         "price_per_day": 50,
+         "type": "SUV"
+       },
+       {
+         "car_id": "222",
+         "company": "CarRentals B",
+         "price_per_day": 45,
+         "type": "Sedan"
+       }
+     ]
+   }
+   ```
+
+In this example, the client benefits from a simplified interface (one endpoint to call) and a comprehensive response, while the server handles the complexity of interacting with multiple APIs and aggregating the data. This approach is common in applications that need to combine information from various services, providing a seamless user experience.

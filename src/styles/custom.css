@@ -1,37 +1,29 @@
+/* Dark mode colors. */
 :root {
-  /* Width of the main container */
-  --sl-content-width: 70rem;
-  /* Size of the header's text */
-  --sl-text-5xl: 3.5rem;
-  --sl-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-  /* --sl-font: Verdana; */
-  /* --sl-font: 'IBM Plex Serif', serif; */
-  /* --sl-font: "Segoe UI",SegoeUI,Helvetica Neue,Helvetica,Arial,sans-serif; */
+  --sl-color-accent-low: #131e4f;
+  --sl-color-accent: #3447ff;
+  --sl-color-accent-high: #b3c7ff;
+  --sl-color-white: #ffffff;
+  --sl-color-gray-1: #eceef2;
+  --sl-color-gray-2: #c0c2c7;
+  --sl-color-gray-3: #888b96;
+  --sl-color-gray-4: #545861;
+  --sl-color-gray-5: #353841;
+  --sl-color-gray-6: #24272f;
+  --sl-color-black: #17181c;
 }
-
-
-body {
-  /* System Fonts as used by GitHub */
-  /* font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"; */
-  
-  /* line-height: 1.5;   */
-  line-height: 160%;  
-  -webkit-font-smoothing: antialiased;
-  color: black;
+/* Light mode colors. */
+:root[data-theme="light"] {
+  --sl-color-accent-low: #c7d6ff;
+  --sl-color-accent: #364bff;
+  --sl-color-accent-high: #182775;
+  --sl-color-white: #17181c;
+  --sl-color-gray-1: #24272f;
+  --sl-color-gray-2: #353841;
+  --sl-color-gray-3: #545861;
+  --sl-color-gray-4: #888b96;
+  --sl-color-gray-5: #c0c2c7;
+  --sl-color-gray-6: #eceef2;
+  --sl-color-gray-7: #f5f6f8;
+  --sl-color-black: #ffffff;
 }
-
-
-p {
-  font-size: 20px;
-  line-break: auto;
-  text-align: justify;
-  /* font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"; */
-
-  /* font-family: apple-system,BlinkMacSystemFont,Segoe UI,Noto Sans,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji; */
-  /* TODO: make a component with the following font */
-  /* font-family: 'Courier New', Courier, monospace; */
-  /* Docfx-based font */
-  /* font-family: "Segoe UI",SegoeUI,Helvetica Neue,Helvetica,Arial,sans-serif; */
-  opacity: 1;
-}
- 
