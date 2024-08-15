@@ -11,6 +11,7 @@
   --sl-color-gray-5: #353841;
   --sl-color-gray-6: #24272f;
   --sl-color-black: #17181c;
+  --sl-content-width: 70rem;
 }
 /* Light mode colors. */
 :root[data-theme="light"] {
@@ -53,3 +54,11 @@ p {
   text-align: justify;
   text-justify: inter-word;
 }
+
+
+/* .sl-markdown-content code:not(:where(.not-content *)) {
+  background-color: #d1e3ee;
+  margin-block: -0.125rem;
+  padding: 0.125rem 0.375rem;
+  font-size: var(--sl-text-code-sm);
+} */
