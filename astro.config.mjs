@@ -33,20 +33,33 @@ export default defineConfig({
       }
     },
     {
-      label: "REST Resources",
-      items: [{
-        label: "Resource Design",
-        link: "/resources/resources"
-      }, {
-        label: "Collection Resources",
-        link: "/resources/collection-resources"
-      }, {
-        label: "Sub-Resources",
-        link: "/resources/relationships-and-sub-resources"
-      }, {
-        label: "Composite Resource",
-        link: "/resources/composite-resource"
-      }]
+      label: "RESTFul Web Services",
+      items: [
+        {
+          label: "Resource Design",
+          link: "/resources/resources"
+        },
+        {
+          label: "Collection Resources",
+          link: "/resources/collection-resources"
+        },
+        {
+          label: "Sub-Resources",
+          link: "/resources/relationships-and-sub-resources"
+        },
+        {
+          label: "Composite Resource",
+          link: "/resources/composite-resource"
+        },
+        {
+          label: "REST features",
+          link: "/resources/rest-features"
+        },
+        {
+          label: "REST vs SOAP",
+          link: "/resources/rest-vs-soap"
+        }
+      ]
     },
     {
       label: "Implementation",
