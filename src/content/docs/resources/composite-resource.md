@@ -3,11 +3,13 @@ title: Composite Resource
 description: Introducing composite resources
 ---
 
+## ℹ What is a composite resource?
+
 In RESTful web services, a composite resource refers to a resource that is a combination of multiple other resources. This is useful when you need to aggregate data from different sources into a single cohesive response. A composite resource allows you to present a unified interface to the client while fetching and combining data from various remote APIs behind the scenes.
 
 Composite resources are essentially a way to aggregate and present data from multiple endpoints in a cohesive manner.
 
-### Example Scenario
+## 🤖 Example Scenario
 
 Imagine an online travel booking service that provides information about flights, hotels, and car rentals. Each of these services could be managed by different APIs:
 
@@ -17,7 +19,7 @@ Imagine an online travel booking service that provides information about flights
 
 A composite resource could be created to offer a unified search feature, allowing users to find flights, hotels, and car rentals in a single query. Here's how it might work:
 
-### Aggregating Data Example
+## 🧪 Aggregating Data Example
 
 1. **Composite Resource Endpoint**: `/api/v1/travel-options`
 
@@ -88,4 +90,8 @@ A composite resource could be created to offer a unified search feature, allowin
    }
    ```
 
-In this example, the client benefits from a simplified interface (one endpoint to call) and a comprehensive response, while the server handles the complexity of interacting with multiple APIs and aggregating the data. This approach is common in applications that need to combine information from various services, providing a seamless user experience.
+:::note
+In this example, the client benefits from a simplified interface (one endpoint to call) and a comprehensive response, while the server handles the complexity of interacting with multiple APIs and aggregating the data.
+
+This approach is common in applications that need to combine information from various services, providing a seamless user experience.
+:::

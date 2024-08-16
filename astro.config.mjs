@@ -1,5 +1,5 @@
-import { defineConfig } from "astro/config";
 import starlight from "@astrojs/starlight";
+import { defineConfig } from "astro/config";
 
 import mdx from "@astrojs/mdx";
 
@@ -13,24 +13,26 @@ export default defineConfig({
       github: "https://github.com/frostybee/ws-course"
     },
     customCss: [
-    // Relative path to your custom CSS file
-    "./src/styles/custom.css"],
+      // Relative path to your custom CSS file
+      "./src/styles/custom.css"],
     // Set English as the default language for this site.
     defaultLocale: "en",
     sidebar: [{
       label: "Guides",
       items: [
-      // Each item here is one entry in the navigation menu.
-      {
-        label: "Information",
-        link: "/guides/"
-      }]
-    }, {
+        // Each item here is one entry in the navigation menu.
+        {
+          label: "Information",
+          link: "/guides/"
+        }]
+    },
+    {
       label: "Lectures",
       autogenerate: {
         directory: "lectures"
       }
-    }, {
+    },
+    {
       label: "REST Resources",
       items: [{
         label: "Resource Design",
@@ -45,20 +47,32 @@ export default defineConfig({
         label: "Composite Resource",
         link: "/resources/composite-resource"
       }]
-    }, {
+    },
+    {
+      label: "Implementation",
+      items: [
+        {
+          label: "Result Pattern",
+          link: "/implementation/result-pattern"
+        },
+      ]
+    },
+    {
       label: "HTTP",
       autogenerate: {
         directory: "http"
       }
-    }, {
+    },
+    {
       label: "Extra",
       items: [
-      // Each item here is one entry in the navigation menu.
-      {
-        label: "Public API",
-        link: "/extra/public-apis"
-      }]
-    }, {
+        // Each item here is one entry in the navigation menu.
+        {
+          label: "Public API",
+          link: "/extra/public-apis"
+        }]
+    },
+    {
       label: "Reference",
       autogenerate: {
         directory: "reference"
