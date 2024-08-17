@@ -1,9 +1,12 @@
 ---
-title: REST Features
+title: Features of REST-Based Web Services
 description: Features of REST-based Web Service
 ---
+:::note
+A RESTful API (Representational State Transfer Application Programming Interface) is a popular architectural style for designing networked applications.
+:::
 
-A RESTful API (Representational State Transfer Application Programming Interface) is a popular architectural style for designing networked applications. Here are some of the key features and principles that characterize RESTful APIs:
+✔ Here are some of the **key features** and principles that characterize RESTful APIs:
 
 1. **Statelessness**: Each request from a client to the server must contain all the information the server needs to fulfill the request. The server does not store any state about the client session between requests. This ensures that each request is independent and can be processed in isolation.
 
@@ -24,7 +27,7 @@ A RESTful API (Representational State Transfer Application Programming Interface
 
 8. **Stateless Communication**: Each request from a client to a server must contain all necessary information for the server to fulfill the request, including authentication details if required. This ensures that the server does not need to retain information about the client's state between requests.
 
-9. **Resource-Based**: RESTful APIs are centered around resources, which are identified by URIs. Resources represent entities or objects in the system, and interactions with these resources are performed using standard HTTP methods:
+9. **Resource-Based**: RESTful APIs are centered around resources, which are identified by URIs. Resources represent entities or objects in the system, and interactions with these resources are performed using **standard HTTP methods**:
 
     - **GET**: Retrieve a resource or a collection of resources.
     - **POST**: Create a new resource.
@@ -36,6 +39,8 @@ A RESTful API (Representational State Transfer Application Programming Interface
 :::note
 These features collectively contribute to the scalability, performance, and ease of use of RESTful APIs.
 :::
+
+## 📈 Benefits of Each Feature
 
 The below table summarizes the key benefits associated with each feature of a RESTful API.
 

@@ -63,6 +63,11 @@ export default defineConfig({
           label: "SOAP Web Services",
           link: "/rest/soap"
         }
+        ,
+        {
+          label: "Load Balancer",
+          link: "/rest/load-balancer"
+        }
       ]
     },
     {
