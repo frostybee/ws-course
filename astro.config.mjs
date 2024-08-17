@@ -37,27 +37,31 @@ export default defineConfig({
       items: [
         {
           label: "Resource Design",
-          link: "/resources/resources"
+          link: "/rest/resources"
         },
         {
           label: "Collection Resources",
-          link: "/resources/collection-resources"
+          link: "/rest/collection-resources"
         },
         {
           label: "Sub-Resources",
-          link: "/resources/relationships-and-sub-resources"
+          link: "/rest/relationships-and-sub-resources"
         },
         {
           label: "Composite Resource",
-          link: "/resources/composite-resource"
+          link: "/rest/composite-resource"
         },
         {
           label: "REST features",
-          link: "/resources/rest-features"
+          link: "/rest/rest-features"
         },
         {
           label: "REST vs SOAP",
-          link: "/resources/rest-vs-soap"
+          link: "/rest/rest-vs-soap"
+        },
+        {
+          label: "SOAP Web Services",
+          link: "/rest/soap"
         }
       ]
     },

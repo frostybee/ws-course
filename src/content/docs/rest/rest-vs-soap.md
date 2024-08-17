@@ -3,7 +3,9 @@ title: REST vs SOAP Web Services
 description: A comparison between REST and SOAP Web Services
 ---
 
-> RESTful Web Services and SOAP (Simple Object Access Protocol) Web Services are two different approaches for web service communication, each with its own strengths.
+RESTful Web Services and SOAP (Simple Object Access Protocol) Web Services are two different approaches for web service communication, each with its own strengths.
+
+## 👩‍💻 Why Using RESTFul Web Services?
 
 Here are **some benefits** of RESTful Web Services over SOAP Web Services:
 
