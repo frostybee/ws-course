@@ -14,19 +14,24 @@ A RESTful API (Representational State Transfer Application Programming Interface
 
 3. **Client-Server Architecture**: The API follows a client-server model, where the client and server are separate entities. The client is responsible for the user interface and user experience, while the server is responsible for data storage and business logic. This separation allows for the development of client and server components independently.
 
-4. **Layered System**: A RESTful API can be composed of multiple layers, each with specific responsibilities. For example, there might be intermediary layers such as load balancers, caches, or gateways between the client and server. This layering can enhance scalability and security by isolating different concerns.
+4. **Resource Representation**: Resources are typically represented in a format such as JSON or XML. Clients can request different representations of a resource (e.g., JSON or XML) based on their needs, using HTTP content negotiation.
 
-5. **Cacheability**: Responses from the server should explicitly indicate whether they are cacheable or not. Proper use of caching can improve performance by reducing the need to repeatedly fetch the same data from the server. HTTP headers like `Cache-Control` and `Expires` are commonly used to manage caching.
+5. **Content Negotiation**: Allows clients and servers to agree on the format of the response data. It involves the client indicating its preferred media types (formats) for the response, and the server selecting one of these formats based on the client’s preferences and its own capabilities.
 
-6. **Stateless Communication**: Each request from a client to a server must contain all necessary information for the server to fulfill the request, including authentication details if required. This ensures that the server does not need to retain information about the client's state between requests.
+6. **Layered System**: A RESTful API can be composed of multiple layers, each with specific responsibilities. For example, there might be intermediary layers such as load balancers, caches, or gateways between the client and server. This layering can enhance scalability and security by isolating different concerns.
 
-7. **Resource-Based**: RESTful APIs are centered around resources, which are identified by URIs. Resources represent entities or objects in the system, and interactions with these resources are performed using standard HTTP methods:
-   - **GET**: Retrieve a resource or a collection of resources.
-   - **POST**: Create a new resource.
-   - **PUT**: Update an existing resource.
-   - **DELETE**: Remove a resource.
+7. **Cacheability**: Responses from the server should explicitly indicate whether they are cacheable or not. Proper use of caching can improve performance by reducing the need to repeatedly fetch the same data from the server. HTTP headers like `Cache-Control` and `Expires` are commonly used to manage caching.
 
-8. **Hypermedia as the Engine of Application State (HATEOAS)**: Although not always fully implemented, RESTful APIs often incorporate hypermedia links in responses to guide clients through available actions and interactions with resources. This enables clients to dynamically navigate the API based on the current state of the application.
+8. **Stateless Communication**: Each request from a client to a server must contain all necessary information for the server to fulfill the request, including authentication details if required. This ensures that the server does not need to retain information about the client's state between requests.
+
+9. **Resource-Based**: RESTful APIs are centered around resources, which are identified by URIs. Resources represent entities or objects in the system, and interactions with these resources are performed using standard HTTP methods:
+
+    - **GET**: Retrieve a resource or a collection of resources.
+    - **POST**: Create a new resource.
+    - **PUT**: Update an existing resource.
+    - **DELETE**: Remove a resource.
+
+10. **Hypermedia as the Engine of Application State (HATEOAS)**: Although not always fully implemented, RESTful APIs often incorporate hypermedia links in responses to guide clients through available actions and interactions with resources. This enables clients to dynamically navigate the API based on the current state of the application.
 
 :::note
 These features collectively contribute to the scalability, performance, and ease of use of RESTful APIs.
