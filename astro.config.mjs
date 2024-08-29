@@ -40,7 +40,7 @@ export default defineConfig({
         },
         components: {
           Header: './src/components/docs/Header.astro',
-          PageSidebar: './src/components/docs/PageSidebar.astro',
+          // PageSidebar: './src/components/docs/PageSidebar.astro',
           PageTitle: './src/components/docs/PageTitle.astro',
         },
         // Set English as the default language for this site.
