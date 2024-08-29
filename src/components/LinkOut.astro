@@ -1,7 +1,7 @@
 ---
 const { href, withIcon = true } = Astro.props;
 ---
-{withIcon ? 
+{withIcon ?
   <a
     href={href}
     target="_blank"
@@ -9,7 +9,7 @@ const { href, withIcon = true } = Astro.props;
     class="icon"
   >
     <slot />
-  </a> : 
+  </a> :
   <a
     href={href}
     target="_blank"

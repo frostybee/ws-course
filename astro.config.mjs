@@ -9,124 +9,129 @@ export default defineConfig({
   site: "https://frostybee.github.io",
   base: "/ws-course",
   integrations: [
-   starlight({
-    title: "420-511-VA Web Services",
-    description: "Material website for the Web Services course",
-    social: {
-      github: "https://github.com/frostybee/ws-course"
-    },
-    customCss: [
-      // Relative path to your custom CSS file
-      // "./src/styles/custom/custom.css",
-       "./src/styles/custom/ilf-docs.css",
-      // './node_modules/@interledger/docs-design-system/src/styles/ilf-docs.css'
-      // "./src/styles/centered_layout.css",
-      // "./src/styles/orange-theme.css",
-      // "./src/styles/style_overrides.css"
-
-    ],
-    plugins: [
-      starlightLinksValidator({
-        errorOnFallbackPages: false,
-        exclude: ['/prob-revshare'],
-      }),
-    ],
-    expressiveCode: {
-      styleOverrides: {
-        borderColor: 'transparent',
-        borderRadius: 'var(--border-radius)',
-      }
-    },
-     components: {
-        Header: './src/components/docs/Header.astro',
-        PageSidebar: './src/components/docs/PageSidebar.astro',
-        PageTitle: './src/components/docs/PageTitle.astro',
-      },
-    // Set English as the default language for this site.
-    defaultLocale: "en",
-    sidebar: [
+    starlight(
       {
-      label: "Guides",
-      items: [
-        // Each item here is one entry in the navigation menu.
-        {
-          label: "Information",
-          link: "/guides/"
-        }]
-    },
-    {
-      label: "Lectures",
-      autogenerate: {
-        directory: "lectures"
-      }
-    },
-    {
-      label: "RESTFul Web Services",
-      items: [
-        {
-          label: "Resource Design",
-          link: "/rest/resources"
+        title: "420-511-VA Web Services",
+        description: "Material website for the Web Services course",
+        social: {
+          github: "https://github.com/frostybee/ws-course"
         },
-        {
-          label: "Collection Resources",
-          link: "/rest/collection-resources"
+        customCss: [
+          // Relative path to your custom CSS file
+          // "./src/styles/custom/custom.css",
+          "./src/styles/custom/ilf-docs.css",
+          // './node_modules/@interledger/docs-design-system/src/styles/ilf-docs.css'
+          // "./src/styles/centered_layout.css",
+          // "./src/styles/orange-theme.css",
+          // "./src/styles/style_overrides.css"
+
+        ],
+        plugins: [
+          starlightLinksValidator({
+            errorOnFallbackPages: false,
+            exclude: ['/prob-revshare'],
+          }),
+        ],
+        expressiveCode: {
+          styleOverrides: {
+            borderColor: 'transparent',
+            borderRadius: 'var(--border-radius)',
+          }
         },
-        {
-          label: "Sub-Resources",
-          link: "/rest/relationships-and-sub-resources"
+        components: {
+          Header: './src/components/docs/Header.astro',
+          PageSidebar: './src/components/docs/PageSidebar.astro',
+          PageTitle: './src/components/docs/PageTitle.astro',
         },
-        {
-          label: "Composite Resource",
-          link: "/rest/composite-resource"
-        },
-        {
-          label: "REST features",
-          link: "/rest/rest-features"
-        },
-        {
-          label: "REST vs SOAP",
-          link: "/rest/rest-vs-soap"
-        },
-        {
-          label: "SOAP Web Services",
-          link: "/rest/soap"
-        }
-        ,
-        {
-          label: "Load Balancer",
-          link: "/rest/load-balancer"
-        }
-      ]
-    },
-    {
-      label: "Implementation",
-      items: [
-        {
-          label: "Result Pattern",
-          link: "/implementation/result-pattern"
-        },
-      ]
-    },
-    {
-      label: "HTTP",
-      autogenerate: {
-        directory: "http"
-      }
-    },
-    {
-      label: "Extra",
-      items: [
-        // Each item here is one entry in the navigation menu.
-        {
-          label: "Public API",
-          link: "/extra/public-apis"
-        }]
-    },
-    {
-      label: "Reference",
-      autogenerate: {
-        directory: "reference"
-      }
-    }]
-  }), mdx()]
+        // Set English as the default language for this site.
+        defaultLocale: "en",
+        sidebar: [
+          {
+            label: "Guides",
+            items: [
+              // Each item here is one entry in the navigation menu.
+              {
+                label: "Information",
+                link: "/guides/"
+              }]
+          },
+          {
+            label: "Lectures",
+            autogenerate: {
+              directory: "lectures"
+            }
+          },
+          {
+            label: "RESTFul Web Services",
+            collapsed: true,
+            items: [
+              {
+                label: "Resource Design",
+                link: "/rest/resources"
+              },
+              {
+                label: "Collection Resources",
+                link: "/rest/collection-resources"
+              },
+              {
+                label: "Sub-Resources",
+                link: "/rest/relationships-and-sub-resources"
+              },
+              {
+                label: "Composite Resource",
+                link: "/rest/composite-resource"
+              },
+              {
+                label: "REST features",
+                link: "/rest/rest-features"
+              },
+              {
+                label: "REST vs SOAP",
+                link: "/rest/rest-vs-soap"
+              },
+              {
+                label: "SOAP Web Services",
+                link: "/rest/soap"
+              }
+              ,
+              {
+                label: "Load Balancer",
+                link: "/rest/load-balancer"
+              }
+            ]
+          },
+          {
+            label: "Implementation",
+            items: [
+              {
+                label: "Result Pattern",
+                link: "/implementation/result-pattern"
+              },
+            ]
+          },
+          {
+            label: "HTTP",
+            autogenerate: {
+              directory: "http"
+            }
+          },
+          {
+            label: "Extra",
+            items: [
+              // Each item here is one entry in the navigation menu.
+              {
+                label: "Public API",
+                link: "/extra/public-apis"
+              }]
+          },
+          {
+            label: "Reference",
+            autogenerate: {
+              directory: "reference"
+            }
+          }]
+      }),
+    mdx(),
+    react()
+  ]
 });
