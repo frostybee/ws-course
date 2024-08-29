@@ -18,20 +18,13 @@ export default defineConfig({
         },
         customCss: [
           // Relative path to your custom CSS file
-          // "./src/styles/custom/custom.css",
-          "./src/styles/custom/ilf-docs.css",
-          // './node_modules/@interledger/docs-design-system/src/styles/ilf-docs.css'
-          // "./src/styles/centered_layout.css",
-          // "./src/styles/orange-theme.css",
-          // "./src/styles/style_overrides.css"
-
+          "./src/styles/custom_styles.css",
         ],
-        plugins: [
-          starlightLinksValidator({
-            errorOnFallbackPages: false,
-            exclude: ['/prob-revshare'],
-          }),
-        ],
+        // plugins: [
+        //   starlightLinksValidator({
+        //     errorOnFallbackPages: false,
+        //   }),
+        // ],
         expressiveCode: {
           styleOverrides: {
             borderColor: 'transparent',
