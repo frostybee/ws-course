@@ -1,23 +1,51 @@
 import starlight from "@astrojs/starlight";
 import { defineConfig } from "astro/config";
-
+import react from '@astrojs/react'
 import mdx from "@astrojs/mdx";
+import starlightLinksValidator from 'starlight-links-validator'
 
 // https://astro.build/config
 export default defineConfig({
   site: "https://frostybee.github.io",
   base: "/ws-course",
-  integrations: [starlight({
+  integrations: [
+   starlight({
     title: "420-511-VA Web Services",
+    description: "Material website for the Web Services course",
     social: {
       github: "https://github.com/frostybee/ws-course"
     },
     customCss: [
       // Relative path to your custom CSS file
-      "./src/styles/custom.css"],
+      // "./src/styles/custom/custom.css",
+       "./src/styles/custom/ilf-docs.css",
+      // './node_modules/@interledger/docs-design-system/src/styles/ilf-docs.css'
+      // "./src/styles/centered_layout.css",
+      // "./src/styles/orange-theme.css",
+      // "./src/styles/style_overrides.css"
+
+    ],
+    plugins: [
+      starlightLinksValidator({
+        errorOnFallbackPages: false,
+        exclude: ['/prob-revshare'],
+      }),
+    ],
+    expressiveCode: {
+      styleOverrides: {
+        borderColor: 'transparent',
+        borderRadius: 'var(--border-radius)',
+      }
+    },
+     components: {
+        Header: './src/components/docs/Header.astro',
+        PageSidebar: './src/components/docs/PageSidebar.astro',
+        PageTitle: './src/components/docs/PageTitle.astro',
+      },
     // Set English as the default language for this site.
     defaultLocale: "en",
-    sidebar: [{
+    sidebar: [
+      {
       label: "Guides",
       items: [
         // Each item here is one entry in the navigation menu.

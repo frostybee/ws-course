@@ -2,7 +2,6 @@
 title: Resources-Oriented Design
 description: Resource-oriented design
 ---
-
 The fundamental concept in any RESTful API is the ***resource***. One of the first steps in developing a RESTful Web service is designing the resource model.
 The resource model identifies and classifies all the resources the client uses to interact with the service.
 
