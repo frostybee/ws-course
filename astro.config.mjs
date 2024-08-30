@@ -56,7 +56,6 @@ export default defineConfig({
           },
           {
             label: "RESTFul Web Services",
-            collapsed: true,
             items: [
               {
                 label: "Resource Design",

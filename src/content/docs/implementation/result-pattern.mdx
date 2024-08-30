@@ -3,6 +3,9 @@ title: The Result Pattern
 description: Implementing the Result Pattern in PHP.
 ---
 import { Steps, Aside } from '@astrojs/starlight/components';
+import  CodeBlock  from "../../../components/CodeBlock.astro";
+import ExternalLink from "../../../components/ExternalLink.astro";
+
 
 ## ℹ What is the Result Pattern?
 
@@ -53,21 +56,20 @@ The Result pattern provides a good alternative to exceptions for handling predic
 </Aside>
 
 ## 🚀 Using the Result Pattern in PHP 
-
+ 
 <Steps>
 
-1. **Define the Result Class**
-
+1. <CodeBlock title=" Create a the following PHP class">
     ```php
     <?php
     class Result
     {
-        private $isSuccess;
+        private $is_success;
         private $data;
         private $error;
-        private function __construct(bool $isSuccess, $data = null, $error = null)
+        private function __construct(bool $is_success, $data = null, $error = null)
         {
-            $this->isSuccess = $isSuccess;
+            $this->is_success = $is_success;
             $this->data = $data;
             $this->error = $error;
         }
@@ -84,12 +86,12 @@ The Result pattern provides a good alternative to exceptions for handling predic
 
         public function isSuccess(): bool
         {
-            return $this->isSuccess;
+            return $this->is_success;
         }
 
         public function getData()
         {
-            if (!$this->isSuccess) {
+            if (!$this->is_success) {
                 throw new Exception("Cannot get data from a failed result.");
             }
             return $this->data;
@@ -97,7 +99,7 @@ The Result pattern provides a good alternative to exceptions for handling predic
 
         public function getError()
         {
-            if ($this->isSuccess) {
+            if ($this->is_success) {
                 throw new Exception("Cannot get error from a successful result.");
             }
             return $this->error;
@@ -106,9 +108,9 @@ The Result pattern provides a good alternative to exceptions for handling predic
     ?>
     ```
 
-2. **Use the Result Class**
+    </CodeBlock>
 
-    **Example #1**
+2. <CodeBlock title="Using the Result pattern: Example #1">
 
     ```php
     <?php
@@ -140,8 +142,8 @@ The Result pattern provides a good alternative to exceptions for handling predic
     }
     ?>
     ```
-    **Example #2**
-
+    </CodeBlock>        
+3. <CodeBlock title="Using the Result pattern: Example #2">
     ```php
     // Example function: Retrieve user data by ID from database
     function getUserData($userId) {
@@ -176,5 +178,5 @@ The Result pattern provides a good alternative to exceptions for handling predic
     }
     ?>
     ```
-
+    </CodeBlock>
 </Steps>

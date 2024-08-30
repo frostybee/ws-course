@@ -255,6 +255,10 @@
 }
 
 /* Element spacing styles */
+.content-panel:where(.astro-qhy5epp2)+.content-panel:where(.astro-qhy5epp2) {
+  /* border-top: 1px solid var(--sl-color-hairline) */
+}
+
 .sl-banner + .content-panel,
 .content-panel:first-of-type {
   padding: var(--space-m) var(--space-l) 0 var(--space-l);
@@ -263,6 +267,8 @@
 .content-panel + .content-panel {
   border-block-start: 0;
   padding: var(--space-m) var(--space-l);
+  border-top: 1px solid var(--sl-color-hairline);
+  border-right: 1px solid var(--sl-color-hairline);
 }
 
 .sl-markdown-content.sl-markdown-content
