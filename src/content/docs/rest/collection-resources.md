@@ -32,7 +32,7 @@ GET /{namespace}/{version}/{resource}
 ##### Example Response
 
 HAL response format
-
+```json
 	{
 	  "_links":
 		{
@@ -66,7 +66,8 @@ HAL response format
 	      }
 	    ]
 	  }
-	}
+	}    
+```
 
 
 
@@ -96,6 +97,7 @@ In scenarios where this data might be used as a subordinate to other data, immut
 
 ##### Example Response
 
+```json
 	{
 	  "_links":
 		{
@@ -104,7 +106,7 @@ In scenarios where this data might be used as a subordinate to other data, immut
 	  "id": "BE14A7269802498F992813885546D058",
 	  "name": "Mustermann"
 	}
-
+```
 
 ##### HTTP Status
 
@@ -114,21 +116,23 @@ If the provided resource identifier is not found, responds `404 Not Found` HTTP 
 
 Updates a single resource. The shape of the PUT request should maintain parity with the GET response for the selected resource. Fields in the request body can be optional or ignored during deserialization, such as `create_time` or other system-calculated values.
 
-##### URI Template
+### URI Template
 
-	PUT /{namespace}/{version}/{resource}/{resource-id}
+```bat
+PUT /{namespace}/{version}/{resource}/{resource-id}
+```
 
+#### Example Request
 
-##### Example Request
+```json
+PUT /user_management/v1/users/BE14A7269802498F992813885546D058
+{
+    "id": "BE14A7269802498F992813885546D058",
+    "name": "Changed Name"
+}
+```
 
-	PUT /user_management/v1/users/BE14A7269802498F992813885546D058
-	{
-	  "id": "BE14A7269802498F992813885546D058",
-	  "name": "Changed Name"
-	}
-
-
-##### HTTP Status
+#### HTTP Status
 
 Any failed request validation responds `400 Bad Request` HTTP status. If clients attempt to modify read-only fields, this is also a `400 Bad Request`.
 
@@ -214,17 +218,19 @@ Note that server-generated values are not provided in the request.
 
 ##### Example Response
 
-	201 Created
-	Location: http://api.haufe-lexware.com/user_management/v1/users/E75E30C0607446219C6EA31735C691B9
+```json
+201 Created
+Location: http://api.haufe-lexware.com/user_management/v1/users/E75E30C0607446219C6EA31735C691B9
 
-	{
-	  "_links":
-		{
-	    "self": { "href": "{baseurl}/users/E75E30C0607446219C6EA31735C691B9" },
-	  }
-	  "id": "E75E30C0607446219C6EA31735C691B9",
-	  "name": "MyName123"
-	}
+{
+    "_links":
+    {
+    "self": { "href": "{baseurl}/users/E75E30C0607446219C6EA31735C691B9" },
+    }
+    "id": "E75E30C0607446219C6EA31735C691B9",
+    "name": "MyName123"
+}
+```
 
 ### Create New Resource - Consumer Supplied Identifier
 
