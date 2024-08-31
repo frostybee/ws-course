@@ -1,6 +1,9 @@
 ---
 title: Load Balancer
 description: Using load balancers in the context of RESTFul Web services
+sidebar:
+    label: "Load Balancing"
+    order: 9
 ---
 
 ## ℹ What Is a Load Balancer?

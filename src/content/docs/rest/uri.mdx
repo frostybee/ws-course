@@ -1,0 +1,112 @@
+---
+title: Uniform Resource Identifier
+description: What is a URI?
+sidebar:
+    label: "URI"
+    order: 7
+---
+import LinkOut from '../../../components/LinkOut.astro'
+
+# What is a URI?
+
+A URI, or Uniform Resource Identifier, is defined in the RFC (Request for Comments) documents, specifically <LinkOut href='https://www.rfc-editor.org/rfc/rfc3986'>RFC 3986</LinkOut>. In the context of RFC 3986, a URI is a string of characters used to identify a **resource**. The key idea is that a URI provides a way to uniquely specify the location or identity of a **resource**, so that it can be retrieved or interacted with.
+
+## Structure of a URI (as defined in <LinkOut href='https://www.rfc-editor.org/rfc/rfc3986'>RFC 3986</LinkOut>)
+
+1. **Scheme**: This specifies the protocol or method used to access the resource. Common schemes include `http`, `https`, `ftp`, `mailto`, etc. For example, in `http://example.com`, `http` is the scheme.
+
+2. **Authority**: This includes the domain name (or IP address) and optional port number of the server hosting the resource. The authority is typically composed of:
+   - **Host**: The domain name or IP address (e.g., `example.com`).
+   - **Port**: An optional port number that specifies a specific port on the server (e.g., `:8080`).
+
+3. **Path**: This specifies the location of the resource on the server. It often resembles a file path on a server or a structured directory. For example, in `/path/to/resource`, `/path/to/resource` is the path.
+
+4. **Query**: This is an optional part of the URI that provides additional parameters or data to the server. It starts with a `?` and includes key-value pairs separated by `&`. For example, `?key=value&anotherkey=anothervalue`.
+
+5. **Fragment**: This is an optional part that refers to a specific section or fragment of the resource. It starts with a `#`. For example, `#section2` might refer to a particular section within a webpage.
+
+:::note
+According to RFC 3986, a URI is a generic term for all types of names and addresses that refer to resources on the internet. The specification defines how URIs are constructed, parsed, and used, ensuring consistent and interoperable identification of resources.
+:::
+
+## Example URI and Breakdown
+
+Consider the URI: `https://www.example.com:8080/path/to/resource?query=example#section1`
+
+- **Scheme**: `https`
+- **Authority**: `www.example.com:8080`
+  - **Host**: `www.example.com`
+  - **Port**: `8080`
+- **Path**: `/path/to/resource`
+- **Query**: `query=example`
+- **Fragment**: `section1`
+
+## Examples of Various Schemes
+
+A URI (Uniform Resource Identifier) can use various schemes, each of which is associated with a specific protocol or method for accessing resources. These schemes are the "protocols" supported by URIs. 
+
+:::tip
+The following **schemes** enable URIs to point to a wide range of resources and support various types of interactions. Each scheme has its own specific syntax and requirements for the URI structure.
+:::
+
+Here are some of the common protocols supported by URIs:
+
+### 1. **HTTP (Hypertext Transfer Protocol)**
+   - **Scheme**: `http`
+   - **Example**: `http://www.example.com`
+   - **Description**: Used for accessing web pages and resources over the web.
+
+### 2. **HTTPS (HTTP Secure)**
+   - **Scheme**: `https`
+   - **Example**: `https://www.example.com`
+   - **Description**: A secure version of HTTP that uses encryption (SSL/TLS) to protect data transmitted between the client and server.
+
+### 3. **FTP (File Transfer Protocol)**
+   - **Scheme**: `ftp`
+   - **Example**: `ftp://ftp.example.com/file.txt`
+   - **Description**: Used for transferring files between computers on a network.
+
+### 4. **FTPS (FTP Secure)**
+   - **Scheme**: `ftps`
+   - **Example**: `ftps://ftp.example.com/file.txt`
+   - **Description**: An extension of FTP that uses SSL/TLS for secure communication.
+
+### 5. **SFTP (SSH File Transfer Protocol)**
+   - **Scheme**: `sftp`
+   - **Example**: `sftp://user@host:/path/to/file`
+   - **Description**: A secure file transfer protocol that operates over SSH (Secure Shell).
+
+### 6. **SMTP (Simple Mail Transfer Protocol)**
+   - **Scheme**: `smtp`
+   - **Example**: `smtp://mail.example.com`
+   - **Description**: Used for sending emails.
+
+### 7. **IMAP (Internet Message Access Protocol)**
+   - **Scheme**: `imap`
+   - **Example**: `imap://mail.example.com`
+   - **Description**: Used for accessing and managing emails on a mail server.
+
+### 8. **POP (Post Office Protocol)**
+   - **Scheme**: `pop`
+   - **Example**: `pop://mail.example.com`
+   - **Description**: Used for retrieving emails from a mail server.
+
+### 9. **MAILTO (Email Address)**
+   - **Scheme**: `mailto`
+   - **Example**: `mailto:someone@example.com`
+   - **Description**: Used to create email messages.
+   
+### 10. **TEL (Telephone Number)**
+   - **Scheme**: `tel`
+   - **Example**: `tel:+1234567890`
+   - **Description**: Used to specify telephone numbers.
+
+### 11. **DATA (Data URLs)**
+   - **Scheme**: `data`
+   - **Example**: `data:text/plain;base64,SGVsbG8sIFdvcmxkIQ==`
+   - **Description**: Used to include data directly in the URI itself (e.g., small data items).
+   
+### 12. **URN (Uniform Resource Name)**
+   - **Scheme**: `urn`
+   - **Example**: `urn:isbn:0451450523`
+   - **Description**: Used to identify resources by name in a specific namespace, rather than by location.

@@ -1,7 +1,11 @@
 ---
 title: Composite Resource
 description: Introducing composite resources
+sidebar:
+    label: "Composite Resource"
+    order: 4
 ---
+import  CodeBlock  from "../../../components/CodeBlock.astro";
 
 ## ℹ What is a composite resource?
 
@@ -41,6 +45,8 @@ A composite resource could be created to offer a unified search feature, allowin
 
    - The aggregated data is returned to the client as a single JSON response, which could look something like this:
 
+  <CodeBlock title="Example of a composite resource representation:">
+  
    ```json
    {
      "flights": [
@@ -89,6 +95,7 @@ A composite resource could be created to offer a unified search feature, allowin
      ]
    }
    ```
+   </CodeBlock>
 
 :::note
 In this example, the client benefits from a simplified interface (one endpoint to call) and a comprehensive response, while the server handles the complexity of interacting with multiple APIs and aggregating the data.

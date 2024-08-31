@@ -1,6 +1,9 @@
 ---
 title: Relationships and Sub-Resources
 description: Resource-oriented design
+sidebar:
+    label: "Sub Resources"
+    order: 3
 ---
 
 A resource is the fundamental unit in RESTful API design. Resources model objects from the application data model.

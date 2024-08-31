@@ -1,6 +1,9 @@
 ---
 title: Collection Resources
 description: Resource-oriented design
+sidebar:
+    label: "Collection Resource"
+    order: 2
 ---
 
 A list of all of the given resources, including any related metadata. Array of resources should be in the `_embedded` field. Fields like `total_items` and `total_pages` help provide context to paged results. Consistent naming of collection resource fields allow API clients to create generic handling for using the provided data across various resource collections.

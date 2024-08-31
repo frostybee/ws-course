@@ -70,41 +70,9 @@ export default defineConfig({
           },
           {
             label: "RESTFul Web Services",
-            items: [
-              {
-                label: "Resource Design",
-                link: "/rest/resources"
-              },
-              {
-                label: "Collection Resources",
-                link: "/rest/collection-resources"
-              },
-              {
-                label: "Sub-Resources",
-                link: "/rest/relationships-and-sub-resources"
-              },
-              {
-                label: "Composite Resource",
-                link: "/rest/composite-resource"
-              },
-              {
-                label: "REST features",
-                link: "/rest/rest-features"
-              },
-              {
-                label: "REST vs SOAP",
-                link: "/rest/rest-vs-soap"
-              },
-              {
-                label: "SOAP Web Services",
-                link: "/rest/soap"
-              }
-              ,
-              {
-                label: "Load Balancer",
-                link: "/rest/load-balancer"
-              }
-            ]
+            autogenerate: {
+              directory: "rest"
+            }
           },
           {
             label: "Implementation",

@@ -1,6 +1,9 @@
 ---
 title: SOAP Web Services
 description: Advantages of using SOAP Web services
+sidebar:
+    label: "SOAP Web Services"
+    order: 7
 ---
 
 SOAP (Simple Object Access Protocol) web services offer several benefits that make them a popular choice in certain scenarios:

@@ -1,6 +1,9 @@
 ---
 title: Features of REST-Based Web Services
 description: Features of REST-based Web Service
+sidebar:
+    label: "REST Features"
+    order: 5
 ---
 :::note
 A RESTful API (Representational State Transfer Application Programming Interface) is a popular architectural style for designing networked applications.
