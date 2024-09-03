@@ -65,9 +65,9 @@
   font-size: var(--sl-text-body);
 }
 
-.sl-container.sl-container {
+/* .sl-container.sl-container {
   max-width: 100%;
-}
+} */
 
 @media (min-width: 72rem) and (max-width: 80rem) {
   [data-has-sidebar] .main-frame .main-pane {
@@ -201,7 +201,8 @@
 @media (min-width: 80rem) {
   .page {
     flex-direction: row;
-    max-width: 95rem;
+    /* TODO: enable the following prop. */
+    /* max-width: 95rem; */
     margin-inline: auto;
   }
 

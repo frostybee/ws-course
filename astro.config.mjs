@@ -4,6 +4,8 @@ import react from '@astrojs/react'
 import mdx from "@astrojs/mdx";
 import starlightLinksValidator from 'starlight-links-validator'
 import starlightImageZoom from 'starlight-image-zoom'
+import starlightViewModes from 'starlight-view-modes'
+
 
 // https://astro.build/config
 export default defineConfig({
@@ -23,7 +25,8 @@ export default defineConfig({
           "./src/styles/custom_styles.css",
         ],
         plugins: [
-          starlightImageZoom()
+          starlightImageZoom(),
+          starlightViewModes()
         ],
         // plugins: [
         //   starlightLinksValidator({
