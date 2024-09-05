@@ -1,6 +1,9 @@
 ---
 title: HTTP Status Codes 
 description: A set of useful resources that helps you understand the material.
+sidebar:
+    label: "HTTP Status Codes"
+    order: 2
 ---
 
 The following table lists the HTTP response status codes for the `GET` (retrieve), `POST` (create), `PUT` (modify), and `DELETE` operations.

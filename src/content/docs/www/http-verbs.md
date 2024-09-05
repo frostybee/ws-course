@@ -1,6 +1,9 @@
 ---
 title: HTTP Verbs
 description: HTTP methods
+sidebar:
+    label: "HTTP Verbs"
+    order: 1
 ---
 
 Just like the HTTP status codes, there are many more verbs in the HTTP standard that, although they are in theory OK to use for your Web API, you can get by with just a few that helps to keep your API simple, and self-explanatory to its clients.

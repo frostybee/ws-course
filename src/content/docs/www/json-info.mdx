@@ -1,0 +1,163 @@
+---
+title: JSON
+description: JavaScript Object Notation
+---
+
+import LinkOut from '../../../components/LinkOut.astro'
+import CodeBlock from '../../../components/CodeBlock.astro'
+
+## What Is JSON?
+
+JSON, which stands for **JavaScript Object Notation**, is a lightweight data-interchange format that's easy for humans to read and write, and easy for machines to parse and generate. It's often used to transmit data between a server and a web application as text. JSON is language-independent but uses conventions that are familiar to programmers of the C family of languages, which includes JavaScript, PHP, C, C++, Java, and many others.
+
+## Key Features of JSON
+
+1. **Text-based Format**: JSON is a text format that is easy to read and write. This simplicity is one of its biggest advantages.
+
+2. **Data Interchange**: JSON is primarily used for data interchange between a client and a server. It’s commonly used in web applications to communicate with APIs and to send and receive data.
+
+3. **Language Independence**: Although JSON originates from JavaScript, it is language-agnostic. It can be used with virtually any programming language, and many languages provide libraries for parsing and generating JSON.
+
+:::note
+JSON's straightforward structure and its support across programming languages make it a popular choice for data interchange and configuration in modern software development.
+:::
+
+## JSON Data Types
+
+JSON supports the following data types:
+
+1. **String**: A sequence of characters enclosed in double quotes. Example: `"hello"`.
+2. **Number**: Numeric values can be integers or floating-point numbers. Example: `42`, `3.14`.
+3. **Object**: An unordered collection of key/value pairs. Example: `{"key": "value"}`.
+4. **Array**: An ordered list of values. Example: `[1, 2, 3]`.
+5. **Boolean**: Represents `true` or `false`.
+6. **Null**: Represents an empty value. Example: `null`.
+
+## JSON Structure
+
+JSON structures data in a **hierarchical** or a **linear** way, using two primary types:
+
+1. **Objects**:
+
+   - **Definition**: An object is a collection of key/value pairs enclosed in curly braces `{}`.
+   - **Structure**: Each key is a string (text) followed by a colon `:` and then a value. The key/value pairs are separated by commas.
+
+   <CodeBlock title="Example: A JSON object containing various JSON data types">
+     ```json
+      {
+        "stringExample": "Hello, world!",
+        "numberExample": 12345,
+        "numberExample": 3.14159,
+        "booleanExample": true,
+        "nullExample": null,
+        "objectExample": {
+          "key1": "value1",
+          "key2": 42,
+          "key3": false,
+          "nestedObject": {
+            "nestedKey1": "nestedValue1",
+            "nestedKey2": 99
+          }
+        },
+        "arrayExample": [
+          "apple",
+          "banana",
+          42,
+          {
+            "subKey1": "subValue1"
+          },
+          [1, 2, 3]
+        ]
+      }
+     ```
+     </CodeBlock>
+
+2. **Arrays**:
+
+   - **Definition**: An array is an ordered list of values enclosed in square brackets `[]`.
+   - **Structure**: The values within an array are separated by commas.
+   
+   <CodeBlock title="Example: An array containing all JSON data types">  
+
+     ```json
+     [
+       "Hello, world!", // String
+       12345, // Integer
+       3.14159, // Float
+       true, // Boolean
+       null, // Null
+       {
+         // Object
+         "key1": "value1",
+         "key2": 42,
+         "key3": false
+       },
+       [
+         // Array
+         "apple",
+         "banana",
+         42,
+         { "subKey": "subValue" },
+         [1, 2, 3] // nested array
+       ]
+     ]
+     ```
+     </CodeBlock>
+
+## Example JSON Data
+
+Here is a more complex JSON example that illustrates a structure of a JSON object:
+
+```json
+{
+  "person": {
+    "name": "Jane Doe",
+    "age": 25,
+    "address": {
+      "street": "123 Main St",
+      "city": "Anytown",
+      "zipcode": "12345"
+    },
+    "phoneNumbers": [
+      {
+        "type": "home",
+        "number": "555-1234"
+      },
+      {
+        "type": "work",
+        "number": "555-5678"
+      }
+    ]
+  }
+}
+```
+
+Here is a breakdown of the structure shown in the example above: 
+
+- **Root Object**: The root of this JSON structure is an object with a single key `"person"`.
+- **Nested Object**: The value associated with `"person"` is another object containing details like `"name"`, `"age"`, `"address"`, and `"phoneNumbers"`.
+- **Nested Object**: The `"address"` key holds another object with its own keys (`"street"`, `"city"`, `"zipcode"`).
+- **Array**: The `"phoneNumbers"` key holds an array of objects, each with its own keys (`"type"` and `"number"`).
+
+## JSON in Practice: Use Cases
+
+1. **Web Development**: JSON is extensively used in web development for exchanging data between web clients and servers. For example, AJAX requests often use JSON to send and receive data.
+
+2. **APIs**: Many web APIs provide data in JSON format. For instance, a weather API might return weather data in JSON.
+
+3. **Configuration Files**: JSON is also used for configuration files, such as `package.json` in Node.js projects, where it describes project metadata and dependencies.
+
+## Parsing and Generating JSON in JavaScript
+
+- **Parsing JSON**: parsing is a process in which JSON data is read or converted into a usable object in a programming language. For example, in JavaScript, you use `JSON.parse()`:
+  ```javascript
+  const jsonString = '{"name": "John", "age": 30}'
+  const obj = JSON.parse(jsonString)
+  console.log(obj.name) // Output: John
+  ```
+- **Generating JSON**: To convert an object into a JSON string representation, you use `JSON.stringify()`:
+  ```javascript
+  const obj = { name: 'John', age: 30 }
+  const jsonString = JSON.stringify(obj)
+  console.log(jsonString) // Output: {"name":"John","age":30}
+  ```

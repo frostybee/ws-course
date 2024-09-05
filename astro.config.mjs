@@ -66,12 +66,6 @@ export default defineConfig({
               }]
           },
           {
-            label: "Lectures",
-            autogenerate: {
-              directory: "lectures"
-            }
-          },
-          {
             label: "RESTFul Web Services",
             autogenerate: {
               directory: "rest"
@@ -87,9 +81,9 @@ export default defineConfig({
             ]
           },
           {
-            label: "HTTP",
+            label: "The World Wide",
             autogenerate: {
-              directory: "http"
+              directory: "www"
             }
           },
           {
