@@ -6,31 +6,30 @@ sidebar:
     order: 2
 ---
 
-A list of all of the given resources, including any related metadata. Array of resources should be in the `_embedded` field. Fields like `total_items` and `total_pages` help provide context to paged results. Consistent naming of collection resource fields allow API clients to create generic handling for using the provided data across various resource collections.
+## What Is a Collection Resources?
 
-The GET verb should not affect the system, and should not change response on subsequent requests (unless the underlying data changes), i.e. it should be idempotent. Exceptions to 'changing the response' are typically instrumentation/logging-related.
+In the context of RESTful web services, **collection resources** are a type of resource that represents a group of related items or entities of the same type.
 
-The list of data is presumed to be filtered based on the provided security context of the API client, this should not be a list of all resources in the domain.
+## Structure
 
-Providing a summarized, or minimized version of the data representation can reduce the bandwidth footprint, in cases where individual resources contain a large object.
+A collection resource is typically represented by a URI that points to a directory of resources. For example, `/customers` might represent a collection of customer resources.
 
 ### Resource naming
 
-Collection resource names should be plural nouns, e.g. `/users`. This helps visually disambiguate collections from singletons.
+Collection resource names should be plural nouns, e.g. `/users`. This helps visually disambiguate collections from **singletons**.
 Please have a look at [REST principles](../rest-principles/rest-principles.md) for naming Guidelines.
 
 ### Get List of resources
 
 #### URI Template
 
-``` bash
-GET /{namespace}/{version}/{resource}    
+```bash
+    GET /{namespace}/{version}/{resource}    
 ```
 
 ##### Example Request
 
 	GET /user_management/v1/users
-
 
 ##### Example Response
 
