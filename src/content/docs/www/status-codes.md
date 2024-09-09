@@ -1,10 +1,40 @@
 ---
-title: HTTP Status Codes 
+title: HTTP Status Codes for CRUD Operations
 description: A set of useful resources that helps you understand the material.
 sidebar:
     label: "HTTP Status Codes"
     order: 2
 ---
+
+## What Are HTTP Status Codes?
+
+---
+
+HTTP status codes are three-digit numbers sent by a web server in response to a client's request. They provide information about **the outcome** of the request and help determine what action should be taken next. 
+
+Here's a quick overview of the main categories:
+
+1. **Informational (100–199)**: These codes indicate that the request was received and is being processed.
+   - **100 Continue**: The initial part of the request has been received, and the client should continue with the rest of the request.
+
+2. **Success (200–299)**: These codes mean that the request was successfully received, understood, and accepted.
+   - **200 OK**: The request was successful, and the server returned the requested data.
+   - **201 Created**: The request was successful, and a new resource was created.
+
+3. **Redirection (300–399)**: These codes indicate that further action is needed to fulfill the request, usually involving a redirection.
+   - **301 Moved Permanently**: The resource has been permanently moved to a new URL.
+   - **302 Found**: The resource is temporarily located at a different URL.
+
+4. **Client Error (400–499)**: These codes indicate that there was an error with the client's request.
+   - **400 Bad Request**: The server could not understand the request due to invalid syntax.
+   - **404 Not Found**: The requested resource could not be found on the server.
+
+5. **Server Error (500–599)**: These codes indicate that the server failed to fulfill a valid request.
+   - **500 Internal Server Error**: The server encountered an unexpected condition that prevented it from fulfilling the request.
+   - **503 Service Unavailable**: The server is currently unable to handle the request due to temporary overload or maintenance.
+
+Each status code provides a specific piece of information about the response and helps both the client and server understand what happened during the request-response cycle.
+
 
 The following table lists the HTTP response status codes for the `GET` (retrieve), `POST` (create), `PUT` (modify), and `DELETE` operations.
 
