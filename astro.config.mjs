@@ -73,12 +73,10 @@ export default defineConfig({
           },
           {
             label: "Implementation",
-            items: [
-              {
-                label: "Result Pattern",
-                link: "/implementation/result-pattern"
-              },
-            ]
+            autogenerate: {
+              directory: "implementation"
+            }
+
           },
           {
             label: "The World Wide",
