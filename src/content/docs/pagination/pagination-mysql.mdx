@@ -1,0 +1,77 @@
+---
+title: Implementing Offset-Based Pagination in MySQL
+description: Implementing pagination in MySQL.
+sidebar:
+  label: 'Pagination with MySQL'
+  order: 4
+---
+import { Aside } from '@astrojs/starlight/components';
+
+In MySQL, the `OFFSET` and `LIMIT` keywords are used to control which subset of rows is returned by a `SELECT` query. These keywords are particularly useful for pagination, where you need to include a subset of rows from a larger dataset, typically in a in a REST API response with multiple pages of results. 
+
+### 1. `LIMIT` Keyword
+
+The `LIMIT` keyword is used to specify the maximum number of rows that the query should return. It can be used in **two forms**:
+
+#### 1.1. `LIMIT number`
+
+This form limits the result set to a specific number of rows from the beginning. For example:
+
+```sql
+SELECT * FROM items LIMIT 10;
+```
+
+This query will return the first 10 rows from the `items` table.
+
+#### 1.2. `LIMIT offset, number`
+
+This form allows you to specify an offset and a limit. The offset determines the starting point (i.e., the number of rows to skip), and the number specifies the number of rows to return. For example:
+
+```sql
+SELECT * FROM items LIMIT 20, 10;
+```
+
+In this query:
+- `20` is the offset, so the query will skip the first 20 rows.
+- `10` is the limit, so the query will return the next 10 rows, starting from row 21.
+
+### 2. `OFFSET` Keyword
+
+The `OFFSET` keyword is often used in conjunction with `LIMIT` to make the query more readable and flexible. It specifies the number of rows to skip before starting to return rows.
+
+The `OFFSET` keyword can be used in the following way:
+
+```sql
+SELECT * FROM items LIMIT 10 OFFSET 20;
+```
+
+This is functionally equivalent to `LIMIT 20, 10`:
+
+- `OFFSET 20` skips the first 20 rows.
+- `LIMIT 10` returns the next 10 rows.
+
+### Practical Example: Pagination
+
+Pagination often combines `LIMIT` and `OFFSET` to display results in pages. For instance, if you want to display results on pages with 10 items per page, you would calculate the **offset** based on the current page number.
+
+Assuming you are on page 3, you would calculate the offset as follows:
+
+- Items per page: 10
+- Current page: 3
+- **Offset** = (Current Page - 1) * Items per Page = (3 - 1) * 10 = 20
+
+So, you would use:
+
+```sql
+SELECT * FROM items LIMIT 10 OFFSET 20;
+```
+
+This query would return the items for the 3rd page, showing rows 21 to 30.
+
+<Aside type="tip" title="Summary">
+- **`LIMIT`**: Specifies the maximum number of rows to return.
+- **`OFFSET`**: Specifies the number of rows to skip before starting to return rows.
+- **`LIMIT number`**: Returns the first `number` rows.
+- **`LIMIT offset, number`**: Skips `offset` rows and then returns `number` rows.
+- **`LIMIT number OFFSET offset`**: Similar to `LIMIT offset, number`, specifying the number of rows to return and the offset in a more readable form.
+</Aside>

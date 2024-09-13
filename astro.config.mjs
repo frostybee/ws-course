@@ -72,6 +72,12 @@ export default defineConfig({
             }
           },
           {
+            label: "Pagination & Filtering",
+            autogenerate: {
+              directory: "pagination"
+            }
+          },
+          {
             label: "Implementation",
             autogenerate: {
               directory: "implementation"
