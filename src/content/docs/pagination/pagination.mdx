@@ -20,3 +20,52 @@ When dealing with large datasets, returning all the data in a single response ca
 1. **Performance**: Sending a large amount of data in one response can be slow and resource-intensive. Pagination reduces the load on the server and network by breaking the data into smaller pieces.
 2. **Usability**: For clients (like web browsers or mobile apps), handling smaller chunks of data is generally easier and faster. Pagination allows clients to load data incrementally, which can improve the user experience.
 3. **Scalability**: By fetching data in smaller chunks, the application can handle larger datasets more efficiently, making it easier to scale.
+
+## Common Pagination Strategies
+
+There are several common strategies for implementing pagination in RESTful APIs:
+
+### 1. **Offset-Based Pagination**
+
+**Concept**: 
+Offset-based pagination uses a combination of an **offset** (the starting point) and a **limit** (the number of records to return) to navigate through large datasets.
+
+**How It Works**:
+- The client specifies an `offset` parameter to indicate where the next set of results should begin and a `limit` parameter to determine the number of items to return.
+- For example, if a client wants the second page of results with 10 items per page, they would use `offset=10` and `limit=10`.
+
+**Example Request**:
+```
+GET /items?offset=10&limit=10
+```
+
+**Pros**:
+- Simple to implement and understand.
+- Suitable for small to medium-sized datasets.
+
+**Cons**:
+- Performance can degrade with large offsets as the database needs to skip over rows.
+- Can lead to inconsistencies if data is modified between requests (e.g., records are added or removed).
+
+### 2. **Cursor-Based Pagination (aka Keyset Pagination)**
+
+**Concept**: 
+Cursor-based pagination uses a **cursor** (usually a unique identifier or a timestamp) to indicate the position of the next set of results. This approach is often more efficient and accurate for large datasets.
+
+**How It Works**:
+- The server returns a cursor with each page of results.
+- The client uses this cursor to request the next page.
+- For example, if the cursor is a record ID or a timestamp, the next page request will use this cursor to fetch records starting from that point.
+
+**Example Request**:
+```
+GET /items?cursor=12345&limit=10
+```
+
+**Pros**:
+- More efficient for large datasets as it avoids scanning large offsets.
+- Reduces the chance of missing or duplicated results when data changes.
+
+**Cons**:
+- Can be more complex to implement compared to offset-based pagination.
+- Requires that each record has a unique and consistent sorting criterion.
