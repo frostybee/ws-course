@@ -1,0 +1,141 @@
+---
+title: Working with Associative Arrays in PHP
+description: Working with Arrays in PHP
+sidebar:
+    label: "Arrays in PHP"
+    order: 1
+---
+import CodeBlock from '../../../components/CodeBlock.astro'
+
+In PHP, associative arrays are arrays where each key is a string (or sometimes an integer) rather than a numeric index. You access elements in an associative array using the keys. Here's how you can work with associative arrays in PHP:
+
+### Creating an Associative Array
+
+You can create an associative array using the `array()` function or the **shorthand** syntax:
+
+```php
+// Using array() function
+$person_info = array(
+    "name" => "John",
+    "age" => 25,
+    "city" => "laval"
+);
+
+// Using shorthand syntax (PHP 5.4+)
+$person_info = [
+    "name" => "John",
+    "age" => 25,
+    "city" => "laval"
+];
+```
+
+### Accessing Elements
+
+To access the elements of an associative array, use the key inside square brackets:
+
+```php
+echo $person_info["name"]; // Outputs: John
+echo $person_info["age"];  // Outputs: 25
+echo $person_info["city"]; // Outputs: laval
+```
+
+### Modifying Elements
+
+You can also modify the value associated with a specific key:
+
+```php
+$person_info["age"] = 26;
+echo $person_info["age"]; // Outputs: 26
+```
+
+### Adding New Elements
+
+To add a new key-value pair to the associative array:
+
+```php
+$person_info["country"] = "USA";
+echo $person_info["country"]; // Outputs: USA
+```
+
+### Checking if a Key Exists
+
+You can use the `isset()` function to check if a key exists in the associative array:
+
+```php
+if (isset($person_info["city"])) {
+    echo "City is set!";
+} else {
+    echo "City is not set!";
+}
+```
+
+### Removing Elements
+
+To remove an element from the associative array, use the `unset()` function:
+
+```php
+unset($person_info["city"]);
+```
+
+After removing the "city" key, accessing `$person_info["city"]` would produce an undefined index notice.
+
+### Iterating Over an Associative Array
+
+You can use a `foreach` loop to iterate over an associative array:
+
+```php
+foreach ($person_info as $key => $value) {
+    echo "$key: $value <br>";
+}
+```
+
+This will output each key-value pair in the associative array.
+
+### Example
+
+<CodeBlock title="Here’s a complete example demonstrating how to manipulate associative arrays in PHP:">
+```php
+<?php
+// Creating an associative array
+$person = [
+    "name" => "Alice",
+    "age" => 30,
+    "city" => "Montreal"
+];
+
+// Accessing elements
+echo $person["name"] . " <br>"; // Outputs: Alice
+
+// Modifying elements
+$person["age"] = 31;
+echo $person["age"] . " <br>"; // Outputs: 31
+
+// Adding a new element
+$person["job"] = "Engineer";
+
+// Checking if a key exists
+if (isset($person["city"])) {
+    echo "City is set to " . $person["city"] . " <br>"; // Outputs: City is set to Montreal
+}
+
+// Removing an element
+unset($person["city"]);
+
+// Iterating over the array
+foreach ($person as $key => $value) {
+    echo "$key: $value <br>";
+}
+?>
+```
+</CodeBlock>
+
+This will output:
+
+```
+Alice
+31
+City is set to Montreal
+name: Alice
+age: 31
+job: Engineer
+```

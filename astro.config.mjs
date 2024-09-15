@@ -86,8 +86,16 @@ export default defineConfig({
           },
           {
             label: "The World Wide",
+            collapsed: true,
             autogenerate: {
               directory: "www"
+            }
+          },
+          {
+            label: "PHP",
+            collapsed: false,
+            autogenerate: {
+              directory: "php"
             }
           },
           {
