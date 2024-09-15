@@ -73,12 +73,14 @@ export default defineConfig({
           },
           {
             label: "Pagination & Filtering",
+            collapsed: true,
             autogenerate: {
               directory: "pagination"
             }
           },
           {
             label: "Implementation",
+            collapsed: true,
             autogenerate: {
               directory: "implementation"
             }
@@ -93,13 +95,14 @@ export default defineConfig({
           },
           {
             label: "PHP",
-            collapsed: false,
+            collapsed: true,
             autogenerate: {
               directory: "php"
             }
           },
           {
             label: "Extra",
+            collapsed: true,
             items: [
               // Each item here is one entry in the navigation menu.
               {
