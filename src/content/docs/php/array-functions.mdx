@@ -176,7 +176,7 @@ The following is a list of PHP functions for manipulating associative arrays, in
          ['name' => 'Jane', 'age' => 25]
      ];
 
-     array_walk($users, function(&$user) {
+     array_walk($users, function($user) {
          $user['email'] = strtolower($user['name']) . '@example.com';
      });
      print_r($users); 
