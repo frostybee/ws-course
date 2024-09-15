@@ -1,0 +1,208 @@
+---
+title: Working with Associative Arrays in PHP
+description: Working with Arrays in PHP
+sidebar:
+    label: "Arrays Functions"
+    order: 2
+---
+import CodeBlock from '../../../components/CodeBlock.astro'
+import LinkOut from '../../../components/LinkOut.astro'
+
+The following is a list of PHP functions for manipulating associative arrays, including examples and links to the official PHP documentation for each function. These functions offer various ways to interact with associative arrays, from retrieving and merging data to applying transformations and filters.
+
+### 1. <LinkOut href="https://www.php.net/manual/en/function.array-key-exists.php"> `array_key_exists()`</LinkOut>
+   - **Description:** Checks if a specific key exists in an array.
+   - **Return type:** `bool`
+   - **Return value:** `true` if the key exists, `false` otherwise   
+   <CodeBlock title="Example: ">   
+     ```php     
+     $user = [
+         'name' => 'John',
+         'age' => 30,
+         'email' => 'john@example.com'
+     ];
+
+     if (array_key_exists('email', $user)) {
+         echo 'Email exists.';
+     }
+     ```
+    </CodeBlock>   
+
+### 2. <LinkOut href="https://www.php.net/manual/en/function.array-keys.php"> `array_keys()`</LinkOut>
+   - **Description:** Returns all the keys of an associative array.
+   - **Return Type:** `array`
+   - **Return Value:** An array of keys from the original array
+   <CodeBlock title="Example:">   
+     ```php
+     $user = [
+         'name' => 'John',
+         'age' => 30,
+         'email' => 'john@example.com'
+     ];
+
+     $keys = array_keys($user);
+     print_r($keys); // Outputs: Array ( [0] => name [1] => age [2] => email )
+     ``` 
+     </CodeBlock>   
+
+### 3. <LinkOut href="https://www.php.net/manual/en/function.array-values.php"> `array_values()`</LinkOut>
+   - **Description:** Returns all the values from an associative array.
+   - **Return Type:** `array`
+   - **Return Value:** An array of values from the original array
+   <CodeBlock title="Example:">   
+     ```php
+     $user = [
+         'name' => 'John',
+         'age' => 30,
+         'email' => 'john@example.com'
+     ];
+
+     $values = array_values($user);
+     print_r($values); // Outputs: Array ( [0] => John [1] => 30 [2] => john@example.com )
+     ```
+     </CodeBlock>   
+   
+
+### 4. <LinkOut href="https://www.php.net/manual/en/function.array-merge.php"> `array_merge()`</LinkOut>
+   - **Description:** Merges one or more arrays.
+   - **Return Type:** `array`
+   - **Return Value:** A new array containing elements from all input arrays
+   <CodeBlock title="Example:">   
+     ```php
+     $user = [
+         'name' => 'John',
+         'age' => 30
+     ];
+
+     $contact = [
+         'email' => 'john@example.com',
+         'phone' => '123-456-7890'
+     ];
+
+     $profile = array_merge($user, $contact);
+     print_r($profile); 
+     // Outputs: Array ( [name] => John [age] => 30 [email] => john@example.com [phone] => 123-456-7890 )
+     ```
+   </CodeBlock>   
+   
+### 5. <LinkOut href="https://www.php.net/manual/en/function.array-diff-assoc.php"> `array_diff_assoc()`</LinkOut> 
+   - **Description:** Computes the difference of arrays with additional index check.
+   - **Return Type:** `array`
+   - **Return Value:** An array containing all the values from the first array that are not present in the other arrays
+   <CodeBlock title="Example:">
+     ```php
+     $user1 = [
+         'name' => 'John',
+         'age' => 30,
+         'email' => 'john@example.com'
+     ];
+
+     $user2 = [
+         'name' => 'John',
+         'age' => 31,
+         'email' => 'john@example.com'
+     ];
+
+     $diff = array_diff_assoc($user1, $user2);
+     print_r($diff); // Outputs: Array ( [age] => 30 )
+     ```
+     </CodeBlock>   
+   
+
+### 6. <LinkOut href="https://www.php.net/manual/en/function.array-combine.php"> `array_combine()`</LinkOut> 
+   - **Description:** Creates an array by using one array for keys and another for its values.
+   - **Return Type:** `array`
+   - **Return Value:** An associative array with keys from the first array and values from the second array
+   <CodeBlock title="Example:">
+     ```php
+     $keys = ['name', 'age', 'email'];
+     $values = ['John', 30, 'john@example.com'];
+
+     $user = array_combine($keys, $values);
+     print_r($user); 
+     // Outputs: Array ( [name] => John [age] => 30 [email] => john@example.com )
+     ```
+     </CodeBlock>   
+   
+
+### 7. <LinkOut href="https://www.php.net/manual/en/function.array-filter.php"> `array_filter()`</LinkOut> 
+   - **Description:** Filters elements of an array using a callback function.
+   - **Return Type:** `array`
+   - **Return Value:** An array containing all the elements of the input array that pass the test implemented by the callback function
+   <CodeBlock title="Example:">
+     ```php
+     $users = [
+         ['name' => 'John', 'age' => 30],
+         ['name' => 'Jane', 'age' => 25],
+         ['name' => 'Doe', 'age' => 35]
+     ];
+
+     $adults = array_filter($users, function($user) {
+         return $user['age'] >= 30;
+     });
+     print_r($adults); 
+     // Outputs: Array ( [0] => Array ( [name] => John [age] => 30 ) [2] => Array ( [name] => Doe [age] => 35 ) )
+     ```
+   </CodeBlock> 
+
+### 8. <LinkOut href="https://www.php.net/manual/en/function.array-map.php"> `array_map()`</LinkOut> 
+   - **Description:** Applies a callback to the elements of the given arrays.
+   - **Return Type:** `array`
+   - **Return Value:** An array containing the results of applying the callback function to each element
+   <CodeBlock title="Example:">
+     ```php
+     $users = [
+         ['name' => 'John', 'age' => 30],
+         ['name' => 'Jane', 'age' => 25],
+         ['name' => 'Doe', 'age' => 35]
+     ];
+
+     $userNames = array_map(function($user) {
+         return $user['name'];
+     }, $users);
+     print_r($userNames); 
+     // Outputs: Array ( [0] => John [1] => Jane [2] => Doe )
+     ```
+   </CodeBlock> 
+
+#### 9. <LinkOut href="https://www.php.net/manual/en/function.array-walk.php"> `array_walk()`</LinkOut> 
+   - **Description:** Applies a user-defined function to each element of an array.
+   - **Return Type:** `bool`
+   - **Return Value:** `true` on success, `false` on failure
+   <CodeBlock title="Example:">
+     ```php
+     $users = [
+         ['name' => 'John', 'age' => 30],
+         ['name' => 'Jane', 'age' => 25]
+     ];
+
+     array_walk($users, function(&$user) {
+         $user['email'] = strtolower($user['name']) . '@example.com';
+     });
+     print_r($users); 
+     // Outputs: Array ( [0] => Array ( [name] => John [age] => 30 [email] => john@example.com ) [1] => Array ( [name] => Jane [age] => 25 [email] => jane@example.com ) )
+     ```
+     </CodeBlock> 
+   
+
+### 10. <LinkOut href="https://www.php.net/manual/en/function.array-reduce.php"> `array_reduce()`</LinkOut>
+    - **Description:** Iteratively reduces the array to a single value using a callback function.
+    - **Return Type:** `mixed`
+    - **Return Value:** The final reduced value, which is the result of the callback function applied across the array
+   <CodeBlock title="Example:">
+      ```php
+      $users = [
+          ['name' => 'John', 'age' => 30],
+          ['name' => 'Jane', 'age' => 25],
+          ['name' => 'Doe', 'age' => 35]
+      ];
+
+      $totalAge = array_reduce($users, function($carry, $user) {
+          return $carry + $user['age'];
+      }, 0);
+      echo $totalAge; 
+      // Outputs: 90
+      ```
+    </CodeBlock> 
+    
+
