@@ -3,14 +3,120 @@ title: Defining and Accessing Static Class Members in PHP
 description: Defining and Accessing Static Class Members
 sidebar:
     label: "Static Class Members"
-    order: 4
+    order: 5
 ---
 
 :::note
 In PHP, static methods belong to a class rather than any particular instance of the class. They are called using the `::` operator and can be accessed without creating an instance of the class. 
 :::
 
-The following are some detailed examples illustrating how to call static methods in PHP.
+### Defining a Static Function
+
+To define a static function, use the `static` keyword in the method declaration within a class:
+
+```php
+class MyClass {
+    public static function myStaticMethod() {
+        return "Hello, I'm a static method!";
+    }
+}
+```
+:::tip
+
+1. Static methods are useful for **utility functions** that do not depend on object instances. They can be called directly on the class and are useful for operations that are **independent** of object state.
+
+2. **Static Context**: Static methods cannot access instance properties or methods directly because they don’t belong to any particular object. They can only access other static properties or methods of the same class.
+
+3. **Calling from Static Context**: Inside a static method, you can call other static methods using `self::methodName()` or `static::methodName()` if you want to respect the runtime class (useful in inheritance).
+
+4. **Inheritance**: Static methods can be inherited by subclasses, but they cannot be overridden in the same way as instance methods.
+
+5. **No `$this`**: You cannot use `$this` in static methods because `$this` refers to the current object instance, and static methods are not associated with any instance.
+:::
+
+### Accessing Static Functions
+
+Static methods can be accessed directly using the class name followed by the scope resolution operator `::`. Here are some examples:
+
+#### Example 1: Basic Access
+
+```php
+echo MyClass::myStaticMethod(); // Outputs: Hello, I'm a static method!
+```
+
+#### Example 2: Inside Another Static Method
+
+Static methods can also be called from within other static methods of the same class:
+
+```php
+class MyClass {
+    public static function myStaticMethod() {
+        return "Hello, I'm a static method!";
+    }
+    
+    public static function anotherStaticMethod() {
+        // Calling the static method from another static method
+        return self::myStaticMethod();
+    }
+}
+
+echo MyClass::anotherStaticMethod(); // Outputs: Hello, I'm a static method!
+```
+
+#### Example 3: Static Method with Parameters
+
+Static methods can accept parameters just like regular methods:
+
+```php
+class MathOperations {
+    public static function add($a, $b) {
+        return $a + $b;
+    }
+}
+
+echo MathOperations::add(5, 3); // Outputs: 8
+```
+
+### Accessing Static Functions from Other Classes
+
+You can also call static methods from other classes:
+
+```php
+class Utility {
+    public static function getGreeting() {
+        return "Hello from Utility!";
+    }
+}
+
+class Client {
+    public function showGreeting() {
+        // Calling static method from another class
+        return Utility::getGreeting();
+    }
+}
+
+$client = new Client();
+echo $client->showGreeting(); // Outputs: Hello from Utility!
+```
+### Example with Inheritance
+
+```php
+class BaseClass {
+    public static function staticMethod() {
+        return "BaseClass static method";
+    }
+}
+
+class DerivedClass extends BaseClass {
+    public static function staticMethod() {
+        return "DerivedClass static method";
+    }
+}
+
+echo BaseClass::staticMethod(); // Outputs: BaseClass static method
+echo DerivedClass::staticMethod(); // Outputs: DerivedClass static method
+```
+
 
 ### **1. Basic Static Method Example**
 
@@ -27,10 +133,6 @@ class MathUtils {
 $result = MathUtils::add(5, 10);
 echo $result; // Outputs: 15
 ```
-
-:::tip
-Static methods are useful for **utility functions** that do not depend on object instances. They can be called directly on the class and are useful for operations that are **independent** of object state.
-:::
 
 ### **2. Static Method with Visibility Modifiers**
 

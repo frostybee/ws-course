@@ -5,7 +5,8 @@ import mdx from "@astrojs/mdx";
 import starlightLinksValidator from 'starlight-links-validator'
 import starlightImageZoom from 'starlight-image-zoom'
 import starlightViewModes from 'starlight-view-modes'
-
+import partytown from '@astrojs/partytown'
+import sitemap from '@astrojs/sitemap';
 
 // https://astro.build/config
 export default defineConfig({
@@ -118,6 +119,12 @@ export default defineConfig({
           }]
       }),
     mdx(),
-    react()
+    react(),
+    sitemap(),
+    partytown({
+        config: {
+          forward: ["dataLayer.push"],
+        },
+      }),
   ]
 });
