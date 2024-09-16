@@ -1,0 +1,260 @@
+---
+title: Working with Classes and Objects in PHP
+description: Working with Classes and Objects in PHP
+sidebar:
+    label: "Classes and Objects"
+    order: 3
+---
+
+This guide will cover the basics of object-oriented programming (OOP) in PHP, including defining classes, creating objects, and utilizing key OOP concepts.
+
+### **1. Introduction to Object-Oriented Programming (OOP)**
+
+Object-oriented programming is a paradigm that organizes code into "objects," which can contain both data (properties) and functions (methods). OOP helps to structure your code in a modular, reusable, and maintainable way.
+
+### **2. Defining a Class**
+
+A class is a blueprint for creating objects. It defines properties and methods that the objects created from the class will have.
+
+```php
+class Car {
+    // Properties
+    private $make;
+    private $model;
+    private $year;
+
+    // Constructor method
+    public function __construct($make, $model, $year) {
+        $this->make = $make;
+        $this->model = $model;
+        $this->year = $year;
+    }
+
+    // Method
+    public function startEngine() {
+        return "The engine of the $this->make $this->model is starting.";
+    }
+}
+```
+
+### **3. Creating Objects**
+
+An object is an instance of a class. You create an object using the `new` keyword.
+
+```php
+// Creating an object of the Car class
+$myCar = new Car("Toyota", "Corolla", 2020);
+
+// Accessing properties
+echo $myCar->make; // Outputs: Toyota
+
+// Calling a method
+echo $myCar->startEngine(); // Outputs: The engine of the Toyota Corolla is starting.
+```
+
+### **4. Visibility Modifiers**
+
+Properties and methods in a class can have visibility modifiers which control their access:
+
+- **`public`**: Accessible from everywhere.
+- **`protected`**: Accessible within the class and its subclasses.
+- **`private`**: Accessible only within the class.
+
+```php
+class Person {
+    public $name;
+    protected $age;
+    private $socialSecurityNumber;
+
+    public function __construct($name, $age, $ssn) {
+        $this->name = $name;
+        $this->age = $age;
+        $this->socialSecurityNumber = $ssn;
+    }
+
+    public function getAge() {
+        return $this->age;
+    }
+
+    private function getSSN() {
+        return $this->socialSecurityNumber;
+    }
+}
+```
+
+### **5. Inheritance**
+
+Inheritance allows a class to use properties and methods of another class. The new class is called a subclass, and the existing class is called a superclass.
+
+```php
+class ElectricCar extends Car {
+    public $batteryCapacity;
+
+    public function __construct($make, $model, $year, $batteryCapacity) {
+        parent::__construct($make, $model, $year); // Call the parent constructor
+        $this->batteryCapacity = $batteryCapacity;
+    }
+
+    public function charge() {
+        return "Charging the $this->make $this->model with a battery capacity of $this->batteryCapacity kWh.";
+    }
+}
+
+$myElectricCar = new ElectricCar("Tesla", "Model S", 2023, 100);
+echo $myElectricCar->charge(); // Outputs: Charging the Tesla Model S with a battery capacity of 100 kWh.
+```
+
+### **6. Method Overriding**
+
+A subclass can override methods from the superclass to provide a specific implementation.
+
+```php
+class Animal {
+    public function makeSound() {
+        return "Some generic animal sound.";
+    }
+}
+
+class Dog extends Animal {
+    public function makeSound() {
+        return "Woof!";
+    }
+}
+
+$dog = new Dog();
+echo $dog->makeSound(); // Outputs: Woof!
+```
+
+### **7. Accessing Parent Class Methods**
+
+A subclass can access methods from the parent class using the `parent` keyword.
+
+```php
+class Bird extends Animal {
+    public function makeSound() {
+        return parent::makeSound() . " Chirp!";
+    }
+}
+
+$bird = new Bird();
+echo $bird->makeSound(); // Outputs: Some generic animal sound. Chirp!
+```
+
+### **8. Static Properties and Methods**
+
+Static properties and methods belong to the class rather than any instance of the class. They are accessed using the `::` operator.
+
+```php
+class Math {
+    public static $pi = 3.14;
+
+    public static function add($a, $b) {
+        return $a + $b;
+    }
+}
+
+echo Math::$pi; // Outputs: 3.14
+echo Math::add(5, 10); // Outputs: 15
+```
+
+### **9. Abstract Classes**
+
+Abstract classes cannot be instantiated directly. They are used to define methods that must be implemented by subclasses.
+
+```php
+abstract class Shape {
+    abstract public function area();
+}
+
+class Rectangle extends Shape {
+    public $width;
+    public $height;
+
+    public function __construct($width, $height) {
+        $this->width = $width;
+        $this->height = $height;
+    }
+
+    public function area() {
+        return $this->width * $this->height;
+    }
+}
+
+$rectangle = new Rectangle(10, 5);
+echo $rectangle->area(); // Outputs: 50
+```
+
+### **10. Interfaces**
+
+Interfaces define methods that implementing classes must provide. They do not contain any implementation.
+
+```php
+interface Drivable {
+    public function drive();
+}
+
+class Car implements Drivable {
+    public function drive() {
+        return "Driving the car.";
+    }
+}
+
+$car = new Car();
+echo $car->drive(); // Outputs: Driving the car.
+```
+
+### **11. Magic Methods**
+
+PHP has several magic methods that are automatically called in certain situations.
+
+- **`__construct()`**: Constructor method called when an object is created.
+- **`__destruct()`**: Destructor method called when an object is destroyed.
+- **`__get($name)`**: Called when reading inaccessible properties.
+- **`__set($name, $value)`**: Called when writing to inaccessible properties.
+- **`__call($name, $arguments)`**: Called when invoking inaccessible methods.
+- **`__toString()`**: Called when an object is treated as a string.
+
+```php
+class Person {
+    private $data = array();
+
+    public function __construct($name) {
+        $this->data['name'] = $name;
+    }
+
+    public function __get($name) {
+        return isset($this->data[$name]) ? $this->data[$name] : null;
+    }
+
+    public function __set($name, $value) {
+        $this->data[$name] = $value;
+    }
+
+    public function __toString() {
+        return "Person: " . $this->data['name'];
+    }
+}
+
+$person = new Person("Alice");
+echo $person->name; // Outputs: Alice
+$person->age = 30;
+echo $person; // Outputs: Person: Alice
+```
+
+### **12. Namespaces**
+
+Namespaces help to avoid name conflicts by grouping logically related classes, functions, and constants.
+
+```php
+namespace Vehicles;
+
+class Car {
+    public function start() {
+        return "Car is starting.";
+    }
+}
+
+// Usage
+$car = new \Vehicles\Car();
+echo $car->start(); // Outputs: Car is starting.
+```
