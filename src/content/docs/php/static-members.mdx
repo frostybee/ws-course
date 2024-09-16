@@ -1,0 +1,178 @@
+---
+title: Defining and Accessing Static Class Members in PHP
+description: Defining and Accessing Static Class Members
+sidebar:
+    label: "Static Class Members"
+    order: 4
+---
+
+:::note
+In PHP, static methods belong to a class rather than any particular instance of the class. They are called using the `::` operator and can be accessed without creating an instance of the class. 
+:::
+
+The following are some detailed examples illustrating how to call static methods in PHP.
+
+### **1. Basic Static Method Example**
+
+Here's a simple class with a static method:
+
+```php
+class MathUtils {
+    public static function add($a, $b) {
+        return $a + $b;
+    }
+}
+
+// Calling the static method without creating an instance
+$result = MathUtils::add(5, 10);
+echo $result; // Outputs: 15
+```
+
+:::tip
+Static methods are useful for **utility functions** that do not depend on object instances. They can be called directly on the class and are useful for operations that are **independent** of object state.
+:::
+
+### **2. Static Method with Visibility Modifiers**
+
+Static methods can have visibility modifiers like `public`, `protected`, and `private`.
+
+```php
+class User {
+    private static $count = 0;
+
+    public static function incrementCount() {
+        self::$count++;
+    }
+
+    public static function getCount() {
+        return self::$count;
+    }
+}
+
+// Using the static methods
+User::incrementCount();
+User::incrementCount();
+echo User::getCount(); // Outputs: 2
+```
+
+### **3. Static Methods with Parameters**
+
+Static methods can accept parameters just like regular methods.
+
+```php
+class Converter {
+    public static function toUpperCase($string) {
+        return strtoupper($string);
+    }
+}
+
+// Calling the static method with a parameter
+echo Converter::toUpperCase("hello world"); // Outputs: HELLO WORLD
+```
+
+### **4. Static Methods in Inheritance**
+
+Static methods are inherited but are not polymorphic. This means that calling a static method from a subclass does not override the method in the parent class.
+
+```php
+class Animal {
+    public static function sound() {
+        return "Some generic sound.";
+    }
+}
+
+class Dog extends Animal {
+    public static function sound() {
+        return "Bark!";
+    }
+}
+
+// Calling static methods
+echo Animal::sound(); // Outputs: Some generic sound.
+echo Dog::sound();    // Outputs: Bark!
+```
+
+### **5. Static Methods with `self` and `static` Keywords**
+
+- `self` refers to the class in which the method is defined.
+- `static` refers to the class that was used to call the method.
+
+```php
+class Base {
+    public static function identify() {
+        return "Base";
+    }
+
+    public static function callIdentify() {
+        return self::identify();
+    }
+}
+
+class Derived extends Base {
+    public static function identify() {
+        return "Derived";
+    }
+}
+
+echo Base::callIdentify(); // Outputs: Base
+echo Derived::callIdentify(); // Outputs: Derived
+```
+
+In this example, `self::identify()` in `Base::callIdentify()` calls the `identify()` method of the `Base` class, even if called from a subclass like `Derived`.
+
+### **6. Static Methods and Constants**
+
+Static methods can be used to return constant values.
+
+```php
+class Config {
+    const VERSION = '1.0';
+
+    public static function getVersion() {
+        return self::VERSION;
+    }
+}
+
+// Accessing the constant and static method
+echo Config::getVersion(); // Outputs: 1.0
+```
+
+### **7. Static Methods with Static Properties**
+
+Static methods can interact with static properties.
+
+```php
+class Counter {
+    private static $count = 0;
+
+    public static function increment() {
+        self::$count++;
+    }
+
+    public static function getCount() {
+        return self::$count;
+    }
+}
+
+// Incrementing and accessing the count
+Counter::increment();
+Counter::increment();
+echo Counter::getCount(); // Outputs: 2
+```
+
+### **8. Static Methods in Namespaces**
+
+Static methods can also be used within namespaces, just like in the global namespace.
+
+```php
+namespace Utilities;
+
+class Helper {
+    public static function sayHello() {
+        return "Hello from Utilities namespace!";
+    }
+}
+
+// Using the static method
+echo \Utilities\Helper::sayHello(); // Outputs: Hello from Utilities namespace!
+```

@@ -6,12 +6,26 @@ sidebar:
     order: 1
 ---
 import CodeBlock from '../../../components/CodeBlock.astro'
+import { Steps, Aside } from '@astrojs/starlight/components';
 
-In PHP, associative arrays are arrays where each key is a string (or sometimes an integer) rather than a numeric index. You access elements in an associative array using the keys. Here's how you can work with associative arrays in PHP:
+:::note
+In PHP, an associative array is a type of array that stores key-value pairs. Each element is identified by a **unique key** rather than a numeric index. This allows you to use meaningful **keys** (which can be strings or integers) to access array elements.
+:::
 
-### Creating an Associative Array
 
-You can create an associative array using the `array()` function or the **shorthand** syntax:
+Here's a breakdown of the structure and usage of associative arrays in PHP:
+
+### Structure
+<Steps>
+1. **`Keys`**: These are identifiers for the array elements. In associative arrays, keys are typically strings but can also be integers.
+2. **`Values`**: These are the data elements stored in the array and can be of any data type (e.g., strings, integers, arrays, objects, etc.).
+</Steps>
+
+### Syntax: Creating an Associative Array
+
+You can create an associative array using the `array()` function or the **shorthand** syntax.
+
+Here's how you can define and initialize an associative array:
 
 ```php
 // Using array() function
