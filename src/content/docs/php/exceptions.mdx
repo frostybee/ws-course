@@ -96,3 +96,72 @@ An exception is an **event** that occurs during the execution of a program that 
         echo "Cleanup actions can be done here.";
     }
     ```
+## Handling HTTP Exceptions with Nested Try-Catch
+
+The example below simulates making an HTTP request that can fail due to various reasons, such as connection issues or HTTP status errors.
+
+:::tip
+Using nested try-catch blocks for handling `HttpException` helps you localize error handling for specific operations while still allowing for broader error management at higher levels of your application. This structured approach improves code readability and error handling efficiency.
+:::
+
+```php
+<?php
+
+class HttpException extends Exception {}
+
+function fetchUrl($url) {
+    try {
+        // Simulating a scenario where the HTTP request might fail
+        if (empty($url)) {
+            throw new HttpException("Invalid URL provided.");
+        }
+
+        // Simulate different types of HTTP errors
+        $httpResponseCode = rand(200, 500); // Random response code for demonstration
+        if ($httpResponseCode >= 400) {
+            throw new HttpException("HTTP Error: $httpResponseCode");
+        }
+
+        // Simulate successful response
+        return "Fetched content from $url";
+        
+    } catch (HttpException $e) {
+        echo "Error in fetchUrl: " . $e->getMessage() . "\n";
+        // You can choose to rethrow or handle further
+        throw $e; // Rethrowing for outer catch
+    }
+}
+
+function makeHttpRequest($url) {
+    try {
+        $content = fetchUrl($url);
+        echo $content . "\n";
+        
+    } catch (HttpException $e) {
+        echo "Caught in makeHttpRequest: " . $e->getMessage() . "\n";
+    }
+}
+
+function main() {
+    try {
+        makeHttpRequest("http://example.com");
+        makeHttpRequest(""); // This will trigger an HttpException
+        makeHttpRequest("http://anotherexample.com");
+        
+    } catch (HttpException $e) {
+        echo "Caught in main: " . $e->getMessage() . "\n";
+    }
+}
+
+main();
+```
+
+### Explanation
+
+1. **Custom exception**: We define a custom exception class `HttpException` that extends the base `Exception` class.
+2. **`fetchUrl` function**: This function simulates fetching content from a given URL. It:
+   - Throws an `HttpException` if the URL is invalid.
+   - Generates a random HTTP response code and throws an `HttpException` if the response code is 400 or greater.
+   - Returns a success message if no exceptions occur.
+3. **`makeHttpRequest` function**: This function calls `fetchUrl` and handles any `HttpException` that may arise, allowing it to manage exceptions at this level.
+4. **`main` function**: This function orchestrates the HTTP requests and handles exceptions at the top level. If an invalid URL or a simulated HTTP error occurs, it catches the `HttpException`.
