@@ -1,0 +1,98 @@
+---
+title:  Handling Runtime Exceptions in PHP
+description:  Handling Runtime Exceptions in PHP
+sidebar:
+    label: "Runtime Exceptions"
+    order: 6
+---
+
+## **What is an Exception?**
+
+An exception is an **event** that occurs during the execution of a program that disrupts the normal flow of instructions. In PHP, exceptions can be **thrown** and **caught**, allowing you to manage errors gracefully.
+
+## **Types of Exceptions**
+- **Built-in Exceptions:** PHP provides several built-in exceptions (e.g., `ErrorException`, `PDOException`).
+- **Custom Exceptions:** You can create your **own** exception classes by extending the base `Exception` class.
+
+## **Basic Exception Handling**
+
+- **Try-Catch Block**
+  Use the `try` and `catch` blocks to handle exceptions.
+
+  ```php
+  try {
+      // Code that may throw an exception
+      $result = someFunction();
+  } catch (Exception $e) {
+      // Handle the exception
+      echo 'Caught exception: ' . $e->getMessage();
+  }
+  ```
+
+- **Throwing Exceptions**
+  You can throw exceptions using the `throw` keyword.
+
+  ```php
+  function divide($a, $b) {
+      if ($b === 0) {
+          throw new Exception("Division by zero.");
+      }
+      return $a / $b;
+  }
+  ```
+
+### **Custom Exceptions**
+
+- **Creating a Custom Exception**
+  Create a custom exception class for more specific error handling.
+
+  ```php
+  class MyCustomException extends Exception {
+      // You can add custom properties or methods if needed
+  }
+
+  try {
+      throw new MyCustomException("A custom error occurred.");
+  } catch (MyCustomException $e) {
+      echo $e->getMessage();
+  }
+  ```
+
+### **Finally Block**
+
+- **Using Finally**
+  The `finally` block is executed after the try and catch blocks, regardless of whether an exception was thrown.
+
+  ```php
+  try {
+      // Code that may throw an exception
+  } catch (Exception $e) {
+      // Handle the exception
+  } finally {
+      // Code that will always execute
+      echo "This always runs.";
+  }
+  ```
+
+### **Example Implementation**
+
+- Here's a simple example that ties it all together:
+
+    ```php
+    class MyCustomException extends Exception {}
+
+    function riskyFunction() {
+        // Simulating an error
+        throw new MyCustomException("Something went wrong!");
+    }
+
+    try {
+        riskyFunction();
+    } catch (MyCustomException $e) {
+        echo 'Error: ' . $e->getMessage();
+        // Log the error message
+        error_log($e->getMessage());
+    } finally {
+        echo "Cleanup actions can be done here.";
+    }
+    ```
