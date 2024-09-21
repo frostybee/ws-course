@@ -59,11 +59,12 @@ On the server side, you need to handle these query parameters to adjust the data
 
 1. **Retrieve Query Parameters**
 
-   Fetch the sorting parameters from the request URL. This can be done using PHP’s `$_GET` superglobal array.
+   Fetch the sorting parameters from the request URL. This can be done using PHP's `$_GET` superglobal array. However, the following examples illustrates retrieving sorting params from the request object in Slim framework. 
 
    ```php
-   $sortBy = isset($_GET['sort_by']) ? $_GET['sort_by'] : 'id';
-   $order = isset($_GET['order']) ? $_GET['order'] : 'asc';
+   $params = $request->getQueryParams();
+   $sortBy = isset(params['sort_by']) ? $params['sort_by'] : 'id';
+   $order = isset($params['order']) ? $params['order'] : 'asc';
    ```
 
 2. **Validate and Sanitize Parameters**
