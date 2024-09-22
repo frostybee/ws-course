@@ -68,6 +68,7 @@ export default defineConfig({
           },
           {
             label: "RESTFul Web Services",
+            collapsed: true,
             autogenerate: {
               directory: "rest"
             }
@@ -96,7 +97,7 @@ export default defineConfig({
           },
           {
             label: "PHP",
-            collapsed: true,
+            collapsed: false,
             autogenerate: {
               directory: "php"
             }
