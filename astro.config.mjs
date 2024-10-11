@@ -64,7 +64,8 @@ export default defineConfig({
               {
                 label: "Information",
                 link: "/guides/"
-              }]
+              }
+            ]
           },
           {
             label: "RESTFul Web Services",
@@ -85,6 +86,14 @@ export default defineConfig({
             collapsed: true,
             autogenerate: {
               directory: "implementation"
+            }
+
+          },
+          {
+            label: "AJAX",
+            collapsed: true,
+            autogenerate: {
+              directory: "ajax"
             }
 
           },
@@ -123,9 +132,9 @@ export default defineConfig({
     react(),
     sitemap(),
     partytown({
-        config: {
-          forward: ["dataLayer.push"],
-        },
-      }),
+      config: {
+        forward: ["dataLayer.push"],
+      },
+    }),
   ]
 });
