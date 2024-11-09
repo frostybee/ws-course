@@ -1,0 +1,165 @@
+---
+title: Working with the Fetch API
+description: Working with the Fetch API
+sidebar:
+  label: 'Fetch Wrapper'
+  order: 2
+  badge:
+    text: New
+    variant: tip
+---
+import LinkOut from '../../../components/LinkOut.astro'
+import { Aside } from '@astrojs/starlight/components';
+
+## How to Implement a Fetch Wrapper?
+
+To create a reusable `fetch` wrapper that accepts request options as inputs, we can define a function that abstracts the basic logic of making a `fetch` request. This wrapper can handle common tasks like error handling, custom headers, or any default configurations, and will allow you to pass in the full set of options as needed.
+
+:::note
+The following fetch wrapper simplifies HTTP requests while giving you flexibility and control over the request configuration.
+:::
+
+## Fetch Wrapper Example 
+
+Here's a basic example of such a wrapper implemented as an **ES module**:
+
+<Aside type="tip" title="Advantages of this Wrapper:">
+- **Reusability**: You can use this same function across your application to make different types of requests.
+- **Centralized error handling**: Common error handling logic is centralized, making it easier to maintain and debug.
+- **Default options**: You can set sensible defaults for common parameters like `method`, `headers`, and `mode`, but still allow them to be customized when needed.
+- **Response parsing**: It automatically handles JSON responses and gracefully handles non-JSON responses (e.g., plain text or HTML).
+</Aside>
+
+```javascript
+/**
+ * A wrapper class for making HTTP requests using the Fetch API.
+ * Provides a method to send HTTP requests with default and custom options.
+ */
+export class FetchWrapper {
+
+    /**
+    * Sends an HTTP request using the Fetch API.
+    * 
+    * @param {string} uri The URI identifying the targeted resource to which the request will be sent.
+    * @param {Object} [options={}] Optional configuration object for the request.    
+    * @returns {Promise<Object>} A promise that resolves with the parsed JSON response body from the server.
+    * @throws {Error} Throws an error if the request fails (network errors or non-2xx HTTP status codes).
+    * 
+    * @example
+    * const fetchWrapper = new FetchWrapper();
+    * try {
+    *   const data = await fetchWrapper.sendRequest('https://api.tvmase.com/shows');
+    *   console.log(data);
+    * } catch (error) {
+    *   console.error('Request failed:', error);
+    * }
+    */
+    async sendRequest(uri, options = {}) {
+
+        //* Default options to apply to every request. 
+        //* NOTE: These options can be overridden.
+        const defaultOptions = {
+            method: 'GET',
+            cache: 'no-cache'
+        }
+        //* Merge default options with the supplied custom options.
+        const requestOptions = {
+            ...defaultOptions,
+            ...options,
+            headers: {
+                ...defaultOptions.headers,
+                ...options.headers,
+            }
+        };
+        try {
+            //* Send the fetch request
+            const response = await fetch(uri, requestOptions);
+
+            //* Check if the request was successful (status in the range 200-299)
+            if (!response.ok) {
+                // Handle non-success responses (e.g., 404, 500)
+                throw new Error(`Request failed with status ${response.status} reason: ${response.statusText}`);
+            }
+            //* Parse the response body as JSON (assuming JSON content)
+            //* If the response doesn't contain JSON, this will throw an error.
+            return await response.json();
+        } catch (error) {
+            // Handle network or other errors
+            console.error('Error during fetch operation:', error);
+            throw error; // Rethrow or return an error object as per your needs
+        }
+    }
+} 
+```
+### How it Works:
+- **URI and Options**: The `sendRequest` method accepts two parameters:
+  - `uri`: The endpoint you're sending the request to.
+  - `options`: An object that contains additional options for the request (e.g., `method`, `headers`, `body`, etc.). It is optional and can be provided to customize the behavior of the request.
+  
+- **Default Options**: 
+  - The function sets some default values for options like `method`, `headers`.
+  - The `headers` object is merged, allowing you to override the default headers, like `Content-Type`, with your own headers if needed.
+
+- **Error Handling**:
+  - The function checks if the response is successful (`response.ok`). If not, it throws an error with the response status.
+  - If there's an issue parsing the response body as JSON (e.g., the server returns HTML or plain text), it throws an error.
+  - The `try-catch` block around the `fetch` ensures that any network-related errors (e.g., timeout, no connection) are also handled gracefully.
+
+### Usage: Importing the FetchWrapper Module
+
+To import the `FetchWrapper` class in another JavaScript file, you can use the following import statement:
+
+```javascript
+import { FetchWrapper } from './path/to/FetchWrapper';
+```
+
+Make sure to replace `'./path/to/FetchWrapper'` with the correct relative path to where the `FetchWrapper` class is defined. For example, if the file is in the same directory, you would write:
+
+```javascript
+import { FetchWrapper } from './FetchWrapper';
+```
+### Usage: Example of a GET request
+
+Sending a GET request with default options:
+
+```js
+async function fetchData() {
+    try {
+        const uri = 'https://api.example.com/data';
+        const fetchWrapper = new FetchWrapper();
+        const data = await fetchWrapper(uri);
+        console.log(data); // Process the response data
+    } catch (error) {
+        console.error('Fetch error:', error);
+    }
+}
+```
+### Usage: Example of a POST request
+
+The wrapper can be customized with different HTTP methods (`POST`, `PUT`, etc.), headers, and a body (useful for sending JSON or form data), as shown in the example below.
+
+```js
+// Sending a POST request with custom request options including headers and body
+async function postData() {
+    try {
+        const person = {
+                firstName: 'Ladybug', 
+                lastName: 'Red',
+                age: 25
+             };
+        const uri = 'https://api.example.com/submit';
+        const fetchWrapper = new FetchWrapper();
+        const response = await fetchWrapper(uri, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer token123',
+            },
+            body: JSON.stringify(person),
+        });
+        console.log(response); // Process the response
+    } catch (error) {
+        console.error('Post request error:', error);
+    }
+}
+```

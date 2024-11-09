@@ -90,10 +90,11 @@ export default defineConfig({
 
           },
           {
-            label: "AJAX",
+            label: "JavaScript & AJAX",
             collapsed: true,
+            badge: { text: 'Assignment', variant: 'caution' },
             autogenerate: {
-              directory: "ajax"
+              directory: "javascript"
             }
 
           },
