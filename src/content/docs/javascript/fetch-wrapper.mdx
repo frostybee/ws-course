@@ -10,6 +10,7 @@ sidebar:
 ---
 import LinkOut from '../../../components/LinkOut.astro'
 import { Aside } from '@astrojs/starlight/components';
+import  CodeBlock  from "../../../components/CodeBlock.astro";
 
 ## How to Implement a Fetch Wrapper?
 
@@ -30,6 +31,8 @@ Here's a basic example of such a wrapper implemented as an **ES module**:
 - **Response parsing**: It automatically handles JSON responses and gracefully handles non-JSON responses (e.g., plain text or HTML).
 </Aside>
 
+The following code must be stored in a file named `fetchWrapper.js`.
+<CodeBlock title="fetchWrapper.js">
 ```javascript
 /**
  * A wrapper class for making HTTP requests using the Fetch API.
@@ -78,7 +81,14 @@ export class FetchWrapper {
             //* Check if the request was successful (status in the range 200-299)
             if (!response.ok) {
                 // Handle non-success responses (e.g., 404, 500)
-                throw new Error(`Request failed with status ${response.status} reason: ${response.statusText}`);
+                //!NOTE: Retrieve any error details from the response body for further processing. 
+                const errorInfo = await response.json();
+                
+                //TODO: You could implement a separate function for  throwing different types exceptions based on the received status code.
+
+                //! Throw a custom exception containing the retrieved error details from.
+                throw new CustomError(`Request failed with status ${response.status}`, response.status, errorInfo);
+                //throw new Error(`Request failed with status ${response.status} reason: ${response.statusText}`);
             }
             //* Parse the response body as JSON (assuming JSON content)
             //* If the response doesn't contain JSON, this will throw an error.
@@ -89,8 +99,23 @@ export class FetchWrapper {
             throw error; // Rethrow or return an error object as per your needs
         }
     }
+}
+export class CustomError extends Error {
+  constructor(message, code, details) {
+    super(message); // Call the parent constructor with the message
+    this.name = this.constructor.name; // Set the error name to CustomError
+    this.code = code; // Custom error code
+    this.details = details; // Additional details or context
+
+    // Optional: Ensure the stack trace is correct for this subclass
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, this.constructor);
+    }
+  }
 } 
 ```
+</CodeBlock>
+
 ### How it Works:
 - **URI and Options**: The `sendRequest` method accepts two parameters:
   - `uri`: The endpoint you're sending the request to.
@@ -110,13 +135,13 @@ export class FetchWrapper {
 To import the `FetchWrapper` class in another JavaScript file, you can use the following import statement:
 
 ```javascript
-import { FetchWrapper } from './path/to/FetchWrapper';
+import { FetchWrapper } from './path/to/fetchWrapper';
 ```
 
-Make sure to replace `'./path/to/FetchWrapper'` with the correct relative path to where the `FetchWrapper` class is defined. For example, if the file is in the same directory, you would write:
+Make sure to replace `'./path/to/fetchWrapper'` with the correct relative path to where the `FetchWrapper` class is defined. For example, if the file is in the same directory, you would write:
 
 ```javascript
-import { FetchWrapper } from './FetchWrapper';
+import { FetchWrapper } from './fetchWrapper';
 ```
 ### Usage: Example of a GET request
 
@@ -148,15 +173,17 @@ async function postData() {
                 age: 25
              };
         const uri = 'https://api.example.com/submit';
-        const fetchWrapper = new FetchWrapper();
-        const response = await fetchWrapper(uri, {
+        // Request options
+        const options = {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer token123',
             },
             body: JSON.stringify(person),
-        });
+        }
+        const fetchWrapper = new FetchWrapper();
+        const response = await fetchWrapper(uri, options);
         console.log(response); // Process the response
     } catch (error) {
         console.error('Post request error:', error);

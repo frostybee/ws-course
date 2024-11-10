@@ -45,19 +45,35 @@ In the constructor, call the `super` method to initialize the `Error` class with
 The following is an examples of a custom exception class named `CustomError` that accepts a `message`, an error `code`, and a `details` object that can be used to store custom data.
 
 ```javascript
+/**
+ * Custom error class that extends the built-in `Error` class.
+ * It includes additional properties such as a custom error code and details.
+ * This allows for more context when handling errors.
+ * 
+ * @class
+ * @extends {Error}  
+ */
 class CustomError extends Error {
+  /**
+   * Creates an instance of CustomError.
+   * 
+   * @param {string} message - The error message.
+   * @param {string|number} code - A custom error code to help identify the type of error.
+   * @param {Object} [details] - Optional additional context or details about the error (e.g., a stack trace, data, etc.).
+   */
   constructor(message, code, details) {
     super(message); // Call the parent constructor with the message
     this.name = this.constructor.name; // Set the error name to CustomError
     this.code = code; // Custom error code
     this.details = details; // Additional details or context
-    
+
     // Optional: Ensure the stack trace is correct for this subclass
     if (Error.captureStackTrace) {
       Error.captureStackTrace(this, this.constructor);
     }
   }
 }
+
 ```
 ### Extending Further
 
