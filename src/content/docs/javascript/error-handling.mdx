@@ -1,0 +1,162 @@
+---
+title: Exception Handling in JavaScript
+description: Working with Exceptions in JavaScript
+sidebar:
+  label: 'Exception Handling'
+  order: 3
+  badge:
+    text: New
+    variant: tip
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+## How to Handle Exceptions in JavaScript?
+In JavaScript, exceptions are typically handled using `try...catch` blocks. This mechanism allows you to gracefully handle errors that may occur during the execution of your code, rather than having the script fail completely.
+
+## Basic Syntax of `try...catch`
+The general structure of the `try...catch` block is:
+
+```javascript
+try {
+  // Code that may throw an error
+} catch (error) {
+  // Code to handle the error
+} finally {
+  // Optional code that runs regardless of success or failure
+}
+```
+
+## How to Create Custom Exceptions in JavaScript
+:::tip
+Creating a custom exception class that accepts **custom data** involves using ES6 classes and extending the **built-in** `Error` **class**. This allows you to create more informative and structured error handling for your applications.  
+:::
+Here's a step-by-step guide with examples:
+### Step 1: Create a Custom Exception Class
+
+To define a custom exception class, use the `class` syntax in JavaScript and extend it from the `Error` class. By doing so, your custom class will inherit the standard error properties (`message`, `name`, `stack`) while allowing you to add custom properties.
+
+### Step 2: Define a Constructor for Custom Properties
+
+In the constructor, call the `super` method to initialize the `Error` class with a `message` and optionally other data. You can add any additional properties that you want your custom exception to carry, like `code`, `details`, etc.
+
+### Example: Implementing a Custom Exception Class in JavaScript
+
+The following is an examples of a custom exception class named `CustomError` that accepts a `message`, an error `code`, and a `details` object that can be used to store custom data.
+
+```javascript
+class CustomError extends Error {
+  constructor(message, code, details) {
+    super(message); // Call the parent constructor with the message
+    this.name = this.constructor.name; // Set the error name to CustomError
+    this.code = code; // Custom error code
+    this.details = details; // Additional details or context
+    
+    // Optional: Ensure the stack trace is correct for this subclass
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, this.constructor);
+    }
+  }
+}
+```
+### Extending Further
+
+If you want to handle different custom errors (e.g., `NotFoundError`, `ValidationError`), you can create more specific subclasses of `CustomError`.
+
+For example:
+
+```javascript
+class NotFoundError extends CustomError {
+  constructor(message, details) {
+    super(message, 404, details);
+  }
+}
+
+class ValidationError extends CustomError {
+  constructor(message, details) {
+    super(message, 400, details);
+  }
+}
+```
+
+<Aside type="tip" title="Best Practices">
+- **Only catch what you can handle**: Don't catch errors that you cannot properly handle. If you can’t recover from an error, it’s often better to let it propagate.
+- **Provide meaningful error messages**: When throwing or logging errors, make sure the error message helps diagnose the problem.
+- **Use specific error types**: If you're throwing errors, consider using custom error classes (e.g., `ValidationError`, `NetworkError`) to make debugging easier.
+</Aside>
+
+### Step 3: Throw and Catch the Custom Exception
+
+You can now throw instances of `CustomError` with any specific data you need. For example:
+
+```javascript
+try {
+  // Simulate a situation that triggers an error
+  throw new CustomError("Invalid user input", 400, { field: "username", expected: "non-empty" });
+} catch (error) {
+  if (error instanceof CustomError) {
+    console.log("CustomError caught!");    
+    console.log(`Message: ${error.message} (Code: ${error.code})`);
+    console.log("Details:", error.details);    
+  } else {
+    console.error("An unknown error occurred:", error);
+  }
+}
+```
+
+### Throwing Different Exceptions: 
+You can now throw instances of `ValidationError` and `NotFoundError` in different scenarios.
+
+```javascript
+try {
+  // Simulate validation failure
+  throw new ValidationError("Invalid input data", { field: "email", expectedFormat: "email@domain.com" });
+} catch (error) {
+  if (error instanceof ValidationError) {
+    console.log("Caught a ValidationError:");
+    console.log(`Message: ${error.message} (Code: ${error.code})`);
+    console.log("Details:", error.details);
+  } else {
+    console.error("Unknown error occurred:", error);
+  }
+}
+```
+### Using **instanceof** to Differentiate Errors
+**Handling specific errors:** 
+In the following example, we throw multiple types of exceptions and use `instanceof` to handle **each one specifically**.
+
+```javascript
+function simulateError(errorType) {
+  switch (errorType) {
+    case "validation":
+      throw new ValidationError("Validation failed for username", { field: "username", reason: "empty" });
+    case "notFound":
+      throw new NotFoundError("User not found", { resourceType: "User", id: 123 });
+    default:
+      throw new CustomError("An unexpected error occurred", 500, { info: "Something went wrong" });
+  }
+}
+
+try {
+  // Test with "validation" error
+  simulateError("validation");
+} catch (error) {
+  if (error instanceof ValidationError) {
+    console.log("Handled ValidationError specifically:");
+    console.log(`Message: ${error.message} (Code: ${error.code})`);
+    console.log("Details:", error.details);
+  } else if (error instanceof NotFoundError) {
+    console.log("Handled NotFoundError specifically:");
+    console.log(`Message: ${error.message} (Code: ${error.code})`);
+    console.log("Details:", error.details);
+  } else if (error instanceof CustomError) {
+    console.log("Handled general CustomError:");
+    console.log(`Message: ${error.message} (Code: ${error.code})`);
+    console.log("Details:", error.details);
+  } else {
+    console.error("Unknown error type:", error);
+  }
+}
+```
+
+
