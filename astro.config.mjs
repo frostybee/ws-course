@@ -82,8 +82,15 @@ export default defineConfig({
             }
           },
           {
+            label: "Documentation",
+            collapsed: false,
+            autogenerate: {
+              directory: "documentation"
+            }
+          },
+          {
             label: "Implementation",
-            collapsed: true,
+            collapsed: false,
             autogenerate: {
               directory: "implementation"
             }
@@ -107,7 +114,7 @@ export default defineConfig({
           },
           {
             label: "PHP",
-            collapsed: false,
+            collapsed: true,
             autogenerate: {
               directory: "php"
             }
