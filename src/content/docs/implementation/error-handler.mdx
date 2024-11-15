@@ -119,11 +119,11 @@ This should be done in your application's bootstrap file **`config/middleware.ph
 
 To test the custom error handler, try accessing a route that doesn't exist or trigger an exception within a route. The `CustomErrorHandler` should now respond with a JSON error message.
 
-**Add the following code snippet to your list routes.**
+**Or simply add the following code snippet to your list of routes (RECOMMENDED)**
 
 ```php    
     // Example route to test error handling
     $app->get('/error', function (Request $request, Response $response) {
-        throw new \Slim\Exception\HttpNotFoundException($request, "Something went wrong");
+        throw new \Slim\Exception\HttpNotFoundException($request, "Oi! Something went wrong");
     });
 ```    
