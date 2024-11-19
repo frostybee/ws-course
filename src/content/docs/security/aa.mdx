@@ -6,4 +6,154 @@ sidebar:
     order: 1
 ---
 
-Oi
+:::note
+In the context of **RESTful web services**, **authentication** and **authorization** are two fundamental security concepts that ensure only the **right users access** the resources and actions they are permitted to perform.
+:::
+---
+
+## **1. Authentication**
+Authentication is the process of verifying the identity of a user or system. It answers the question, ***"Who are you?"***. The main purpose of authentication in RESTful web services is to ensure that the client accessing the API is genuine and valid.
+
+### **Key Concepts in Authentication**
+- **Identity Verification**: Proves that the client (user, application, or system) is **who they claim to be**.
+- **Credentials**: Data provided by the client to prove identity, such as:
+  - Username and password.
+  - API keys.
+  - OAuth tokens (e.g., access tokens).
+  - Certificates (in case of mutual TLS).
+
+### **Common Authentication Mechanisms**
+- **Basic Authentication**:
+  - Uses a base64-encoded string of `username:password` sent in the `Authorization` header.
+  - Example: 
+    ```
+    Authorization: Basic base64(username:password)
+    ```
+  - Simple to implement but insecure without HTTPS.
+  
+- **Token-Based Authentication**:
+  - The client sends a token (e.g., a JWT or bearer token) in the `Authorization` header.
+  - Example: 
+    ```
+    Authorization: Bearer <token>
+    ```
+  - Tokens can have a limited lifetime, reducing the risk of misuse.
+
+- **OAuth 2.0**:
+  - A widely used framework for delegated access.
+  - Provides access tokens after authentication with a trusted identity provider.
+  - Commonly used by platforms like Google, Facebook, and GitHub.
+
+- **Session-Based Authentication**:
+  - The server creates a session ID after successful login and sends it to the client as a cookie.
+  - Suitable for web applications but less common in stateless REST APIs.
+
+- **API Key Authentication**:
+  - A unique key issued to the client and passed with each request, often as a query parameter or in the header.
+  - Example: 
+    ```
+    GET /resource?api_key=12345
+    ```
+
+### **Best Practices for Authentication in RESTful APIs**
+:::tip
+- Always use **HTTPS** to encrypt credentials during transit.
+- Avoid exposing sensitive data like passwords or API keys in URLs.
+- Prefer token-based mechanisms like **JWT** or **OAuth** for modern APIs.
+- Implement rate limiting and monitoring to detect and prevent brute-force attacks.
+:::
+---
+
+## **2. Authorization**
+Authorization is the process of determining whether a user or system has permission to access a specific resource or perform a particular action. It answers the question, ***"What are you allowed to do?"***.
+
+### **Key Concepts in Authorization**
+- **Roles and Permissions**:
+  - Users or clients are assigned roles (e.g., admin, editor, viewer).
+  - Permissions define what actions (e.g., read, write, delete) a role can perform on a resource.
+  
+- **Resource Ownership**:
+  - Authorization rules can depend on resource ownership.
+  - Example: A user can edit their own posts but not others'.
+
+### **Common Authorization Strategies**
+- **Role-Based Access Control (RBAC)**:
+  - Access is granted based on the user's role.
+  - Example:
+    ```
+    Admin: Can create, read, update, delete all resources.
+    Editor: Can read and update specific resources.
+    Viewer: Can only read resources.
+    ```
+
+- **Attribute-Based Access Control (ABAC)**:
+  - Access is granted based on attributes such as user attributes, resource attributes, and environment conditions.
+  - Example: 
+    - Allow actions only during business hours.
+    - Allow access to resources owned by the user.
+
+- **Resource-Based Policies**:
+  - Policies are defined at the resource level.
+  - Example: In AWS, you can attach policies to S3 buckets to define who can access them and how.
+
+### **How Authorization Works in RESTful APIs**
+1. **After Authentication**:
+   - Once the client is authenticated, the server evaluates whether the client is authorized to perform the requested action.
+   
+2. **Defined Policies**:
+   - Authorization rules or policies are checked based on roles, permissions, or attributes.
+   
+3. **Response**:
+   - If authorized, the server processes the request and returns a response.
+   - If not, the server responds with an appropriate status code, e.g., `403 Forbidden` or `401 Unauthorized`.
+
+---
+
+## **Key Differences Between Authentication and Authorization**
+| Aspect                  | Authentication                  | Authorization                  |
+|-------------------------|----------------------------------|--------------------------------|
+| **Purpose**             | Verify identity                | Verify access permissions     |
+| **Question Answered**   | "Who are you?"                 | "What are you allowed to do?" |
+| **Data Used**           | Credentials (e.g., username/password) | Roles, policies, permissions  |
+| **Sequence**            | Happens first                  | Happens after authentication  |
+| **Response on Failure** | `401 Unauthorized`             | `403 Forbidden`               |
+
+---
+
+## **Implementing Authentication and Authorization Together in RESTful APIs**
+1. **Authentication Layer**:
+   - The client sends credentials or tokens with each request.
+   - The server validates the credentials and identifies the user.
+
+2. **Authorization Layer**:
+   - The server checks the user's roles or permissions against the requested resource or action.
+
+3. **Statelessness**:
+   - RESTful APIs are stateless, meaning the server doesn't retain session information. All necessary information (e.g., tokens, permissions) must be included in each request.
+
+4. **HTTP Status Codes for Security**:
+   - **401 Unauthorized**: Authentication failed or missing.
+   - **403 Forbidden**: Authenticated but not authorized.
+   - **404 Not Found**: Optionally used to hide resource existence.
+
+---
+
+## **Example Workflow**
+### Scenario: A user requests to delete a post.
+
+1. **Request**:
+   ```
+   DELETE /players/123
+   Authorization: Bearer <valid_token>
+   ```
+
+2. **Authentication**:
+   - The server verifies the token and identifies the user.
+
+3. **Authorization**:
+   - The server checks if the user has permission to delete this post.
+   - This may involve checking roles, resource ownership, or a policy.
+
+4. **Response**:
+   - If allowed: `200 OK` with confirmation.
+   - If unauthorized: `403 Forbidden`.

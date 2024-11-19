@@ -107,13 +107,13 @@ eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4
 
 ## How JWT Works in Authentication
 
-JWTs are typically used for **authentication** and **authorization**. Here’s how JWT works in a nutshell:
+JWTs are typically used for **authentication** and **authorization**. Here's how JWT works in a nutshell:
 
 1. **Client Authentication**: The client sends its credentials (usually a username and password) to the server.
 2. **Token Generation**: The server verifies the credentials, and if valid, generates a JWT signed with a secret key or a private key (depending on the algorithm used).
 3. **Token Transmission**: The server sends the JWT back to the client. The client stores the token, typically in local storage or an HTTP-only cookie.
 4. **Token Usage**: For subsequent API requests, the client includes the JWT in the `Authorization` header (e.g., `Authorization: Bearer <JWT>`).
-5. **Token Verification**: The server verifies the token's authenticity and ensures it hasn’t expired. If valid, the server allows access to the requested resource.
+5. **Token Verification**: The server verifies the token's authenticity and ensures it hasn't expired. If valid, the server allows access to the requested resource.
 
 ## **Use Cases**
 
