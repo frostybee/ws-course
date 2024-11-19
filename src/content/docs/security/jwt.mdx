@@ -1,11 +1,131 @@
 ---
-title: JSON Web Tokens
-description: JSON Web Tokens
+title: Working with JSON Web Tokens
+description: Working with JSON Web Tokens
 sidebar:
     label: "JSON Web Tokens"
     order: 2
 ---
 
 import  CodeBlock  from "../../../components/CodeBlock.astro";
-import ExternalLink from "../../../components/ExternalLink.astro";
+import LinkOut from '../../../components/LinkOut.astro'
+import { Aside } from '@astrojs/starlight/components';
 
+## What is a JSON Web Token (JWT)?
+
+A **<LinkOut href='https://jwt.io/'>JSON Web Token</LinkOut>** (JWT) is an open, industry-standard (<LinkOut href='https://datatracker.ietf.org/doc/html/rfc7519'>RFC 7519</LinkOut>) method for securely transmitting information between parties as a JSON object. This information is digitally signed, making it both verifiable and trustworthy. JWTs are commonly used for **authentication** and secure data exchange.
+
+## Characteristics of JWTs
+
+<Aside type="tip" title=":">
+- **Self-contained**: JWTs contain all the information needed for **authentication** and **authorization** in the payload, eliminating the need for a database lookup.
+- **Compact**: JWTs are URI-safe and can easily be transmitted via HTTP headers or query strings.
+- **Stateless**: Because they are self-contained, JWTs are often used in stateless authentication systems: There is no need to store session information on the server, making JWT suitable for distributed systems or microservices.
+- **Secure**: The signature ensures that the token is valid and untampered.
+- **Flexibility**: JWTs can include **custom claims**, allowing developers to store application-specific information.
+</Aside>
+---
+
+## Structure of a JWT
+
+A JWT consists of **three parts**:  
+1. **Header**: Contains metadata about the token, such as the signing algorithm (e.g., HMAC HS256, RSA).
+2. **Payload**: Contains the claims, such as user information and permissions.
+3. **Signature**: Ensures the token's integrity by validating that it was not tampered with.
+
+
+These parts are concatenated together with periods (`.`), forming a string like this:
+```
+<Header>.<Payload>.<Signature>
+```
+
+### 1. **Header**
+The header typically consists of two parts:
+- **`alg`**: The signing algorithm, such as HMAC SHA256 or RSA.
+- **`typ`**: (optional) The type of the token. It is usually `JWT`.
+
+For example, a header might look like this:
+
+```json
+{
+  "alg": "HS256",
+  "typ": "JWT"
+}
+```
+
+When encoded in Base64Url, this becomes a string (part of the JWT).
+
+### 2. **Payload**
+The payload contains the **claims**. Claims are statements about an entity (typically the user) and additional data. There are **three types** of claims:
+
+1. **Registered claims**: Predefined claims that are not mandatory but recommended for interoperability. Some common registered claims include:
+    - **`sub`** (Subject): Identifies the principal that is the subject of the JWT (e.g., the user ID).
+    - **`iat`** (Issued At): The time the JWT was issued.
+    - **`exp`** (Expiration Time): The expiration time after which the JWT should no longer be accepted.
+    - **`iss`** (Issuer): Identifies the issuer of the JWT.
+    - **`aud`** (Audience): Identifies the audience for which the JWT is intended.
+
+2. **Public claims**: Claims that can be defined at will by the user or system, but to avoid collisions, they should be defined in a way that is collision-resistant, often using a URI namespace.
+
+3. **Private claims**: Custom claims created for use by parties who agree on them, e.g., user roles or permissions.
+
+Example of a payload (claims):
+
+```json
+{
+  "sub": "1234567890",
+  "name": "John Doe",
+  "iat": 1516239022
+}
+```
+
+This payload, when Base64Url encoded, forms the second part of the JWT string.
+
+### 3. **Signature**
+To ensure the integrity of the token and verify its authenticity, the third part of a JWT is the **signature**. To generate the signature, the following process is typically followed:
+1. Take the encoded header and the encoded payload.
+2. Concatenate them with a period (`.`) separator.
+3. Use a secret key (HMAC SHA256) or a private key (RSA or ECDSA) and the signing algorithm (as specified in the header) to create the signature.
+
+For example, if you're using the HMAC SHA256 algorithm, the signature is generated like this:
+
+```text
+HMACSHA256(
+  base64UrlEncode(header) + "." +
+  base64UrlEncode(payload),
+  secret)
+```
+
+The result of this operation is the **signature** that is the third part of the JWT. It ensures that the token has not been tampered with. If someone tries to alter the payload or header, the signature will not match when the token is verified.
+
+### Example of a Complete JWT
+
+Putting it all together, a JWT might look like this:
+
+```
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwibWFya2V0Ijp0cnVlfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+```
+
+## How JWT Works in Authentication
+
+JWTs are typically used for **authentication** and **authorization**. Here’s how JWT works in a nutshell:
+
+1. **Client Authentication**: The client sends its credentials (usually a username and password) to the server.
+2. **Token Generation**: The server verifies the credentials, and if valid, generates a JWT signed with a secret key or a private key (depending on the algorithm used).
+3. **Token Transmission**: The server sends the JWT back to the client. The client stores the token, typically in local storage or an HTTP-only cookie.
+4. **Token Usage**: For subsequent API requests, the client includes the JWT in the `Authorization` header (e.g., `Authorization: Bearer <JWT>`).
+5. **Token Verification**: The server verifies the token's authenticity and ensures it hasn’t expired. If valid, the server allows access to the requested resource.
+
+## **Use Cases**
+
+### 1. **Authentication**
+The most common use of JWTs is for **user authentication**. After a user logs in, a JWT is generated and sent to the client (e.g., a web browser or mobile app). The client then sends this token in the `Authorization` header on subsequent requests, typically using the `Bearer` schema:
+```
+Authorization: Bearer <JWT>
+```
+This allows the server to authenticate the user by verifying the token's signature and checking the claims (e.g., expiration time, issuer).
+
+### 2. **Authorization**
+JWTs are also commonly used to carry **authorization information**. For example, the payload might include **roles** or **permissions** granted to the user. The server can use this information to authorize actions, such as allowing a user with an "admin" role to access an admin panel.
+
+### 3. **Information Exchange**
+Since JWTs can carry any kind of information (provided it's signed), they are often used for securely transmitting data between parties. The signature ensures that the data has not been tampered with in transit.
