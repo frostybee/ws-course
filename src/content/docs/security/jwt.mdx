@@ -12,7 +12,7 @@ import { Aside } from '@astrojs/starlight/components';
 
 ## What is a JSON Web Token (JWT)?
 
-A **<LinkOut href='https://jwt.io/'>JSON Web Token</LinkOut>** (JWT) is an open, industry-standard (<LinkOut href='https://datatracker.ietf.org/doc/html/rfc7519'>RFC 7519</LinkOut>) method for securely transmitting information between parties as a JSON object. This information is digitally signed, making it both verifiable and trustworthy. JWTs are commonly used for **authentication** and secure data exchange.
+A **<LinkOut href='https://jwt.io/'>JSON Web Token</LinkOut>** (JWT) is an open, industry-standard (<LinkOut href='https://datatracker.ietf.org/doc/html/rfc7519'>RFC 7519</LinkOut>) method for securely transmitting information between parties as a JSON object. This information is digitally signed, making it both verifiable and trustworthy. JWTs are commonly used for **authentication** and secure data exchange in web applications.
 
 ## Characteristics of JWTs
 
@@ -40,7 +40,7 @@ These parts are concatenated together with periods (`.`), forming a string like 
 
 ### 1. **Header**
 The header typically consists of two parts:
-- **`alg`**: The signing algorithm, such as HMAC SHA256 or RSA.
+- **`alg`**: The signing algorithm used, such as HMAC SHA256 or RSA.
 - **`typ`**: (optional) The type of the token. It is usually `JWT`.
 
 For example, a header might look like this:
@@ -55,15 +55,16 @@ For example, a header might look like this:
 When encoded in Base64Url, this becomes a string (part of the JWT).
 
 ### 2. **Payload**
-The payload contains the **claims**. Claims are statements about an entity (typically the user) and additional data. There are **three types** of claims:
+The payload contains the **claims** (pieces of information). Claims are statements about an entity (typically the user) and additional metadata. There are **three types** of claims:
 
 1. **Registered claims**: Predefined claims that are not mandatory but recommended for interoperability. Some common registered claims include:
     - **`sub`** (Subject): Identifies the principal that is the subject of the JWT (e.g., the user ID).
-    - **`iat`** (Issued At): The time the JWT was issued.
-    - **`exp`** (Expiration Time): The expiration time after which the JWT should no longer be accepted.
     - **`iss`** (Issuer): Identifies the issuer of the JWT.
     - **`aud`** (Audience): Identifies the audience for which the JWT is intended.
-
+    - **`iat`** (Issued At): When the token was issued.
+    - **`exp`** (Expiration Time): The expiration time after which the JWT should no longer be accepted.
+    - **`nbf`** (not before): When the token becomes valid.    
+    
 2. **Public claims**: Claims that can be defined at will by the user or system, but to avoid collisions, they should be defined in a way that is collision-resistant, often using a URI namespace.
 
 3. **Private claims**: Custom claims created for use by parties who agree on them, e.g., user roles or permissions.
@@ -74,7 +75,9 @@ Example of a payload (claims):
 {
   "sub": "1234567890",
   "name": "John Doe",
-  "iat": 1516239022
+  "iat": 1516239022,
+  "exp": 2546539831,
+  "role": "admin",
 }
 ```
 
@@ -105,14 +108,17 @@ Putting it all together, a JWT might look like this:
 eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwibWFya2V0Ijp0cnVlfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
 ```
 
-## How JWT Works in Authentication
+## How JWTs Work in Authentication
 
 JWTs are typically used for **authentication** and **authorization**. Here's how JWT works in a nutshell:
 
 1. **Client Authentication**: The client sends its credentials (usually a username and password) to the server.
 2. **Token Generation**: The server verifies the credentials, and if valid, generates a JWT signed with a secret key or a private key (depending on the algorithm used).
 3. **Token Transmission**: The server sends the JWT back to the client. The client stores the token, typically in local storage or an HTTP-only cookie.
-4. **Token Usage**: For subsequent API requests, the client includes the JWT in the `Authorization` header (e.g., `Authorization: Bearer <JWT>`).
+4. **Token Usage**: For any subsequent requests to protected routes, the client includes the JWT in the `Authorization` header using the **Bearer schema**:
+     ```
+     Authorization: Bearer <token>
+     ```
 5. **Token Verification**: The server verifies the token's authenticity and ensures it hasn't expired. If valid, the server allows access to the requested resource.
 
 ## **Use Cases**
