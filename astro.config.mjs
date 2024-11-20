@@ -90,7 +90,7 @@ export default defineConfig({
 
           },
           {
-            label: "Security",
+            label: "Securing Web Services",
             collapsed: false,
             autogenerate: {
               directory: "security"

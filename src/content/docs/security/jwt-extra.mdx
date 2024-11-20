@@ -1,0 +1,69 @@
+---
+title: JWT - Security Considerations and Best Practices
+description: JWT - Security Considerations and Best Practices
+sidebar:
+    label: "JWT - Best Practices "
+    order: 3
+---
+
+import  CodeBlock  from "../../../components/CodeBlock.astro";
+import LinkOut from '../../../components/LinkOut.astro'
+import { Aside } from '@astrojs/starlight/components';
+
+## Why Use JWT?
+
+JWT is popular for several reasons:
+- **Stateless**: JWT is self-contained, meaning that the server does not need to store session information.
+- **Scalable**: Ideal for distributed applications (e.g., microservices) because the token carries all necessary information.
+- **Cross-domain**: JWTs are typically used for Single Sign-On (SSO) across multiple applications.
+- **Security**: JWTs can be signed and optionally encrypted, ensuring that the token's data is authentic and confidential.
+
+---
+## Common JWT Best Practices
+
+- **Use HTTPS**: Always use HTTPS to encrypt the communication between the client and server and to prevent token interception, especially when transmitting sensitive information like JWTs.
+- **Keep the secret safe**: Do not expose your JWT signing secret or private keys in client-side code or **repositories**.
+- **Token expiration (short-lived tokens)**: Set an expiration time for your JWTs (e.g., `exp` claim) to minimize the risks of a stolen token being used indefinitely.
+- **Use refresh tokens**: Implement refresh tokens to allow users to obtain new JWTs after the old one expires without requiring them to log in again.
+- **Limit payload size**: Keep the JWT payload small to improve performance and avoid storing too much sensitive data.
+- **Store Tokens Securely**:
+   - For web apps: Use `HttpOnly` cookies.
+   - For mobile apps: Use secure storage mechanisms.
+- **Use strong secrets**: Use a robust, unpredictable secret key for signing tokens.   
+- **Blacklist Tokens**: Maintain a blacklist to invalidate tokens if necessary (e.g., after logout or suspected compromise).
+- **Validate Claims**: Validate `aud`, `iss`, and other claims as required.
+
+---
+
+## Security Considerations
+:::note
+JWTs are **not encrypted by default**. They are only **signed**, meaning that anyone with access to the token can read its contents (though they cannot modify it without invalidating the signature). Therefore, if you're transmitting sensitive data, you should consider encrypting the JWT or using HTTPS to protect the token during transit.
+:::
+
+**Some important security aspects to keep in mind:**
+- **Signature verification**: Always verify the JWT's signature before trusting its contents. This prevents attackers from tampering with the token.
+-  **Key management**: Keep your signing key secure. If it gets compromised, attackers can issue their own JWTs.
+-  **Signing algorithms**: Choose secure algorithms (e.g., RS256 over HS256) to avoid risks related to symmetric keys.
+-  **Token revocation**: Be aware that if a JWT is compromised, it cannot be revoked until expiration unless you implement a token blacklist or use short lifetimes.
+-  **Storage security**: Securely store JWTs in a way that prevents XSS attacks.
+-  **Encryption**: If sensitive data is in the payload, consider encrypting the token.
+
+---
+
+## Handling JWT Expiration and Refresh Tokens
+
+JWTs have an expiration time (`exp` claim) to prevent indefinite access. When a JWT expires, the client should use a **refresh token** to obtain a new JWT without re-authenticating.
+
+**Example Refresh Token Flow:**
+1. Issue a refresh token along with the JWT when the user logs in.
+2. When the JWT expires, the client sends the refresh token to the server.
+3. The server verifies the refresh token and issues a new JWT.
+
+---
+
+
+## Disadvantages of JWT
+
+- **No built-in expiration enforcement**: Although you can set an expiration claim (`exp`), JWTs do not have a built-in mechanism to automatically expire on the server side. If a JWT is leaked, it remains valid until the expiration date.
+- **Size**: While compact, JWTs can become large if they contain many claims or are not carefully designed.
+- **Security risks with long-lived tokens**: If a JWT is long-lived and exposed, it can be used maliciously. Implementing short-lived tokens and using refresh tokens to rotate access tokens is a common strategy to mitigate this risk.

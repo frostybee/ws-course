@@ -1,8 +1,8 @@
 ---
-title: Working with JSON Web Tokens
+title: 🗝 Working with JSON Web Tokens
 description: Working with JSON Web Tokens
 sidebar:
-    label: "JSON Web Tokens"
+    label: " 🗝 JSON Web Tokens"
     order: 2
 ---
 
@@ -10,11 +10,13 @@ import  CodeBlock  from "../../../components/CodeBlock.astro";
 import LinkOut from '../../../components/LinkOut.astro'
 import { Aside } from '@astrojs/starlight/components';
 
-## What is a JSON Web Token (JWT)?
+## 🚀 What is a JSON Web Token (JWT)?
 
 A **<LinkOut href='https://jwt.io/'>JSON Web Token</LinkOut>** (JWT) is an open, industry-standard (<LinkOut href='https://datatracker.ietf.org/doc/html/rfc7519'>RFC 7519</LinkOut>) method for securely transmitting information between parties as a JSON object. This information is digitally signed, making it both verifiable and trustworthy. JWTs are commonly used for **authentication** and secure data exchange in web applications.
 
-## Characteristics of JWTs
+---
+
+## 📑 Characteristics of JWTs
 
 <Aside type="tip" title=":">
 - **Self-contained**: JWTs contain all the information needed for **authentication** and **authorization** in the payload, eliminating the need for a database lookup.
@@ -23,9 +25,18 @@ A **<LinkOut href='https://jwt.io/'>JSON Web Token</LinkOut>** (JWT) is an open,
 - **Secure**: The signature ensures that the token is valid and untampered.
 - **Flexibility**: JWTs can include **custom claims**, allowing developers to store application-specific information.
 </Aside>
+
 ---
 
-## Structure of a JWT
+## 📈 **Debugging and Monitoring**
+:::note
+- **Decode Tokens**: Use tools like **<LinkOut href='https://jwt.io/'>jwt.io</LinkOut>** to decode and inspect tokens.
+- **Log Failures**: Log all failed authentication attempts for monitoring and auditing.
+:::
+
+---
+
+## 🎪 Structure of a JWT
 
 A JWT consists of **three parts**:  
 1. **Header**: Contains metadata about the token, such as the signing algorithm (e.g., HMAC HS256, RSA).
@@ -100,6 +111,8 @@ HMACSHA256(
 
 The result of this operation is the **signature** that is the third part of the JWT. It ensures that the token has not been tampered with. If someone tries to alter the payload or header, the signature will not match when the token is verified.
 
+---
+
 ### Example of a Complete JWT
 
 Putting it all together, a JWT might look like this:
@@ -107,8 +120,9 @@ Putting it all together, a JWT might look like this:
 ```
 eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwibWFya2V0Ijp0cnVlfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
 ```
+---
 
-## How JWTs Work in Authentication
+## ✅ How JWTs Work in Authentication
 
 JWTs are typically used for **authentication** and **authorization**. Here's how JWT works in a nutshell:
 
@@ -121,7 +135,9 @@ JWTs are typically used for **authentication** and **authorization**. Here's how
      ```
 5. **Token Verification**: The server verifies the token's authenticity and ensures it hasn't expired. If valid, the server allows access to the requested resource.
 
-## **Use Cases**
+---
+
+## ℹ **Use Cases**
 
 ### 1. **Authentication**
 The most common use of JWTs is for **user authentication**. After a user logs in, a JWT is generated and sent to the client (e.g., a web browser or mobile app). The client then sends this token in the `Authorization` header on subsequent requests, typically using the `Bearer` schema:
