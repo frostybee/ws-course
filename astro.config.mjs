@@ -84,6 +84,7 @@ export default defineConfig({
           {
             label: "Implementation",
             collapsed: false,
+            badge: { text: 'Team Project', variant: 'caution' },
             autogenerate: {
               directory: "implementation"
             }
