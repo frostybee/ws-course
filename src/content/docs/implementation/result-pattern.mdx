@@ -10,14 +10,13 @@ import { Steps, Aside } from '@astrojs/starlight/components';
 import  CodeBlock  from "../../../components/CodeBlock.astro";
 import ExternalLink from "../../../components/ExternalLink.astro";
 
-
 ## ℹ What is the Result Pattern?
 
 The **Result pattern** is a design pattern used to handle the outcome of operations in a way that explicitly communicates success or failure, and potentially carries additional information about the result or the error.
 
 It provides a structured way to handle the outcomes of functions or methods, especially in languages that lack built-in support for tuples or multiple return values. The key idea is to return an object (often called `Result`, `Outcome`, `Response`, etc.) that contains information about whether the operation was successful and, if not, what went wrong.
 
-## ⚙ Components of the Result Pattern
+## 🗜 Components of the Result Pattern
 
 The Result pattern encapsulates the outcome of a function or operation into a structured object, rather than using exceptions for error handling. This pattern typically includes:
 
@@ -49,7 +48,7 @@ The Result pattern encapsulates the outcome of a function or operation into a st
 
 7. **Composability:** Result objects can be easily passed around and composed with other functions or methods, promoting code reuse and maintainability.
 
-## ✅ When to Use Each
+## 📅 When to Use Each
 
 1. **Result Pattern**: Ideal for cases where you expect failures as part of normal operation (e.g., user input validation, simple computations).
   
@@ -63,29 +62,31 @@ The Result pattern provides a good alternative to exceptions for handling predic
  
 <Steps>
 
-1. <CodeBlock title=" Create a the following PHP class">
-    ```php wrap
-    <?php
+1. <CodeBlock title="PHP implementation of the Result pattern">
+    ```php
     class Result
     {
-        private $is_success;
+        private bool $is_success = false;
+        private string $message;
         private $data;
-        private $error;
-        private function __construct(bool $is_success, $data = null, $error = null)
+        private $errors;
+
+        private function __construct(bool $success, string $message, mixed $data = null, mixed $errors = null)
         {
-            $this->is_success = $is_success;
+            $this->is_success = $success;
+            $this->message = $message;
             $this->data = $data;
-            $this->error = $error;
+            $this->errors = $errors;
         }
 
-        public static function success($data): Result
+        public static function success($message, mixed $data = null): Result
         {
-            return new self(true, $data);
+            return new Result(true, $message, $data);
         }
 
-        public static function failure($error): Result
+        public static function failure($message, mixed $errors = null): Result
         {
-            return new self(false, null, $error);
+            return new Result(false, $message, null, $errors);
         }
 
         public function isSuccess(): bool
@@ -93,7 +94,12 @@ The Result pattern provides a good alternative to exceptions for handling predic
             return $this->is_success;
         }
 
-        public function getData()
+        public function isFailure(): bool
+        {
+            return !$this->is_success;
+        }
+
+        public function getData(): mixed
         {
             if (!$this->is_success) {
                 throw new Exception("Cannot get data from a failed result.");
@@ -101,87 +107,99 @@ The Result pattern provides a good alternative to exceptions for handling predic
             return $this->data;
         }
 
-        public function getError()
+        public function getErrors(): mixed
         {
             if ($this->is_success) {
-                throw new Exception("Cannot get error from a successful result.");
+                throw new Exception("Cannot get errors from a successful result.");
             }
-            return $this->error;
+            return $this->errors;
+        }
+
+        public function getMessage(): string
+        {
+            return $this->message;
+        }
+
+        public function __toString(): string
+        {
+            if ($this->is_success) {
+                $data = $this->data !== null ? 'Data: ' . json_encode($this->data) : 'No data';
+                return "Success: {$this->message}, {$data}";
+            } else {
+                $errors = $this->errors !== null ? 'Errors: ' . json_encode($this->errors) : 'No errors';
+                return "Failure: {$this->message}, {$errors}";
+            }
         }
     }
-    ?>
     ```
-
     </CodeBlock>
 
-2. <CodeBlock title="Using the Result pattern: Example #1">
+2. <CodeBlock title="Example #1: Using the Result pattern">
 
     ```php
     <?php
-    function divide($numerator, $denominator): Result
-    {
-        if ($denominator == 0) {
-            return Result::failure("Cannot divide by zero.");
-        }
 
-        $result = $numerator / $denominator;
-        return Result::success($result);
+    // Include the Result class code here
+    class UserService
+    {
+        private $users = [
+            'john_doe' => 'password123',
+            'alice_smith' => 'alicepassword',
+        ];
+        
+        public function login(string $username, string $password): Result
+        {
+            // Check if the user exists
+            if (!isset($this->users[$username])) {
+                return Result::failure("User not found.");
+            }
+
+            // Check if the password is correct
+            if ($this->users[$username] !== $password) {
+                return Result::failure("Incorrect password.");
+            }
+
+            // Successful login
+            return Result::success("Login successful.", ["username" => $username]);
+        }
     }
 
     // Example usage:
-    $result = divide(10, 2);
+    $userService = new UserService();
+
+    // Test successful login
+    $result = $userService->login('john_doe', 'password123');
 
     if ($result->isSuccess()) {
-        echo "Result: " . $result->getData();
+        echo "Success: " . $result->getMessage() . "<br/>";
+        echo "User data: " . json_encode($result->getData()) . "<br/>";
     } else {
-        echo "Error: " . $result->getError();
+        echo "Failure: " . $result->getMessage() . "<br/>";
+        echo "Errors: " . json_encode($result->getErrors()) . "<br/>";
     }
 
-    $result = divide(10, 0);
+    // Test failed login (incorrect password)
+    $result = $userService->login('john_doe', 'wrongpassword');
 
     if ($result->isSuccess()) {
-        echo "Result: " . $result->getData();
+        echo "Success: " . $result->getMessage() . "<br/>";
+        echo "User data: " . json_encode($result->getData()) . "<br/>";
     } else {
-        echo "Error: " . $result->getError();
+        echo "Failure: " . $result->getMessage() . "<br/>";
+        echo "Errors: " . json_encode($result->getErrors()) . "<br/>";
+    }
+
+    // Test failed login (user not found)
+    $result = $userService->login('non_existent_user', 'any_password');
+
+    if ($result->isSuccess()) {
+        echo "Success: " . $result->getMessage() . "<br/>";
+        echo "User data: " . json_encode($result->getData()) . "<br/>";
+    } else {
+        echo "Failure: " . $result->getMessage() . "<br/>";
+        echo "Errors: " . json_encode($result->getErrors()) . "<br/>";
     }
     ?>
     ```
     </CodeBlock>        
-3. <CodeBlock title="Using the Result pattern: Example #2">
-    ```php
-    <?php
-    // Example function: Retrieve user data by ID from database
-    function getUserData($userId) {
-        // Simulating database operation
-        $users = [
-            1 => ['name' => 'John Doe', 'email' => 'john@example.com'],
-            2 => ['name' => 'Jane Smith', 'email' => 'jane@example.com'],
-        ];
-
-        if (array_key_exists($userId, $users)) {
-            return Result::success($users[$userId]);
-        } else {
-            return Result::fail("User not found");
-        }
-    }
-
-    // Example usage:
-    $result1 = getUserData(1);
-    if ($result1->isSuccess()) {
-        $user1 = $result1->getValue();
-        echo "User found: {$user1['name']} ({$user1['email']})\n";
-    } else {
-        echo "Error: " . $result1->getError() . "\n";
-    }
-
-    $result2 = getUserData(3);
-    if ($result2->isSuccess()) {
-        $user2 = $result2->getValue();
-        echo "User found: {$user2['name']} ({$user2['email']})\n";
-    } else {
-        echo "Error: " . $result2->getError() . "\n";
-    }
-    ?>
-    ```
-    </CodeBlock>
 </Steps>
