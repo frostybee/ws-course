@@ -17,3 +17,4 @@ Starlight is a documentation website toolkit built with [Astro](https://astro.bu
 ```sh
 npm create astro@latest -- --template starlight
 ```
+:::

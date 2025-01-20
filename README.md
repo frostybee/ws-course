@@ -1,4 +1,8 @@
-# WS Material
+# What Is this?
+
+This repository contains course materials for the Internet Programming course.
+
+[![Built with Starlight](https://astro.badg.es/v2/built-with-starlight/tiny.svg)](https://starlight.astro.build)
 
 ## 🧞 Commands
 
@@ -11,6 +15,8 @@ All commands are run from the root of the project, from a terminal:
 | `npm run build`           | Build your production site to `./dist/`          |
 | `npm run preview`         | Preview your build locally, before deploying     |
 | `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro --help`    | Get help using the Astro CLI                     |
-| `npm outdated`            | Check outdated packages                          |
-| `npx npm-check -u`        | Check and pick packages to update                |
+| `npm run astro -- --help` | Get help using the Astro CLI                     |
+
+## 👀 Want to learn more?
+
+Check out [Starlight’s docs](https://starlight.astro.build/), read [the Astro documentation](https://docs.astro.build), or jump into the [Astro Discord server](https://astro.build/chat).

@@ -10,12 +10,12 @@ docs/* linguist-documentation
 * text eol=lf
 
 # ------------------------------------------------------------------------------
-# All the files and directories that can be excluded from dist, 
+# All the files and directories that can be excluded from dist,
 # we could have a more clean vendor/
 #
-# So when someone will install that package through with --prefer-dist option, 
-# all the files and directories listed in .gitattributes file will be excluded. 
-# This could have a big impact on big deployments and/or testing. 
+# So when someone will install that package through with --prefer-dist option,
+# all the files and directories listed in .gitattributes file will be excluded.
+# This could have a big impact on big deployments and/or testing.
 # ------------------------------------------------------------------------------
 
 # /.github            export-ignore
