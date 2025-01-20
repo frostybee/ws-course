@@ -1,6 +1,6 @@
 # What Is this?
 
-This repository contains course materials for the Internet Programming course.
+This repository contains course materials for the Web Services course.
 
 [![Built with Starlight](https://astro.badg.es/v2/built-with-starlight/tiny.svg)](https://starlight.astro.build)
 

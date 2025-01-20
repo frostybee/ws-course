@@ -1,6 +1,3 @@
-import cssSidebar from './css-sidebar.ts'
-import htmlSidebar from './html-sidebar.ts'
-
 // Configuration of the main sidebar.
 export default
   [
@@ -10,10 +7,19 @@ export default
       icon: "open-book",
       items: [
         {
-          label: "Lectures",
+          label: "REST",
+          collapsed: true,
           autogenerate: {
-            directory: "lectures/",
+            directory: "lectures/rest",
           }
+        },
+        {
+          label: "Pagination",
+          autogenerate: { directory: 'lectures/pagination' },
+        },
+        {
+          label: "Security",
+          autogenerate: { directory: 'lectures/security' },
         }
       ],
     },
