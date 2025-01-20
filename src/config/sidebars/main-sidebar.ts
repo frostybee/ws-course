@@ -14,7 +14,7 @@ export default
           }
         },
         {
-          label: "Pagination",
+          label: "Pagination & Filtering",
           autogenerate: { directory: 'lectures/pagination' },
         },
         {
@@ -42,7 +42,7 @@ export default
       icon: "seti:javascript",
       items: [
         {
-          label: "javascript",
+          label: "Javascript",
           autogenerate: {
             directory: "javascript/",
           }
