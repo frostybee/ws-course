@@ -107,13 +107,13 @@ In your Slim application, register the custom error handler with the error middl
 This should be done in your application's bootstrap file **`config/middleware.php`** as shown below.
 
 ```php
-    $errorMiddleware = $app->addErrorMiddleware(true, true, true);
+$errorMiddleware = $app->addErrorMiddleware(true, true, true);
 
-    // Create the custom error handler to be used for handling runtime errors.
-    $callableResolver = $app->getCallableResolver();
-    $responseFactory = $app->getResponseFactory();
-    $errorHandler = new CustomErrorHandler($callableResolver, $responseFactory);
-    $errorMiddleware->setDefaultErrorHandler($errorHandler);
+// Create the custom error handler to be used for handling runtime errors.
+$callableResolver = $app->getCallableResolver();
+$responseFactory = $app->getResponseFactory();
+$errorHandler = new CustomErrorHandler($callableResolver, $responseFactory);
+$errorMiddleware->setDefaultErrorHandler($errorHandler);
 ```
 ### Step 3: Test the Custom Error Handler
 
@@ -122,8 +122,8 @@ To test the custom error handler, try accessing a route that doesn't exist or tr
 **Or simply add the following code snippet to your list of routes (RECOMMENDED)**
 
 ```php    
-    // Example route to test error handling
-    $app->get('/error', function (Request $request, Response $response) {
-        throw new \Slim\Exception\HttpNotFoundException($request, "Oi! Something went wrong");
-    });
+// Example route to test error handling
+$app->get('/error', function (Request $request, Response $response) {
+    throw new \Slim\Exception\HttpNotFoundException($request, "Oi! Something went wrong");
+});
 ```    

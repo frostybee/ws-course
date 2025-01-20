@@ -18,12 +18,25 @@ export default
       ],
     },
     {
+      label: "Implementation",
+      link: "/implementation",
+      icon: "seti:html",
+      items: [
+        {
+          label: "Implementation",
+          autogenerate: {
+            directory: "implementation/",
+          }
+        }
+      ],
+    },
+    {
       label: "JavaScript",
       link: "/javascript",
       icon: "seti:javascript",
       items: [
         {
-          label: "JavaScript Topics",
+          label: "javascript",
           autogenerate: {
             directory: "javascript/",
           }
