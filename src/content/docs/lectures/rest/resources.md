@@ -42,7 +42,7 @@ Collections can exist globally at the top level of an API, but can also be conta
 
 The diagram below illustrates the aforementioned concepts of in a RESTful API.
 
-![Rest Resource Model](../../../assets/images/restresourcemodel.png)
+![Rest Resource Model](../../../../assets/images/restresourcemodel.png)
 
 We call information that describes available resources types, their behavior, and their relationships the **resource model** of an API. The resource model can be viewed as the RESTful mapping of the application data model.
 

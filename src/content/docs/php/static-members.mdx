@@ -10,7 +10,7 @@ sidebar:
 In PHP, static methods belong to a class rather than any particular instance of the class. They are called using the `::` operator and can be accessed without creating an instance of the class. 
 :::
 
-### Defining a Static Function
+## Defining a Static Function
 
 To define a static function, use the `static` keyword in the method declaration within a class:
 
@@ -20,7 +20,9 @@ class MyClass {
         return "Hello, I'm a static method!";
     }
 }
-```
+```  
+---
+
 :::tip
 
 1. Static methods are useful for **utility functions** that do not depend on object instances. They can be called directly on the class and are useful for operations that are **independent** of object state.
@@ -34,7 +36,7 @@ class MyClass {
 5. **No `$this`**: You cannot use `$this` in static methods because `$this` refers to the current object instance, and static methods are not associated with any instance.
 :::
 
-### Accessing Static Functions
+## Accessing Static Functions
 
 Static methods can be accessed directly using the class name followed by the scope resolution operator `::`
 
@@ -44,7 +46,7 @@ Static methods can be accessed directly using the class name followed by the sco
 echo MyClass::myStaticMethod(); // Outputs: Hello, I'm a static method!
 ```
 
-#### Example 2: Inside Another Static Method
+### Example 2: Inside Another Static Method
 
 Static methods can also be called from within other static methods of the same class:
 
@@ -63,7 +65,7 @@ class MyClass {
 echo MyClass::anotherStaticMethod(); // Outputs: Hello, I'm a static method!
 ```
 
-#### Example 3: Static Method with Parameters
+### Example 3: Static Method with Parameters
 
 Static methods can accept parameters just like regular methods:
 
@@ -77,7 +79,7 @@ class MathOperations {
 echo MathOperations::add(5, 3); // Outputs: 8
 ```
 
-### Accessing Static Functions from Other Classes
+## Accessing Static Functions from Other Classes
 
 You can also call static methods from other classes:
 

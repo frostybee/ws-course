@@ -1,35 +1,20 @@
 import cssSidebar from './css-sidebar.ts'
 import htmlSidebar from './html-sidebar.ts'
 
+// Configuration of the main sidebar.
 export default
   [
     {
       label: "Lectures",
-      link: "/guides",
+      link: "/lectures",
       icon: "open-book",
       items: [
         {
-          label: "Home",
+          label: "Lectures",
           autogenerate: {
-            directory: "guides/",
+            directory: "lectures/",
           }
         }
-      ],
-    },
-    {
-      label: "HTML",
-      link: "/html",
-      icon: "seti:html",
-      items: [
-        ...htmlSidebar
-      ],
-    },
-    {
-      label: "CSS",
-      link: "/css",
-      icon: "seti:css",
-      items: [
-        ...cssSidebar
       ],
     },
     {
