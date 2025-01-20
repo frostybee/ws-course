@@ -51,9 +51,8 @@ A **composite resource** could be created to offer a unified search feature, all
 
    - The aggregated data is returned to the client as a single JSON response, which could look something like this:
 
-  <CodeBlock title="JSON representation example of a composite resource:">
   
-   ```json
+   ```json title="JSON representation example of a composite resource:"
    {
      "flights": [
        {
@@ -101,7 +100,6 @@ A **composite resource** could be created to offer a unified search feature, all
      ]
    }
    ```
-   </CodeBlock>
 
 :::tip
 In this example, the client benefits from a simplified interface (one endpoint to call) and a comprehensive response, while the server handles the complexity of interacting with multiple APIs and aggregating the data.
@@ -111,8 +109,7 @@ This approach is common in applications that need to combine information from va
 
 ## 🚀 Implementing a Composite Resource 
 
-<CodeBlock title="Example of a composite resource implementation using Slim Framework:">
-   ```php
+ ```php title="Example of a composite resource implementation using Slim Framework:"
     /**
  * Handles the HTTP GET request to retrieve the list of players and aggregate them with external data.
  * 
@@ -168,7 +165,4 @@ public function getListOfLeagues() : mixed
     */
     return [];
 }
-
-
-   ```
-</CodeBlock>
+ ```

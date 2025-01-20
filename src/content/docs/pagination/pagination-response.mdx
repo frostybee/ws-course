@@ -62,8 +62,7 @@ The **`meta`** field in the response provides typically includes:
 - **`current_page`**: The current page number or index of the data being returned. This helps clients keep track of which page they are viewing.
 - **`page_size`**: The number of items per page, which tells clients how many items are included in each page of the response.
 
-<CodeBlock title="Example of an offset-based pagination metadata:">
-    ```json
+    ```json title="Example of an offset-based pagination metadata:"
     {
     "meta": {
         "total": 100,
@@ -73,15 +72,13 @@ The **`meta`** field in the response provides typically includes:
     }
     }
   ```
-</CodeBlock>
 
 ### 2. **Data**
 
 The **`data`** field contains the actual list of items returned by the REST API. This is usually an array of objects representing the resources.
 
-<CodeBlock title="Example of paginated data:">
 
-```json
+```json title="Example of paginated data:"
 {
   "data": [
     {
@@ -97,7 +94,6 @@ The **`data`** field contains the actual list of items returned by the REST API.
   ]
 }
 ```
-</CodeBlock>
 
 ### 3. **Links**
 
@@ -109,9 +105,8 @@ The **`links`** field contains navigation links to facilitate moving between pag
 - **`first`**: A URI of the first page of results, providing a quick way to jump back to the beginning.
 - **`last`**: A URI of the last page of results, giving clients a quick way to jump to the end of the dataset.
 
-<CodeBlock title="Example of links information in a paginated response:">
 
-```json
+```json title="Example of links information in a paginated response:"
 {
   "links": {
     "self": "https://api.example.com/items?page=1",
@@ -122,13 +117,11 @@ The **`links`** field contains navigation links to facilitate moving between pag
   }
 }
 ```
-</CodeBlock>
 
 ### Example of a Well-Structured Paginated Response
 
 
-<CodeBlock title="Combining all the elements, a complete paginated response might look like this:">
-```json
+```json title="Combining all the elements, a complete paginated response might look like this:"
 {
   "meta": {
     "total": 100,
@@ -157,7 +150,6 @@ The **`links`** field contains navigation links to facilitate moving between pag
   }
 }
 ```
-</CodeBlock>
 
 ## Additional Metadata in the Paginated Response
 

@@ -32,8 +32,8 @@ Here's a basic example of such a wrapper implemented as an **ES module**:
 </Aside>
 
 The following code must be stored in a file named `fetchWrapper.js`.
-<CodeBlock title="fetchWrapper.js">
-```javascript
+
+```javascript title="fetchWrapper.js"
 /**
  * A wrapper class for making HTTP requests using the Fetch API.
  * Provides a method to send HTTP requests with default and custom options.
@@ -114,7 +114,6 @@ export class CustomError extends Error {
   }
 } 
 ```
-</CodeBlock>
 
 ### How it Works:
 - **URI and Options**: The `sendRequest` method accepts two parameters:
