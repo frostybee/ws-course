@@ -22,11 +22,12 @@ function sideBorder() {
         `,
     hooks: {
       postprocessRenderedBlock: async (context) => {
-        if (
-          context.renderData.blockAst.children[1].properties
-            .dataLanguage !== "css"
+        const language =
+        context.renderData.blockAst.children[1].properties
+        .dataLanguage;
+        if ( language !== "css"|| language !== "php"
         ) {
-          return;
+          // return;
         }
         const side = h("div.sideBar");
 
@@ -46,6 +47,9 @@ function remapLanguageIdentifiers(lang) {
     }
     case "sh": {
       return "bash";
+    }
+    case "plaintext": {
+      return "-";
     }
     default: {
       return lang;
