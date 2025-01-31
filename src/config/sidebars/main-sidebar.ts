@@ -20,6 +20,10 @@ export default
         {
           label: "Security",
           autogenerate: { directory: 'lectures/security' },
+        },
+        {
+          label: "WWW",
+          autogenerate: { directory: 'lectures/www' },
         }
       ],
     },
