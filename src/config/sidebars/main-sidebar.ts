@@ -16,8 +16,8 @@ export default
           }
         },
         {
-          label: "Bruh",
-          autogenerate: { directory: 'lectures/test' },
+          label: "Pagination and Filtering",
+          autogenerate: { directory: 'lectures/pagination' },
         },
         {
           label: "Security",
