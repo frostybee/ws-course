@@ -15,18 +15,18 @@ export default
             directory: "lectures/rest",
           }
         },
-        {
-          label: "Pagination & Filtering",
-          autogenerate: { directory: 'lectures/pagination' },
-        },
-        {
-          label: "Security",
-          autogenerate: { directory: 'lectures/security' },
-        },
-        {
-          label: "WWW",
-          autogenerate: { directory: 'lectures/www' },
-        }
+        // {
+        //   label: "Pagination and Filtering",
+        //   autogenerate: { directory: 'lectures/pagination' },
+        // },
+        // {
+        //   label: "Security",
+        //   autogenerate: { directory: 'lectures/security' },
+        // },
+        // {
+        //   label: "WWW",
+        //   autogenerate: { directory: 'lectures/www' },
+        // }
       ],
     },
     {
