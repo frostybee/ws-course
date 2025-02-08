@@ -1,0 +1,111 @@
+---
+title: Filtering Collection Resources
+description: Implementing filtering on collection resources.
+topic: lectures
+sidebar:
+    label: "Filtering Collection Resources"
+    order: 1
+---
+
+## What Is Filtering?
+
+Filtering in the context of RESTful web services refers to the process of retrieving a subset of data based on specific criteria. It allows clients to request only the data they need rather than receiving a large dataset and then processing it on the client side. This is particularly useful for improving **performance** and **user experience**, especially when dealing with large datasets.
+
+:::note
+Filtering is the process of selecting a subset of data based on certain criteria. This process helps clients to efficiently access data that meets their needs, rather than receiving the entire dataset and then having to sift through it.
+:::
+
+ > For example, if you have an API that returns a list of books, you might want to filter this list based on parameters such as genre, author, publication date, or price range. Filtering helps reduce the amount of data transferred over the network and improves the **performance** and usability of your web service.
+
+## How to Implement Filtering in RESTful Web Services?
+
+1. **Define filter criteria**:
+   - **Resource Identification**: Determine which resource the filtering applies to. For example, if you have a `products` resource, the endpoint might be `/products`.
+   - **Filtering Parameters**: Decide on the parameters that clients can use to filter the data. These parameters could include various fields of the resource such as IDs, dates, names, or any other attributes relevant to your application.
+
+2. **Design the API Endpoint:**
+   Modify your API endpoints to accept filter parameters. Typically, filtering parameters are passed as query parameters in the URI of the GET request.
+
+   **Example URI for filtering:**
+   ```batch
+   GET /api/books?author=John+Doe&genre=Science+Fiction&price_max=20
+   ```
+
+   **In this example:**
+   - `author` filters books by the author name.
+   - `genre` filters books by the genre.
+   - `price_max` filters books with a price less than or equal to 20.   
+
+3. **Filter logic on the server side:**
+        - **Extract Parameters**: Parse the query parameters from the request.
+        - **Validate Parameters**: Ensure that the parameters are valid and sanitize them to prevent issues such as SQL injection or other security vulnerabilities.   
+   - **Apply Filtering**: Use the parameters to filter the data. This usually involves:
+        - Querying the database with filtering conditions.
+        - Or, iterating over a collection of objects and applying filter logic programmatically.
+    
+        For example, in SQL, you might use:
+        ```sql
+        SELECT * FROM books WHERE author = 'John Doe' AND genre = 'Science Fiction' AND price <= 20;
+        ```
+
+    - **Return the filtered data:** Respond with the filtered data in the appropriate format (e.g., JSON or XML). Ensure that the response contains only the data that matches the criteria specified.
+
+### Example 1: Filtering with Multiple Criteria
+
+1. **API endpoint**: `/products`
+2. **Filter parameters**: `category`, `price_range` (min and max), `availability`
+3. **PHP Implementation**:
+
+```php
+<?php
+// Database connection
+$dsn = 'mysql:host=localhost;dbname=shop';
+$username = 'root';
+$password = '';
+$options = [];
+$pdo = new PDO($dsn, $username, $password, $options);
+
+// Extract and validate filter parameters
+$category = isset($_GET['category']) ? $_GET['category'] : '';
+$min_price = isset($_GET['min_price']) ? (float)$_GET['min_price'] : 0;
+$max_price = isset($_GET['max_price']) ? (float)$_GET['max_price'] : PHP_INT_MAX;
+$availability = isset($_GET['availability']) ? $_GET['availability'] : '';
+
+// Build the SQL query
+$sql = "SELECT * FROM products WHERE price BETWEEN :min_price AND :max_price";
+$params = [
+    ':min_price' => $min_price,
+    ':max_price' => $max_price
+];
+
+if (!empty($category)) {
+    $sql .= " AND category = :category";
+    $params[':category'] = $category;
+}
+
+if (!empty($availability)) {
+    $sql .= " AND availability = :availability";
+    $params[':availability'] = $availability;
+}
+
+// Prepare and execute the query
+$stmt = $pdo->prepare($sql);
+$stmt->execute($params);
+$products = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Return the results as JSON
+header('Content-Type: application/json');
+echo json_encode($products);
+?>
+```
+
+## Key Points to Consider
+
+:::tip
+- **Security**: Always validate and sanitize input to prevent SQL injection and other security issues. Using prepared statements, as shown in the examples, helps mitigate these risks.
+- **Performance**: Ensure that your filtering logic is efficient, especially when dealing with large datasets. Indexing the database fields that are frequently filtered can improve performance.
+- **User Experience**: Provide useful error messages and handle cases where no results are found.
+- **Scalability**: As your application grows, consider more advanced filtering options to manage large results efficiently.
+- **Pagination:** If the dataset can be very large, consider implementing pagination along with filtering to manage the volume of data returned.
+- **Documentation:** Clearly document the filter parameters and their usage in your API documentation so that clients know how to use them.
+:::
