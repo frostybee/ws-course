@@ -5,10 +5,12 @@ export default
       label: "Lectures",
       link: "/lectures",
       icon: "open-book",
+      id: "lectures",
       items: [
         {
           label: "REST",
           collapsed: true,
+
           autogenerate: {
             directory: "lectures/rest",
           }
@@ -31,6 +33,7 @@ export default
       label: "Implementation",
       link: "/implementation",
       icon: "seti:html",
+      id: "implementation",
       items: [
         {
           label: "Implementation",
@@ -43,6 +46,7 @@ export default
     {
       label: "JavaScript",
       link: "/javascript",
+      id: "javascript",
       icon: "seti:javascript",
       items: [
         {
@@ -56,6 +60,7 @@ export default
     {
       label: "PHP",
       link: "/php",
+      id: "php",
       icon: "seti:php",
       items: [
         {
