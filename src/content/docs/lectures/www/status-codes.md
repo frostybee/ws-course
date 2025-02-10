@@ -11,8 +11,8 @@ sidebar:
 ---
 :::note
 
-- HTTP status codes are three-digit numbers sent by a web server in response to a client's request.  
-- They provide information about **the outcome** of the request,helping clients (such as web browsers or APIs) understand whether their request was successful or if there were any issues.  
+- HTTP status codes are **three-digit numbers** sent by a web server in response to a client's request.  
+- They provide information about **the outcome** of the request, helping clients (such as web browsers or APIs) understand whether their request was successful or if there were any issues.  
 - They are categorized into **five different classes** based on the **first digit**.
 :::
 
