@@ -9,31 +9,41 @@ sidebar:
 ## What Are HTTP Status Codes?
 
 ---
+:::note
 
-HTTP status codes are three-digit numbers sent by a web server in response to a client's request. They provide information about **the outcome** of the request and help determine what action should be taken next. 
+- HTTP status codes are three-digit numbers sent by a web server in response to a client's request.  
+- They provide information about **the outcome** of the request,helping clients (such as web browsers or APIs) understand whether their request was successful or if there were any issues.  
+- They are categorized into **five different classes** based on the **first digit**.
+:::
 
 Here's a quick overview of the main categories:
+1. **1xx (Informational)**:  
+   These codes indicate that the request was received and is being processed.
+   - Example: **100 Continue** — The request is being processed.
 
-1. **Informational (100–199)**: These codes indicate that the request was received and is being processed.
-   - **100 Continue**: The initial part of the request has been received, and the client should continue with the rest of the request.
+2. **2xx (Successful)**:  
+   These codes show that the request was successfully received, understood, and accepted.
+   - Example: **200 OK** — The request was successful, and the server is returning the requested data.
+   - Example: **201 Created** — The request was successful, and a new resource was created.
 
-2. **Success (200–299)**: These codes mean that the request was successfully received, understood, and accepted.
-   - **200 OK**: The request was successful, and the server returned the requested data.
-   - **201 Created**: The request was successful, and a new resource was created.
+3. **3xx (Redirection)**:  
+   These codes mean that further action is needed to fulfill the request, typically in the form of redirection.
+   - Example: **301 Moved Permanently** — The resource has been moved permanently to a new URL.
+   - Example: **302 Found** — The resource is temporarily located at a different URL.
 
-3. **Redirection (300–399)**: These codes indicate that further action is needed to fulfill the request, usually involving a redirection.
-   - **301 Moved Permanently**: The resource has been permanently moved to a new URL.
-   - **302 Found**: The resource is temporarily located at a different URL.
+4. **4xx (Client Error)**:  
+   These codes indicate that the client seems to have made an error in their request.
+   - Example: **400 Bad Request** — The request is malformed or incorrect.
+   - Example: **404 Not Found** — The requested resource could not be found on the server.
+   - Example: **403 Forbidden** — The server understood the request but refuses to authorize it.
 
-4. **Client Error (400–499)**: These codes indicate that there was an error with the client's request.
-   - **400 Bad Request**: The server could not understand the request due to invalid syntax.
-   - **404 Not Found**: The requested resource could not be found on the server.
+5. **5xx (Server Error)**:  
+   These codes indicate that the server failed to fulfill a valid request.
+   - Example: **500 Internal Server Error** — A generic error occurred on the server.
+   - Example: **502 Bad Gateway** — The server received an invalid response from another server it was accessing.
+   - Example: **503 Service Unavailable** — The server is currently unable to handle the request, often due to being overloaded or under maintenance.
 
-5. **Server Error (500–599)**: These codes indicate that the server failed to fulfill a valid request.
-   - **500 Internal Server Error**: The server encountered an unexpected condition that prevented it from fulfilling the request.
-   - **503 Service Unavailable**: The server is currently unable to handle the request due to temporary overload or maintenance.
-
-Each status code provides a specific piece of information about the response and helps both the client and server understand what happened during the request-response cycle.
+Each of these status codes gives the client important information about how to proceed, whether the request was successful, needs correction, or if there's an issue with the server.
 
 
 The following table lists the HTTP response status codes for the `GET` (retrieve), `POST` (create), `PUT` (modify), and `DELETE` operations.
