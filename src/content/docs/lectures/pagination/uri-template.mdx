@@ -1,0 +1,46 @@
+---
+title: URI Template
+description: URI Template
+topic: lectures
+sidebar:
+  label: 'URI Template'
+  order: 7
+  badge: 
+        text: New
+        variant: danger
+---
+
+## What Are URI Templates?
+
+- A **URI template** ([RFC 6570](https://datatracker.ietf.org/doc/html/rfc6570)) is a standardized way to define a pattern for a URI (Uniform Resource Identifier), allowing for **flexible** and **reusable** URIs with variable parts that can be **substituted** dynamically. It can be considered as a "blueprint" for building URIs.
+
+- A URI template specifies a **general structure** for a URI, using **placeholders** or **variable segments** that can be filled in with **actual values** to form complete URIs. 
+
+- These placeholders are often **denoted** by **curly braces** `{}`, and they can represent path parameters, query parameters, or even portions of the domain.
+
+:::tip
+**URI template** is a useful concept in web services and REST API design to define paths that **can be adapted** based on different inputs.
+:::
+
+### Example:
+Here's a simple example of a URI template:
+
+```
+https://api.example.com/users/{userId}/posts/{postId}
+```
+**In this case:**
+- `{userId}` and `{postId}` are **placeholders** for dynamic values.
+- You can replace `{userId}` with an actual user ID (e.g., `123`) and `{postId}` with a specific post ID (e.g., `456`), resulting in a final URI like:
+
+```
+https://api.example.com/users/123/posts/456
+```
+
+## Features of URI Templates:
+- **Placeholders**: Variables wrapped in curly braces (`{}`) that will be replaced with actual values.
+- **Syntax rules**: URI templates can define how the variables should be encoded (e.g., slashes, query strings).
+- **Flexible matching**: Templates can allow for optional segments, repeated segments, and more complex structures.
+
+## Common Use Cases:
+- **API Design**: Often used in RESTful APIs to specify endpoints where certain parts of the URI can be replaced with parameters.
+- **URL generation**: Templates allow for the dynamic generation of URLs in web applications, for example, creating links to user profiles, search results, or specific resources.
