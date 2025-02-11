@@ -23,7 +23,7 @@ export default defineConfig({
   integrations: [
     starlight({
       title: 'Web Services',
-      favicon: '/public/svgrepo-com.svg',
+      favicon: '/images/svgrepo-com.svg',
       social: {
         github: 'https://github.com/frostybee/ws-course',
       },
