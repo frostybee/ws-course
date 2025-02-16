@@ -7,16 +7,25 @@ sidebar:
     order: 1
 ---
 
+import { Aside } from '@astrojs/starlight/components';
+
 ## What Is Filtering?
 
-- Filtering in the context of REST web services refers to the process of retrieving a subset of data based on specific criteria.
-- It allows clients to request only the data they need rather than receiving a large dataset and then processing it on the client side. This is particularly useful for improving **performance** and **user experience**, especially when dealing with large datasets.
-
 :::note
-Filtering is the process of selecting a subset of data based on certain criteria. This process helps clients to efficiently access data that meets their needs, rather than receiving the entire dataset and then having to process it on the client side.
+- Filtering is the process of **selecting** and **retrieving** a **subset** of data based on certain criteria.
+- It allows clients to request **only the data** that meets their needs rather than receiving a large dataset and then processing it on the client side. 
 :::
 
- > For example, if you have an API that returns a list of books, you might want to filter this list based on parameters such as genre, author, publication date, or price range. Filtering helps reduce the amount of data transferred over the network and improves the **performance** and usability of your web service.
+- **Common Use Cases:**
+ > For example, if you have an API that returns a list of books, you might want to filter this list based on parameters such as genre, author, publication date, or price range.
+
+## Why Filtering Is Important?
+
+<Aside type='tip' title='Filtering Benefits' >
+- Helps avoid over-fetching data.
+- Reduces payload size and the **amount of data** transferred over the network, **improving performance** and **usability** of your web service.
+- Improves user experience by providing more **relevant information**,   especially when dealing with large datasets.
+</Aside>
 
 ## How to Implement Filtering in RESTful Web Services?
 
