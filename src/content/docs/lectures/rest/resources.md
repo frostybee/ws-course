@@ -6,6 +6,20 @@ sidebar:
     order: 1
 ---
 
+## What is REST?
+---
+
+:::note
+
+- REST (Representational State Transfer) is an architectural style for designing networked applications.
+- **Key Concepts:**
+  - Stateless communication
+  - Resources identified by URIs
+  - HTTP methods (GET, POST, PUT, DELETE, PATCH)
+  - Support for multiple resources representations.
+  
+:::
+
 ## Resources in REST
 
 ---
