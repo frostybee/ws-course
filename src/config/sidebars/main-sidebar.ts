@@ -38,7 +38,13 @@ export default
         {
           label: "Implementation",
           autogenerate: {
-            directory: "implementation/",
+            directory: "implementation/common",
+          }
+        },
+        {
+          label: "Error Handling",
+          autogenerate: {
+            directory: "implementation/error-handling",
           }
         }
       ],
