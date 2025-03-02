@@ -14,11 +14,19 @@ sidebar:
 - When the error response is structured properly (including status codes, error codes, and meaningful messages), it helps both developers and systems easily pinpoint the problem during debugging.
 :::
 
-## Producing a Well-Structured Error Response
+
+## Key Principles
+--- 
+
+1. **Use appropriate HTTP status codes**: The status code should reflect the type of error (e.g., `400` for bad requests, `404` for not found, `500` for server errors).
+2. **Consistent Format:** Keep the error response format consistent with your successful responses (e.g., JSON), so clients can parse it uniformly.
+3. **Provide enough detail**: Include a human-readable message, an error code (if applicable), and optionally, details for debugging or next steps.
+4. **Avoid overexposure:** Don't leak sensitive information (e.g., stack traces) in production responses.
+
+## Recommended Structure
 ---
 
-To **properly structure** a REST API response with an error message, you should follow a **standard format** that makes the response easy to understand and consistent. This ensures that your API responses with error messages are **easy to interpret** and handle, improving the client experience and **easing debugging**.
-
+To **properly structure** a REST API response with an error message, you should follow a **standard format** that makes the response easy to understand and consistent. 
 :::tip
 **Don't Include Sensitive Information**: Avoid including sensitive information such as database internals, stack traces, or detailed logs in the error response.
 :::
@@ -39,13 +47,13 @@ To **properly structure** a REST API response with an error message, you should 
 ### **Response Format**  
 ---
 
-The response body should be structured as a JSON object with the following key properties:
-- **status**: General status of the response (e.g., error, success).
-- **code**: HTTP status code indicating the type of error.
-- **message**: A human-readable message explaining the error. Ensure the message is concise, informative, and written in plain language.
-- **details**: The `details` field is optional, but it can be useful for providing further context on validation issues (e.g., missing required fields, or invalid format).
-- **documentation_url**: A link to the documentation to help developers troubleshoot the issue.
-- **Consistency**: Be consistent in the error structure across different endpoints of your API.
+Keep the error response format consistent with your successful responses (e.g., JSON), so clients can parse it uniformly.
+
+A well-structured error response typically includes:
+- **status**: Indicates the outcome (e.g., "error" or "fail").
+- **message**: A concise, human-readable description of the error.
+- **code** (optional): A machine-readable error code for programmatic handling.
+- **details** (optional): Additional context, such as validation errors or specific fields that failed.
    
 ### Example of a Structured Error Response
 
