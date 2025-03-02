@@ -75,7 +75,7 @@
   font-weight: 600;
   line-height: var(--sl-line-height-headings);
   color: var(--sl-color-asides-text-accent) !important;
-  text-transform: uppercase;
+  /* text-transform: uppercase; */
 }
 
 .starlight-aside__content a {

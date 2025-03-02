@@ -1,10 +1,67 @@
 ---
-title: Implementing a Custom Error Handler
-description: Implementing a Custom Error Handler
+title: Structuring Error Responses
+description: Structuring Error Responses
 sidebar:
     label: "Error Response"
     order: 5
 ---
 
-NOTE: create a category for error handling.
-Need to define that in the main menu.
+## Motivation
+---
+
+:::note
+- A consistent **structure for error responses** makes it easier for developers to understand and handle errors across different API endpoints. When the **structure is predictable**, developers can quickly identify what went wrong and how to process the error.
+- When the error response is structured properly (including status codes, error codes, and meaningful messages), it helps both developers and systems easily pinpoint the problem during debugging.
+:::
+
+## Producing a Well-Structured Error Response
+---
+
+To **properly structure** a REST API response with an error message, you should follow a **standard format** that makes the response easy to understand and consistent. This ensures that your API responses with error messages are **easy to interpret** and handle, improving the client experience and **easing debugging**.
+
+:::tip
+**Don't Include Sensitive Information**: Avoid including sensitive information such as database internals, stack traces, or detailed logs in the error response.
+:::
+
+### **HTTP Status Code**  
+---
+
+- Use the appropriate HTTP **status code** for the error. This helps clients quickly understand the type of issue:
+    - **4xx**: Client-related errors (e.g., invalid input, not found).
+    - **5xx**: Server-related errors (e.g., internal server issues).
+- **Example status codes**:
+    - `400 Bad Request`: Invalid or missing parameters.
+    - `401 Unauthorized`: Authentication failure.     
+    - `403 Forbidden`: Authentication succeeded, but the user doesn't have permission.
+    - `404 Not Found`: Resource is not found.
+    - `500 Internal Server Error`: Server encountered an unexpected condition.
+
+### **Response Format**  
+---
+
+The response body should be structured as a JSON object with the following key properties:
+- **status**: General status of the response (e.g., error, success).
+- **code**: HTTP status code indicating the type of error.
+- **message**: A human-readable message explaining the error. Ensure the message is concise, informative, and written in plain language.
+- **details**: The `details` field is optional, but it can be useful for providing further context on validation issues (e.g., missing required fields, or invalid format).
+- **documentation_url**: A link to the documentation to help developers troubleshoot the issue.
+- **Consistency**: Be consistent in the error structure across different endpoints of your API.
+   
+### Example of a Structured Error Response
+
+Here's a sample response for an error when a user tries to access a resource that doesn't exist:
+
+```json
+{
+  "status": "error",
+  "code": 400,
+  "message": "Bad Request: Missing required parameter 'email'.",
+  "details": [
+    {
+      "field": "email",
+      "issue": "Missing"
+    }
+  ],
+  "documentation_url": "https://example.com/api/docs/errors#400"
+}
+```
