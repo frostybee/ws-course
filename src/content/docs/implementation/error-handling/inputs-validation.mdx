@@ -1,0 +1,48 @@
+---
+title: Validating Inputs in a REST API
+description: Validating Inputs in a REST API
+sidebar:
+    label: "Inputs Validation"
+    order: 1
+    badge: 
+        text: New
+        variant: danger
+---
+
+## 🔔 Why Input Validation Matters?
+---
+:::note
+1. **Security**: Prevents **malicious data** from compromising your application (e.g., injection attacks).
+2. **Data Integrity**: Ensures inputs **match expected** types, formats, and constraints (e.g., email format, non-negative numbers).
+3. **User Experience**: Provides clear **error messages** to API consumers when inputs are invalid.
+4. **Reliability & Stability**: Prevents crashes, runtime errors, or unexpected behavior due to malformed data.
+:::
+
+## 👩‍💻 What to Validate?
+---
+### 🔢 Input Sources
+For a REST API, inputs typically come from:
+- **Query Parameters** (e.g., `GET /species?limit=10`)
+- **URL Path Parameters** (e.g., `GET /players/123`)
+- **Request Body** (e.g., JSON in a POST or PUT request)
+- **Headers** (e.g., `Content-Type`, `Authorization`)
+
+### 📋 Validation Rules
+You'll need to validate:
+- **Presence**: Is a required field provided?
+- **Type**: Is the input an integer, string, boolean, etc.?
+- **Format**: Does it match a pattern (e.g., email, date)?
+- **Range/Length**: Is it within acceptable bounds (e.g., age between 18-100)?
+- **Business Rules**: Does it make sense in your domain (e.g., order quantity > 0)?
+
+---
+
+## 🔨 Tools and Approaches in PHP
+
+1. **Native PHP Functions**:
+   - `filter_var()` for sanitizing and validating common types (e.g., email, URL).
+   - `isset()`, `empty()` for checking presence.
+   - Type casting/checking with `is_int()`, `is_string()`, etc.
+
+2. **Third-Party Libraries**: **[Valitron](https://github.com/vlucas/valitron)**: A simple, stand-alone validation library with no dependencies.
+   
