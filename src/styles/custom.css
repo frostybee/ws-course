@@ -529,6 +529,16 @@ Style overrides: Right sidebar, items of the table of content */
   font-size: 3rem;
 }
 
+.sl-markdown-content code {
+  border-radius: 6px;
+  padding: .23em .42em;
+  margin: 0;
+  font-size: 85%;
+  white-space: break-spaces;
+  border: 1px solid rgba(0,0,0,.1);
+  background-color: #818b981f;
+}
+
 
 /* Styles for markdown content headings  */
 /* .sl-markdown-content :is(h1, h2, h3, h4, h5, h6):not(:where(.not-content *)) {

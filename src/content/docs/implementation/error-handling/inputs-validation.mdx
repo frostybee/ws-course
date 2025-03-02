@@ -9,40 +9,72 @@ sidebar:
         variant: danger
 ---
 
+## What is Input Validation?
+---
+Input Validation is the process of **verifying** that user or client-provided data meets **expected formats**, types, and **constraints** before processing.  
+- Context in RESTful APIs: Ensures incoming requests (e.g., JSON payloads, query parameters) **are safe** and **usable**.  
+- Goal: Prevent errors, security vulnerabilities, and unexpected behavior.  
+- Example:  
+  - Valid: `{"user_id": 123, "name": "Quacker"}`  
+  - Invalid: `{"user_id": "abc", "name": ""}`  
+
+
 ## 🔔 Why Input Validation Matters?
 ---
 :::note
 1. **Security**: Prevents **malicious data** from compromising your application (e.g., injection attacks).
-2. **Data Integrity**: Ensures inputs **match expected** types, formats, and constraints (e.g., email format, non-negative numbers).
-3. **User Experience**: Provides clear **error messages** to API consumers when inputs are invalid.
-4. **Reliability & Stability**: Prevents crashes, runtime errors, or unexpected behavior due to malformed data.
+2. **Data integrity**: Ensures inputs **match expected** types, formats, and constraints (e.g., email format, non-negative numbers).
+3. **User experience**: Provides clear **error messages** to API consumers when inputs are invalid.
+4. **Reliability & Stability**: Prevents crashes, runtime errors, or unexpected behavior due to malformed or invalid data.
 :::
 
 ## 👩‍💻 What to Validate?
 ---
+
 ### 🔢 Input Sources
 For a REST API, inputs typically come from:
-- **Query Parameters** (e.g., `GET /species?limit=10`)
-- **URL Path Parameters** (e.g., `GET /players/123`)
-- **Request Body** (e.g., JSON in a POST or PUT request)
-- **Headers** (e.g., `Content-Type`, `Authorization`)
+1. **Query Parameters** (e.g., `GET /species?limit=10`)
+2. **URL Path Parameters** (e.g., `GET /players/123`)
+3. **Request Body** (e.g., JSON in a POST or PUT request)
+4. **Headers** (e.g., `Content-Type`, `Authorization`)
 
 ### 📋 Validation Rules
 You'll need to validate:
 - **Presence**: Is a required field provided?
 - **Type**: Is the input an integer, string, boolean, etc.?
-- **Format**: Does it match a pattern (e.g., email, date)?
+- **Format**: Does it match a pattern (e.g., email, date, phone number, etc.)?
 - **Range/Length**: Is it within acceptable bounds (e.g., age between 18-100)?
-- **Business Rules**: Does it make sense in your domain (e.g., order quantity > 0)?
+- **Business rules**: Does it make sense in your domain (e.g., order quantity > 0)?
 
----
+**Examples of validation rules:**
+- `name`: Required, string, 2-50 characters.
+- `email`: Required, valid email format.
+- `age`: Optional, integer, 18-100.
 
 ## 🔨 Tools and Approaches in PHP
+---
 
-1. **Native PHP Functions**:
+1. **Native PHP functions**:
    - `filter_var()` for sanitizing and validating common types (e.g., email, URL).
    - `isset()`, `empty()` for checking presence.
    - Type casting/checking with `is_int()`, `is_string()`, etc.
 
-2. **Third-Party Libraries**: **[Valitron](https://github.com/vlucas/valitron)**: A simple, stand-alone validation library with no dependencies.
+2. **Third-party libraries**: **[Valitron](https://github.com/vlucas/valitron)**: A simple, stand-alone validation library with no dependencies.
    
+
+## Best Practices
+---
+1. **Use HTTP Status Codes**:
+   - 400: Bad Request (malformed JSON).
+   - 422: Unprocessable Entity (validation errors).
+   - 201: Created (success for POST).
+2. **Sanitize Inputs**:
+   - Even after validation, use `filter_var()` or similar to sanitize before database insertion.
+3. **Centralize Validation**:
+   - Move rules and messages to a separate class or config file for reusability.
+4. **Log Errors**:
+   - Log validation failures for debugging or security monitoring.
+5. **Document Your API**:
+   - Use OpenAPI/Swagger to specify expected inputs and error responses.
+6. **Handle Edge Cases**:
+   - Test with empty strings, null values, malformed JSON, and oversized payloads.
