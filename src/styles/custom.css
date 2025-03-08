@@ -534,7 +534,7 @@ Style overrides: Right sidebar, items of the table of content */
   padding: .23em .42em;
   margin: 0;
   font-size: 85%;
-  vertical-align: middle;
+  /* vertical-align: middle; */
   white-space: break-spaces;
   border: 1px solid rgba(0,0,0,.1);
   background-color: #818b981f;
