@@ -40,10 +40,11 @@ A well-structured JSON response for **a sub-collection** typically **includes**:
 7. **Error Handling**: If the sub-collection is empty, return an empty array (`"data": []`) rather than `null` or an error (unless the parent resource doesn't exist, which might result in a 404 case).
 
 ## How to Produce a Sub-Collection Response?
-Below is an implementation of `model method` that shows you how a response for a sub-collection should be produced and properly structured. 
+Below is a `model method` that demonstrates an implementation of properly structured response for a sub-collection. 
 
 :::tip
-The following method was implemented in the **`PlayersModel`** class.
+The following method was implemented in the **`PlayersModel`** class.  
+**Endpoint:** `GET /players/{player_id}/goals`
 
 ```php title="Example: Producing a structure response for a sub-collection with parent resource context"
 public function getGoalsByPlayerID(string $player_id): mixed
