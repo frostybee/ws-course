@@ -1,0 +1,125 @@
+---
+title: Working with AJAX
+description: Working with AJAX
+sidebar:
+  label: 'ES Modules'
+  order: 4
+---
+
+## What Are ECMAScript Modules (ESM)?
+
+- In JavaScript, **ECMAScript Modules (ESM)** are a standardized module system for **structuring** and **organizing** code. 
+- Introduced in **ECMAScript 6 (ES6/ES2015)**, they allow developers to divide their code into smaller, reusable pieces. This modularity helps to manage complex applications and avoid **polluting the global scope**, ensuring a more maintainable and scalable codebase.
+
+### What Is a Module?
+:::note
+A **module** in JavaScript refers to a **reusable** piece of code that is isolated in **its own scope**. This allows functions, variables, and classes within that module to be either **private** (not accessible outside) or **exported** (shared with other modules). 
+:::
+
+**The goal of modules is to provide:**
+
+1. **Encapsulation**: You can define variables and functions inside a module, and they are hidden from the outside world unless **explicitly** exported.
+2. **Reusability**: Once a module is created, it can be reused in different parts of the application by importing it.
+3. **Maintainability**: Breaking down a large application into smaller, modular components makes the codebase easier to maintain, test, and extend.
+
+## Exporting Values from a Module
+
+In ESM, you export variables, functions, or classes so they can be used by other modules. This can be done using either **named exports** or a **default export**.
+
+### Named Exports
+
+Named exports allow you to **export multiple things** from a module. The exported items can be functions, variables, or constants.
+
+```javascript
+// math.js
+export const add = (a, b) => a + b;
+export const subtract = (a, b) => a - b;
+```
+
+### Default Exports
+
+A default export is used when you want to **export a single entity** from the module, such as a function or a class. **A module can only have one default export.**
+
+```javascript
+// greet.js
+export default function greet(name) {
+  return `Hello, ${name}!`;
+}
+```
+
+You can also combine named and default exports in the same module.
+
+```javascript
+// utils.js
+export const multiply = (a, b) => a * b;
+export default function divide(a, b) {
+  return a / b;
+}
+```
+
+## Importing Modules
+
+There are various ways to import modules depending on how they are exported.
+
+### Named Imports
+
+When importing named exports, you use curly braces **`{}`** to reference specific values from the module.
+
+```javascript
+// app.js
+import { add, subtract } from './math.js';
+
+console.log(add(2, 3)); // 5
+console.log(subtract(5, 2)); // 3
+```
+
+### Default Imports
+
+When importing a default export, you can give the imported value any name you choose.
+
+```javascript
+// app.js
+import greet from './greet.js';
+
+console.log(greet('Alice')); // Hello, Alice!
+```
+
+### Importing Everything
+
+If you want to import **everything** from a module, you can use the  **`*`** syntax and assign it to a single object.
+
+```javascript
+// app.js
+import * as math from './math.js';
+
+console.log(math.add(2, 3)); // 5
+console.log(math.subtract(5, 2)); // 3
+```
+
+## Setting Up ECMAScript Modules
+
+### In the Browser
+
+In modern browsers, ECMAScript modules can be used by specifying the **`type="module"`** attribute in a  **`<script>`** tag. This tells the browser to treat the script as an ESM.
+
+:::tip
+- Modules must be **served over** HTTP/HTTPS (not `file://` due to CORS restrictions).
+- Note that modules in the browser are **always loaded asynchronously**, and relative paths (e.g., `./math.js`) must be specified.
+- File paths must include extensions (e.g., `./math.js`, not `./math`).
+- Modules are deferred by default (like `<script defer>`).
+:::
+
+```html title="Example: Importing an ES module into an HTML document:"
+<!-- index.html -->
+<script type="module" src="app.js"></script>
+```
+
+With this setup, the `app.js` file can import other modules, such as:
+
+```javascript
+// app.js
+import { add } from './math.js';
+
+console.log(add(2, 3)); // 5
+```
+
