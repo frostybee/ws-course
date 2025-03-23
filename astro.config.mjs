@@ -42,11 +42,19 @@ export default defineConfig({
       lastUpdated: true,
       plugins: [
         starlightImageZoom(),
-        starlightViewModes(),
+        starlightViewModes({
+          showHeader: false,
+          showSidebar: false,
+          showTableOfContents: true,
+          showFooter: true,
+        }),
         starlightSidebarTopics(
           [
             ...mainSidebar
-          ]
+          ],
+          {
+            exclude: ["/zen-mode/**/*"],
+          }
         )
       ],
       // plugins: [
