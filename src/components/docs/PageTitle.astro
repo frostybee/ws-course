@@ -1,10 +1,9 @@
 ---
-import type { Props } from '@astrojs/starlight/props';
 import Default from '@astrojs/starlight/components/PageTitle.astro';
 const { labels, lang, lastUpdated } = Astro.props;
 ---
 
-<Default {...Astro.props}><slot /></Default>
+<Default><slot /></Default>
 {
 	lastUpdated && (
 		<p class="last-updated">
