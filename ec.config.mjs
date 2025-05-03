@@ -5,7 +5,7 @@ import { pluginLineNumbers } from "@expressive-code/plugin-line-numbers";
 
 function sideBorder() {
   return definePlugin({
-    name: "Adds side border to slint code blocks",
+    name: "Adds side border to Starlight code blocks",
     baseStyles: `
         .sideBar {
             position: absolute;

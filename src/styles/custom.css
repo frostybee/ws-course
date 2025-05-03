@@ -258,6 +258,7 @@ Style overrides: Right sidebar, items of the table of content */
 
   &:hover {
     font-weight: 600;
+    border-left: 3px solid var(--fb-toc-color-border);
   }
 }
 
