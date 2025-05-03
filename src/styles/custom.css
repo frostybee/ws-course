@@ -299,9 +299,9 @@ Style overrides: Right sidebar, items of the table of content */
 
   >li:before {
     --fb-steps-dimension: 30px;
-    background-color: var(--fb-steps-bg-color);
+    /* background-color: var(--fb-steps-bg-color); */
     /* background-color: var(--sl-color-gray-6); */
-    color: var(--fb-steps-text-color) !important;
+    /* color: var(--fb-steps-text-color) !important; */
     box-shadow: none !important;
     font-size: .8rem;
     width: var(--fb-steps-dimension);
