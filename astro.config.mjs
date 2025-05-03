@@ -11,7 +11,6 @@ import starlightSidebarTopics from "starlight-sidebar-topics";
 
 import mainSidebar from './src/config/sidebars/main-sidebar.ts'
 // TODO: clean the following imports
-import mdx from "@astrojs/mdx";
 import starlightLinksValidator from 'starlight-links-validator'
 
 
@@ -34,10 +33,7 @@ export default defineConfig({
         Header: './src/components/Header.astro',
       },
       customCss: [
-        "./src/styles/custom.css",
-        "./src/styles/Linkable-headings.css",
-        "./src/styles/sidebar-topics.css",
-        "./src/styles/asides.css",
+        "./src/styles/index.css",
       ],
       lastUpdated: true,
       plugins: [
