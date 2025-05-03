@@ -12,12 +12,10 @@
   --sl-content-width: 55rem;
   /* --sl-color-bg: #0d1117; */
   /* --sl-color-bg: #1b1b1f; */
-  --sl-color-bg: #121213;
-  /* --sl-color-bg: #17181c; */
+  --sl-color-bg: hsl(224, 10%, 10%);
   /* SL's main text color  */
   /* --sl-color-text: #e3e3e3; */
   /* --sl-color-text: #f0f6fc; */
-  --sl-color-text: #d7dadc;
   /* --sl-color-bg: #1b1b1f; */
   --sl-color-white: hsl(0, 0%, 100%);
   --sl-color-gray-7: hsl(224, 10%, 10%);
@@ -116,6 +114,7 @@ body {
   --border-xheavy: rgba(0, 0, 0, .25);
   --fb-level-2-bg: #ffffff;
   --fb-level-0-bg: #f5f7f8;
+  --sl-color-bg-sidebar: #fcfcfc;
   --sl-color-bg-nav: #eff1f1;
   --fb-sidebar-color-text-current: rgba(38, 50, 56, 1);
   --fb-toc-color-current-bg: #0085f230;
@@ -126,7 +125,7 @@ body {
 :root {
   /* Customize the font style here */
 
-  --sl-font: "Roboto Flex", sans-serif;
+  --sl-font: "Roboto Flex Variable", sans-serif;
   --font-mono: Noto Mono, Menlo, Monaco, Consolas, monospace;
   font-weight: 400;
   --fb-scrollbar-height: 0.250rem;
@@ -170,7 +169,6 @@ h4,
 h5,
 h6 {
   font-family: 'Plus Jakarta Sans Variable', sans-serif;
-  /* color: var(--sl-color-text); */
 }
 
 
@@ -237,7 +235,6 @@ Style overrides: Right sidebar, items of the table of content */
 .right-sidebar-panel starlight-toc ul li[class^=astro-] a {
   border-radius: 0%;
   display: inline-block;
-  /* padding: .5rem 1.1rem; */
   padding-top: .5rem;
   padding-bottom: .3rem;
   text-decoration: none;
@@ -245,7 +242,7 @@ Style overrides: Right sidebar, items of the table of content */
   border-left: 2px solid var(--sl-color-gray-5);
   font-weight: 400;
 
-  /* Currently selected item in the TOC */
+  /* Current selected item in the TOC */
   &:where([aria-current='true']) {
     border-left: 3px solid var(--fb-toc-color-border);
     color: var(--sl-color-white);
@@ -258,7 +255,7 @@ Style overrides: Right sidebar, items of the table of content */
 
   &:hover {
     font-weight: 600;
-    border-left: 3px solid var(--fb-toc-color-border);
+    border-left: 2px solid var(--fb-toc-color-border);
   }
 }
 
@@ -409,13 +406,10 @@ Style overrides: Right sidebar, items of the table of content */
   counter-reset: listitem;
 }
 
+.sl-markdown-content ol:not(:where(.sl-steps, .not-content *))>li,
 .sl-markdown-content ul:not( :where(.sl-steps, .not-content *))>li {
   position: relative;
-  padding-left: 1.6rem;
-}
-.sl-markdown-content ol:not(:where(.sl-steps, .not-content *))>li {
-  position: relative;
-  padding-left: 2.2rem;
+  padding-left: 2rem;
 }
 
 .sl-markdown-content li:not(:where(.not-content *))>ol,
@@ -448,8 +442,7 @@ Style overrides: Right sidebar, items of the table of content */
   line-height: 1.3rem;
   text-align: center;
   height: 22px;
-  width: 26px;
-  /* width: fit-content; */
+  width: 22px;
   min-width: 22px;
   padding-inline: 4px;
   left: 0;
@@ -495,6 +488,8 @@ Style overrides: Right sidebar, items of the table of content */
       color: var(--fb-sidebar-color-text-current);
       background-color: var(--fb-sidebar-color-current-hover);
       font-weight: 600;
+      /* border-bottom-right-radius: .25rem !important;
+      border-top-right-radius: .25rem !important; */
     }
   }
 
@@ -523,22 +518,10 @@ Style overrides: Right sidebar, items of the table of content */
 
 [data-has-hero] .hero>img {
   filter: drop-shadow(0 0 3rem var(--overlay-blurple));
-  margin-left: 2.5rem;
 }
 
 [data-page-title] {
   font-size: 3rem;
-}
-
-.sl-markdown-content code {
-  border-radius: 6px;
-  padding: .23em .42em;
-  margin: 0;
-  font-size: 85%;
-  /* vertical-align: middle; */
-  white-space: break-spaces;
-  border: 1px solid rgba(0,0,0,.1);
-  background-color: #818b981f;
 }
 
 
@@ -565,3 +548,4 @@ font-weight: 600;
     border-inline-end: 1px solid var(--sl-color-hairline-shade);
   }
 } */
+
