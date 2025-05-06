@@ -138,9 +138,9 @@ errors.
 $callableResolver = $app->getCallableResolver();
 $responseFactory = $app->getResponseFactory();
 // 2) Instantiate your custom error handler to be used for handling runtime 
-$errorHandler = new CustomErrorHandler($callableResolver, $responseFactory);
-// 3) Set your custom error handler as the default error handler
-$errorMiddleware->setDefaultErrorHandler($errorHandler);
+$customErrorHandler = new CustomErrorHandler($callableResolver, $responseFactory);
+// 3) Override the default error handler: use your custom error handler instead.
+$errorMiddleware->setDefaultErrorHandler($customErrorHandler);
 ```
 ### Step 3: Test the Custom Error Handler
 
