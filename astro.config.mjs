@@ -1,58 +1,64 @@
 import { defineConfig } from "astro/config";
+import { passthroughImageService } from 'astro/config';
 import starlight from '@astrojs/starlight';
 import starlightImageZoom from 'starlight-image-zoom'
-import starlightViewModes from 'starlight-view-modes'
-
 import rehypeExternalLinks from "rehype-external-links";
 import { rehypeHeadingIds } from "@astrojs/markdown-remark";
-import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import rehypeSlug from 'rehype-slug';
 import starlightSidebarTopics from "starlight-sidebar-topics";
+import starlightScrollToTop from 'starlight-scroll-to-top';
 
-import mainSidebar from './src/config/sidebars/main-sidebar.ts'
-// TODO: clean the following imports
-import starlightLinksValidator from 'starlight-links-validator'
+import leftSidebar from './src/config/sidebars/main-sidebar.ts'
+import appConfig from './src/config/website-config.ts'
+import starlightThemeGalaxy from 'starlight-theme-galaxy'
 
 
-const siteURI = 'https://frostybee.github.io';
 //@see: https://astro.build/config
 export default defineConfig({
-  site: siteURI,
-  base: "/ws-course",
+  site: appConfig.siteURI,
+  base: appConfig.baseDirectory,
   integrations: [
     starlight({
-      title: 'Web Services',
-      favicon: '/images/svgrepo-com.svg',
-      social: {
-        github: 'https://github.com/frostybee/ws-course',
-      },
+      title: appConfig.title,
+      favicon: appConfig.favicon,
+      social: [
+        { icon: 'github', label: 'GitHub', href: appConfig.gitHubRepoUri },
+      ],
       tableOfContents: {minHeadingLevel: 2, maxHeadingLevel: 4},
       //TODO: add the head property.
       defaultLocale: "en",
+
+      // Load components overrides.
       components: {
-        Header: './src/components/Header.astro',
+        //  TableOfContents: './src/components/ui/CustomToC.astro',
+        //  Head: './src/components/search/TelescopeProvider.astro',
+         Header: './src/components/ui/CustomHeader.astro',
+         Sidebar: './src/components/ui/SideBar.astro',
       },
+
+      // Load and apply the default custom styles.
       customCss: [
-        "./src/styles/index.css",
+               "./src/styles/index.css",
       ],
       lastUpdated: true,
       plugins: [
+        starlightScrollToTop(
+          {
+            threshold: 10,
+            showTooltip: true,
+            showProgressRing: true
+          }
+        ),
         starlightImageZoom(),
-        starlightViewModes({
-          showHeader: false,
-          showSidebar: false,
-          showTableOfContents: true,
-          showFooter: true,
-        }),
+        starlightThemeGalaxy(),
         starlightSidebarTopics(
           [
-            ...mainSidebar
+            // Load the sidebar items from the ./src/config/sidebar/sidebar-items.ts file.
+            ...leftSidebar
           ],
-          {
-            exclude: ["/zen-mode/**/*"],
-          }
         )
       ],
+      //TODO: enable the links validator plugin when the site is ready for production or if you want to validate the links in the site.
       // plugins: [
       //   starlightLinksValidator({
       //     errorOnFallbackPages: false,
@@ -65,7 +71,7 @@ export default defineConfig({
     rehypePlugins: [
       rehypeSlug,
       rehypeHeadingIds,
-      [rehypeAutolinkHeadings, { behavior: 'wrap' }],
+      // [rehypeAutolinkHeadings, { behavior: 'wrap' }],
       [rehypeExternalLinks,
         {
           content: {
@@ -80,4 +86,7 @@ export default defineConfig({
       ],
     ],
   },
+  image: {
+    service: passthroughImageService()
+  }
 });

@@ -1,0 +1,352 @@
+---
+import MobileMenuFooter from '@astrojs/starlight/components/MobileMenuFooter.astro';
+import SidebarSublist from '@astrojs/starlight/components/SidebarSublist.astro';
+import StarlightSidebarTopicsSidebar from 'starlight-sidebar-topics/components/Sidebar.astro';
+const { sidebar } = Astro.locals.starlightRoute;
+---
+
+
+
+
+<nav class="sidebar" aria-label="Main">
+  <StarlightSidebarTopicsSidebar />
+  <SidebarSublist sublist={sidebar} />
+  <div class="md:sl-hidden">
+    <MobileMenuFooter />
+  </div>
+</nav>
+
+<style>
+  .sidebar-toggle-container {
+    position: fixed !important;
+    top: 4rem !important;
+    right: 1rem !important;
+    z-index: 99999 !important;
+    width: 40px !important;
+    height: 40px !important;
+    pointer-events: auto !important;
+    display: block !important;
+  }
+
+  button#sidebar-toggle {
+    background: #3b82f6 !important;
+    background-color: #3b82f6 !important;
+    border: none !important;
+    border-radius: 4px !important;
+    padding: 8px !important;
+    cursor: pointer !important;
+    width: 40px !important;
+    height: 40px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+    transition: all 0.2s ease !important;
+    font-size: 18px !important;
+    color: white !important;
+  }
+
+  #sidebar-toggle:hover {
+    background: var(--sl-color-accent-high) !important;
+    transform: translateY(-1px) !important;
+  }
+
+  .toggle-icon {
+    color: white !important;
+    font-size: 18px !important;
+    line-height: 1 !important;
+    transition: transform 0.2s ease;
+  }
+
+  .sidebar-toggle-container .tooltip {
+    position: absolute !important;
+    top: 50% !important;
+    left: -150px !important;
+    transform: translateY(-50%) !important;
+    background: rgba(0, 0, 0, 0.9) !important;
+    color: white !important;
+    padding: 8px 12px !important;
+    border-radius: 4px !important;
+    font-size: 14px !important;
+    white-space: nowrap !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    display: none !important;
+    transition: opacity 0.2s ease, visibility 0.2s ease !important;
+    z-index: 100000 !important;
+    pointer-events: none !important;
+  }
+
+  .tooltip::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: -5px;
+    transform: translateY(-50%);
+    border: 5px solid transparent;
+    border-left-color: rgba(0, 0, 0, 0.9);
+  }
+
+  .sidebar-toggle-container:hover .tooltip {
+    opacity: 1 !important;
+    visibility: visible !important;
+    display: block !important;
+  }
+
+  /* Collapsed state styles */
+  :global(.sidebar-collapsed) .sidebar-toggle-container {
+    right: 1rem !important;
+  }
+
+  :global(.sidebar-collapsed) .toggle-icon {
+    transform: rotate(180deg) !important;
+  }
+
+  /* Hide on mobile screens where sidebar is already hidden */
+  @media (max-width: 768px) {
+    .sidebar-toggle-container,
+    .sidebar-toggle-btn {
+      display: none !important;
+    }
+  }
+
+  /* Also hide JavaScript-created toggle containers on mobile */
+  @media (max-width: 768px) {
+    body > div[style*="position: fixed"][style*="top: 4rem"][style*="right: 1rem"] {
+      display: none !important;
+    }
+  }
+
+  /* Global styles for sidebar transitions */
+  :global(.sidebar-pane) {
+    transition: width 0.3s ease, opacity 0.3s ease, visibility 0.3s ease;
+  }
+
+  :global(.sidebar-pane ul.top-level) {
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+  }
+
+  :global(.sidebar-pane .sidebar-content) {
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+  }
+
+  :global(.main-frame) {
+    transition: padding-inline-start 0.3s ease, padding-top 0.3s ease;
+  }
+
+  :global(.header) {
+    transition: opacity 0.3s ease, visibility 0.3s ease, height 0.3s ease;
+  }
+
+  /* CSS variables transition smoothly */
+  :global(:root) {
+    transition: --sl-sidebar-width 0.3s ease, --sl-content-width 0.3s ease;
+  }
+
+</style>
+
+<script>
+  function initSidebarToggle() {
+    // Don't create toggle button on mobile devices
+    if (window.innerWidth <= 768) {
+      return;
+    }
+
+    // Also check if button already exists to prevent duplicates
+    if (document.getElementById('sidebar-toggle')) {
+      return;
+    }
+
+    const sidebarPane = document.querySelector('.sidebar-pane');
+    const mainFrame = document.querySelector('.main-frame');
+    const navBar = sidebarPane?.querySelector('ul.top-level') as HTMLElement;
+    const header = document.querySelector('.header');
+    const body = document.body;
+
+    if (!sidebarPane || !mainFrame || !navBar || !header) {
+      return;
+    }
+
+    // Create toggle button and inject it into body
+    const toggleContainer = document.createElement('div');
+    toggleContainer.style.cssText = `
+      position: fixed !important;
+      top: 4rem !important;
+      right: 1rem !important;
+      z-index: 99999 !important;
+      width: 40px !important;
+      height: 40px !important;
+      pointer-events: auto !important;
+      display: block !important;
+    `;
+
+    const toggleBtn = document.createElement('button');
+    toggleBtn.id = 'sidebar-toggle';
+    toggleBtn.setAttribute('aria-label', 'Toggle sidebar');
+    toggleBtn.setAttribute('title', 'Toggle full view mode');
+    toggleBtn.style.cssText = `
+      background: #3b82f6 !important;
+      border: none !important;
+      border-radius: 4px !important;
+      padding: 8px !important;
+      cursor: pointer !important;
+      width: 40px !important;
+      height: 40px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+      font-size: 18px !important;
+      color: white !important;
+      transition: all 0.2s ease !important;
+      margin-top: 1rem !important;
+    `;
+
+    const toggleIcon = document.createElement('span');
+    toggleIcon.className = 'toggle-icon';
+    toggleIcon.textContent = '☰';
+
+    const tooltip = document.createElement('div');
+    tooltip.className = 'tooltip';
+    tooltip.textContent = 'Toggle full view mode';
+    tooltip.style.cssText = `
+      position: absolute !important;
+      top: 85% !important;
+      right: 50px !important;
+      transform: translateY(-50%) !important;
+      background: rgba(0, 0, 0, 0.9) !important;
+      color: white !important;
+      padding: 8px 12px !important;
+      border-radius: 4px !important;
+      font-size: 14px !important;
+      white-space: nowrap !important;
+      z-index: 100000 !important;
+      pointer-events: none !important;
+      display: none !important;
+    `;
+
+    const arrow = document.createElement('div');
+    arrow.style.cssText = `
+      position: absolute !important;
+      top: 50% !important;
+      right: -5px !important;
+      transform: translateY(-50%) !important;
+      width: 0 !important;
+      height: 0 !important;
+      border: 5px solid transparent !important;
+      border-left-color: rgba(0, 0, 0, 0.9) !important;
+      display: none !important;
+    `;
+    tooltip.appendChild(arrow);
+
+    toggleBtn.appendChild(toggleIcon);
+    toggleContainer.appendChild(toggleBtn);
+    toggleContainer.appendChild(tooltip);
+    body.appendChild(toggleContainer);
+
+    // Handle tooltip show/hide with JavaScript
+    toggleContainer.addEventListener('mouseenter', () => {
+      tooltip.style.display = 'block';
+      arrow.style.display = 'block';
+    });
+
+    toggleContainer.addEventListener('mouseleave', () => {
+      tooltip.style.display = 'none';
+      arrow.style.display = 'none';
+    });
+
+    // Load saved state
+    const isCollapsed = localStorage.getItem('sidebar-collapsed') === 'true';
+    if (isCollapsed) {
+      body.classList.add('sidebar-collapsed');
+      applySidebarStyles(true);
+    }
+
+    toggleBtn.addEventListener('click', () => {
+      const collapsed = body.classList.toggle('sidebar-collapsed');
+      localStorage.setItem('sidebar-collapsed', collapsed.toString());
+      applySidebarStyles(collapsed);
+    });
+
+    // Handle window resize to hide/show button on mobile
+    function handleResize() {
+      if (window.innerWidth <= 768) {
+        toggleContainer.style.display = 'none';
+      } else {
+        toggleContainer.style.display = 'block';
+      }
+    }
+
+    window.addEventListener('resize', handleResize);
+    handleResize(); // Call once to set initial state
+
+    function applySidebarStyles(collapsed: boolean) {
+      const root = document.documentElement;
+      const sidebarContent = sidebarPane?.querySelector('.sidebar-content') as HTMLElement;
+
+      if (collapsed) {
+        // Collapse sidebar like the standalone example - COMPLETELY HIDE IT
+        (sidebarPane as HTMLElement).classList.add('sidebar-pane-collapsed');
+        (sidebarPane as HTMLElement).style.width = '0'; // completely hidden
+        (sidebarPane as HTMLElement).style.visibility = 'hidden';
+        (sidebarPane as HTMLElement).style.opacity = '0';
+
+        // Hide content with visibility and opacity (like standalone example)
+        if (sidebarContent) {
+          sidebarContent.style.visibility = 'hidden';
+          sidebarContent.style.opacity = '0';
+        }
+        (navBar as HTMLElement).style.visibility = 'hidden';
+        (navBar as HTMLElement).style.opacity = '0';
+
+        // COLLAPSE THE HEADER TOO
+        (header as HTMLElement).style.visibility = 'hidden';
+        (header as HTMLElement).style.opacity = '0';
+        (header as HTMLElement).style.height = '0';
+        (header as HTMLElement).style.overflow = 'hidden';
+
+        (mainFrame as HTMLElement).style.paddingInlineStart = '0';
+        (mainFrame as HTMLElement).style.paddingTop = '0'; // Remove header padding
+
+        // Expand content width to use MAXIMUM space - don't touch other variables
+        root.style.setProperty('--sl-content-width', '90rem'); // MASSIVE expansion!
+
+        body.classList.add('main-side-bar-collapsed');
+      } else {
+        // Expand sidebar following the working pattern
+        (sidebarPane as HTMLElement).classList.remove('sidebar-pane-collapsed');
+        (sidebarPane as HTMLElement).style.width = '';
+        (sidebarPane as HTMLElement).style.visibility = '';
+        (sidebarPane as HTMLElement).style.opacity = '';
+
+        // Show content with visibility and opacity
+        if (sidebarContent) {
+          sidebarContent.style.visibility = '';
+          sidebarContent.style.opacity = '';
+        }
+        (navBar as HTMLElement).style.visibility = '';
+        (navBar as HTMLElement).style.opacity = '';
+
+        // RESTORE THE HEADER
+        (header as HTMLElement).style.visibility = '';
+        (header as HTMLElement).style.opacity = '';
+        (header as HTMLElement).style.height = '';
+        (header as HTMLElement).style.overflow = '';
+
+        (mainFrame as HTMLElement).style.paddingInlineStart = '';
+        (mainFrame as HTMLElement).style.paddingTop = ''; // Restore header padding
+
+        // Restore CSS variables
+        root.style.setProperty('--sl-content-width', '45rem');
+
+        body.classList.remove('main-side-bar-collapsed');
+      }
+    }
+  }
+
+  // Initialize on page load
+  document.addEventListener('DOMContentLoaded', initSidebarToggle);
+
+  // Re-initialize on navigation (for SPA-like behavior)
+  document.addEventListener('astro:page-load', initSidebarToggle);
+</script>

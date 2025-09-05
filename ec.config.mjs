@@ -1,13 +1,14 @@
 import { definePlugin } from "@expressive-code/core";
 import { h } from "@expressive-code/core/hast";
-import fs from "node:fs";
 import { pluginLineNumbers } from "@expressive-code/plugin-line-numbers";
+import { pluginFullscreen } from 'expressive-code-fullscreen';
+
 
 function sideBorder() {
   return definePlugin({
     name: "Adds side border to Starlight code blocks",
     baseStyles: `
-        .sideBar {
+       .sideBar {
             position: absolute;
             top: calc(var(--button-spacing) - 6px);
             bottom: 0;
@@ -22,12 +23,11 @@ function sideBorder() {
         `,
     hooks: {
       postprocessRenderedBlock: async (context) => {
-        const language =
-        context.renderData.blockAst.children[1].properties
-        .dataLanguage;
-        if ( language !== "css"|| language !== "php"
+        if (
+          context.renderData.blockAst.children[1].properties
+            .dataLanguage !== "css"
         ) {
-          // return;
+          return;
         }
         const side = h("div.sideBar");
 
@@ -47,9 +47,6 @@ function remapLanguageIdentifiers(lang) {
     }
     case "sh": {
       return "bash";
-    }
-    case "plaintext": {
-      return "-";
     }
     default: {
       return lang;
@@ -104,16 +101,12 @@ export default {
     sideBorder(),
     languageLabel(),
     pluginLineNumbers(),
+    pluginFullscreen(),
   ],
   defaultProps: {
     showLineNumbers: false,
     wrap: true,
   },
-  // Code block style
-  // @doc: https://expressive-code.com/installation/
-  // themes: ["dark-plus", "light-plus"],
-  // themes: ['dracula', 'catppuccin-latte'],
-  // themes: ['aurora-x', 'catppuccin-latte'],
   themes: ["github-dark-high-contrast", "light-plus"],
   styleOverrides: {
     borderRadius: "0.4rem",
@@ -122,6 +115,9 @@ export default {
       shadowColor: "var(--sl-shadow-sm)"
     },
     codeBackground: "var(--fb-code-block-bg-color)",
+    fontFamily: "'Fira Code', monospace",
+    fontSize: "0.9em",
+    lineHeight: "1.5",
   },
   frames: {
     extractFileNameFromCode: false,
