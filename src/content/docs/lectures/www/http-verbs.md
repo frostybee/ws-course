@@ -2,8 +2,11 @@
 title: HTTP Verbs
 description: HTTP methods and their usage in REST Web services
 sidebar:
-    label: "HTTP Verbs"
+    label: "REST & HTTP Verbs"
     order: 1
+    badge:
+      text: New!
+      variant: danger
 ---
 
 ## What Are HTTP Verbs?

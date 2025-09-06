@@ -4,6 +4,9 @@ description: HTTP status codes and their proper usage in RESTful Web services
 sidebar:
     label: "HTTP Status Codes"
     order: 2
+    badge:
+      text: New!
+      variant: danger
 ---
 
 ## What Are HTTP Status Codes?

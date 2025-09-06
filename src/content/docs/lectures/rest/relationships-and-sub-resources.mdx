@@ -1,332 +1,380 @@
 ---
-title: Relationships and Sub-Resources
-description: Resource-oriented design
+title: Resource Relationships and Sub-Resources
+description: How to design relationships between REST resources using space exploration examples
 sidebar:
-    label: "Sub Resources"
+    label: "Resource Relationships"
     order: 3
 ---
 
-## Understanding Resource Relationships
+## The Challenge: Resources Don't Live Alone
 
-In real-world applications, resources rarely exist in isolation. They form complex webs of relationships that mirror the domain model. A well-designed REST API must effectively represent these relationships while maintaining clean, intuitive URI structures and providing clear navigation paths for clients.
+In the real world, things are connected. A space mission involves astronauts, visits planets, uses spacecraft, and collects data. In REST APIs, we need to represent these **relationships** between resources clearly and intuitively.
 
-Resource relationships in REST APIs serve multiple purposes:
-- **Data integrity**: Ensure related resources maintain consistent state
-- **Navigation**: Enable clients to discover and traverse related resources
-- **Business logic**: Reflect real-world constraints and dependencies
-- **Performance**: Optimize data access patterns
+**The question**: How do we design URLs and responses that show how resources relate to each other?
 
-## Types of Resource Relationships
+---
 
-### 1. One-to-Many (1:N) Relationships
+## Types of Relationships
 
-The most common relationship type where one parent resource owns or contains multiple child resources.
+Let's explore the common relationship patterns using a **Space Exploration API**.
 
-**Examples:**
-- A research expedition has many collected samples
-- A galaxy contains many star systems
-- A lab has many experiments
+### 1. One-to-Many (Parent → Children)
 
-**URI Patterns:**
+**One parent resource "owns" or "contains" many child resources.**
+
+#### Example: Mission → Astronauts
 ```http
-GET /expeditions/EXP-MARS-2159/samples
-POST /expeditions/EXP-MARS-2159/samples
-GET /expeditions/EXP-MARS-2159/samples/SAMPLE-001
+GET /api/missions/apollo-11/astronauts
 ```
 
-### 2. Many-to-Many (N:M) Relationships
+A mission has multiple astronauts, but each astronaut assignment belongs to that specific mission.
 
-Complex relationships where resources can be associated with multiple other resources.
-
-**Examples:**
-- Scientists collaborate on multiple research projects
-- Chemical compounds participate in multiple reactions
-- Genes are expressed in multiple tissues
-
-**URI Patterns:**
+#### Example: Planet → Moons
 ```http
-GET /scientists/SCI-CURIE-001/projects
-GET /projects/PROJ-GENETICS-2159/scientists
-POST /projects/PROJ-GENETICS-2159/scientists
+GET /api/planets/jupiter/moons
 ```
 
-### 3. One-to-One (1:1) Relationships
+Jupiter has many moons (79!), and each moon belongs to Jupiter.
 
-Specialized relationships where resources have exclusive associations.
+### 2. One-to-One (Exclusive Relationship)
 
-**Examples:**
-- Each spacecraft has one navigation system
-- Each experiment has one primary researcher
-- Each planet has one orbital data record
+**One resource has exactly one related resource.**
 
-**URI Patterns:**
+#### Example: Spacecraft → Navigation System
 ```http
-GET /spacecraft/CRAFT-VOYAGER-3/navigation-system
-PUT /spacecraft/CRAFT-VOYAGER-3/navigation-system
+GET /api/spacecraft/voyager-1/navigation-system
 ```
 
-## Relationship Design Patterns
+Each spacecraft has one navigation system, and that system belongs exclusively to that spacecraft.
 
-### Sub-Resources (Nested Resources)
+### 3. Many-to-Many (Multiple Relationships)
 
-Use sub-resources when child resources are **existentially dependent** on their parent or when representing strong ownership relationships.
+**Resources can be related to multiple other resources.**
 
-#### When to Use Sub-Resources
+#### Example: Astronauts ↔ Missions
+```http
+GET /api/astronauts/neil-armstrong/missions    # Neil's missions
+GET /api/missions/apollo-11/astronauts         # Apollo 11's crew
+```
 
-1. **Existential Dependency**: Child cannot exist without parent
-2. **Composition Relationship**: Child is part of the parent
-3. **Strong Ownership**: Parent owns and manages child lifecycle
+Astronauts can go on multiple missions, and missions have multiple astronauts.
 
-#### Example: Research Expedition Samples
+---
+
+## Sub-Resources: When to Use Nested URLs
+
+**Sub-resources** are accessed through their parent resource's URL. Use them when the child **depends on** the parent or is **owned by** the parent.
+
+### Pattern: `/parent/{id}/children`
+
+### Example 1: Mission Crew
+```http
+GET /api/missions/artemis-3/astronauts         # Get all crew members
+POST /api/missions/artemis-3/astronauts        # Add crew member to mission
+GET /api/missions/artemis-3/astronauts/sarah   # Get specific crew member
+```
+
+**Why use sub-resources here?**
+- Crew assignments **belong to** the mission
+- You usually want crew **in the context** of the mission
+- Adding someone to crew is mission-specific
+
+### Example 2: Planet's Moons
+```http
+GET /api/planets/saturn/moons                  # Get all Saturn's moons
+POST /api/planets/saturn/moons                 # Add newly discovered moon
+GET /api/planets/saturn/moons/titan            # Get Titan specifically
+```
+
+**Why use sub-resources here?**
+- Moons **orbit** a specific planet
+- Moons are discovered **in relation to** their planet
+- You often want all moons **of a particular planet**
+
+### Example 3: Mission Data
+```http
+GET /api/missions/perseverance/data            # All data from Perseverance
+POST /api/missions/perseverance/data           # Upload new data from mission
+GET /api/missions/perseverance/data/sample-17  # Specific data sample
+```
+
+---
+
+## When NOT to Use Sub-Resources
+
+### Independent Resources with References
+
+Some resources can exist independently and just **reference** each other.
+
+### Example: Astronauts and Spacecraft
+
+**Instead of:** `/api/spacecraft/apollo-csm/astronauts` 
+
+**Use:** `/api/astronauts` with references
 
 ```http
-# Get all samples from an expedition
-GET /astrobiology/v1/expeditions/EXP-EUROPA-2159/samples
+GET /api/astronauts/buzz-aldrin
+```
 
-# Create a new sample for the expedition
-POST /astrobiology/v1/expeditions/EXP-EUROPA-2159/samples
-Content-Type: application/json
-
+```json
 {
-  "sample_type": "ice_core",
-  "location": {
-    "latitude": -15.2,
-    "longitude": 181.4,
-    "depth_meters": 2.5
-  },
-  "collection_method": "drill_extraction"
+  "id": "buzz-aldrin",
+  "name": "Edwin 'Buzz' Aldrin",
+  "current_mission": "apollo-11",
+  "current_spacecraft": "apollo-csm",
+  "total_missions": 2,
+  "_links": {
+    "current_mission": "/api/missions/apollo-11",
+    "current_spacecraft": "/api/spacecraft/apollo-csm",
+    "all_missions": "/api/astronauts/buzz-aldrin/missions"
+  }
 }
-
-# Get specific sample
-GET /astrobiology/v1/expeditions/EXP-EUROPA-2159/samples/SAMPLE-ICE-001
 ```
 
-**Response Example:**
+**Why not use sub-resources?**
+- Astronauts exist **independently** of any specific spacecraft
+- They can transfer between spacecraft
+- You often need astronaut info **without spacecraft context**
+
+---
+
+## Practical Examples
+
+### Space Mission Management System
+
+Let's design a complete API for managing space missions:
+
+#### Resource Hierarchy
+```
+Missions
+├── /astronauts (sub-resource: mission crew)
+├── /spacecraft (sub-resource: mission vehicles)  
+├── /objectives (sub-resource: mission goals)
+└── /data (sub-resource: collected data)
+
+Planets (independent)
+├── /moons (sub-resource: natural satellites)
+├── /atmosphere (sub-resource: atmospheric data)
+└── /surface (sub-resource: surface characteristics)
+
+Astronauts (independent)
+├── /missions (reference: mission history)
+├── /training (sub-resource: training records)
+└── /medical (sub-resource: medical data)
+```
+
+#### API Endpoints
+```http
+# Missions and their components
+GET /api/missions                              # All missions
+GET /api/missions/artemis-3                    # Specific mission
+GET /api/missions/artemis-3/astronauts         # Mission crew
+GET /api/missions/artemis-3/objectives         # Mission objectives
+GET /api/missions/artemis-3/data               # Mission data
+
+# Planets and their features  
+GET /api/planets                               # All planets
+GET /api/planets/mars                          # Mars details
+GET /api/planets/mars/moons                    # Mars' moons (Phobos, Deimos)
+GET /api/planets/mars/atmosphere               # Mars atmospheric data
+
+# Independent astronauts with relationships
+GET /api/astronauts                            # All astronauts
+GET /api/astronauts/chris-hadfield              # Chris Hadfield's profile
+GET /api/astronauts/chris-hadfield/missions    # His mission history
+GET /api/astronauts/chris-hadfield/training    # His training records
+```
+
+---
+
+## Designing Relationships: Step by Step
+
+### Step 1: Identify Your Resources
+
+**Ask: What are the main "things" in my system?**
+
+For our space API:
+- **Mission** (space expedition)
+- **Astronaut** (space traveler)
+- **Planet** (celestial body)
+- **Spacecraft** (vehicle)
+- **Data** (scientific information)
+
+### Step 2: Understand Dependencies
+
+**Ask: Which resources depend on others?**
+
+**Dependent (use sub-resources):**
+- Mission crew → depends on mission
+- Planet's moons → belong to planet
+- Mission data → collected by specific mission
+- Training records → belong to astronaut
+
+**Independent (use references):**
+- Astronauts → can exist without missions
+- Planets → exist independently
+- Spacecraft → can be reassigned
+
+### Step 3: Design the URLs
+
+```http
+# Parent-child relationships (sub-resources)
+/api/missions/{mission-id}/astronauts
+/api/planets/{planet-id}/moons
+/api/astronauts/{astronaut-id}/training
+
+# Independent resources with references
+/api/astronauts              # Include mission_id in response
+/api/spacecraft              # Include current_mission_id
+/api/planets                 # Standalone
+```
+
+---
+
+## Response Design with Relationships
+
+### Sub-Resource Response
+```http
+GET /api/missions/artemis-3/astronauts
+```
+
 ```json
 {
   "_links": {
-    "self": { "href": "{baseurl}/expeditions/EXP-EUROPA-2159/samples/SAMPLE-ICE-001" },
-    "parent": { "href": "{baseurl}/expeditions/EXP-EUROPA-2159" },
-    "collection": { "href": "{baseurl}/expeditions/EXP-EUROPA-2159/samples" },
-    "analysis": { "href": "{baseurl}/expeditions/EXP-EUROPA-2159/samples/SAMPLE-ICE-001/analysis" }
+    "self": "/api/missions/artemis-3/astronauts",
+    "mission": "/api/missions/artemis-3"
   },
-  "id": "SAMPLE-ICE-001",
-  "expedition_id": "EXP-EUROPA-2159",
-  "sample_type": "ice_core",
-  "location": {
-    "latitude": -15.2,
-    "longitude": 181.4,
-    "depth_meters": 2.5
-  },
-  "collection_method": "drill_extraction",
-  "collected_at": "2159-04-15T14:30:00Z",
-  "status": "analyzing"
-}
-```
-
-### Reference Links (Association Resources)
-
-Use reference links when resources have **loose coupling** or when the relationship is more of an association than ownership.
-
-#### When to Use Reference Links
-
-1. **Independent Existence**: Both resources can exist independently
-2. **Weak Association**: Relationship can change over time
-3. **Cross-Domain References**: Resources belong to different bounded contexts
-
-#### Example: Scientist-Project Association
-
-Instead of making projects sub-resources of scientists, use associations:
-
-```http
-# Get scientist's current projects
-GET /research/v1/scientists/SCI-WATSON-042/projects
-
-# Associate scientist with project
-POST /research/v1/scientists/SCI-WATSON-042/projects
-Content-Type: application/json
-
-{
-  "project_id": "PROJ-DNA-ANALYSIS-2159",
-  "role": "lead_researcher",
-  "start_date": "2159-01-15"
-}
-
-# Get project details (independent resource)
-GET /research/v1/projects/PROJ-DNA-ANALYSIS-2159
-```
-
-**Response with Association:**
-```json
-{
-  "_links": {
-    "self": { "href": "{baseurl}/scientists/SCI-WATSON-042/projects" },
-    "scientist": { "href": "{baseurl}/scientists/SCI-WATSON-042" }
-  },
-  "projects": [
+  "mission_id": "artemis-3",
+  "mission_name": "Artemis 3 - Lunar Landing",
+  "crew_size": 4,
+  "astronauts": [
     {
+      "id": "sarah-chen",
+      "name": "Sarah Chen",
+      "role": "Commander",
+      "experience_years": 12,
       "_links": {
-        "project": { "href": "{baseurl}/projects/PROJ-DNA-ANALYSIS-2159" },
-        "remove": { 
-          "href": "{baseurl}/scientists/SCI-WATSON-042/projects/PROJ-DNA-ANALYSIS-2159",
-          "method": "DELETE"
-        }
-      },
-      "project_id": "PROJ-DNA-ANALYSIS-2159",
-      "project_title": "Martian DNA Sequencing Analysis",
-      "role": "lead_researcher",
-      "start_date": "2159-01-15",
-      "status": "active"
+        "profile": "/api/astronauts/sarah-chen",
+        "training": "/api/astronauts/sarah-chen/training"
+      }
+    },
+    {
+      "id": "alex-kowalski", 
+      "name": "Alex Kowalski",
+      "role": "Pilot",
+      "experience_years": 8,
+      "_links": {
+        "profile": "/api/astronauts/alex-kowalski"
+      }
     }
   ]
 }
 ```
 
-## Complex Relationship Examples
-
-### Scientific Equipment and Experiments
-
+### Independent Resource with References
 ```http
-# Equipment can be used in multiple experiments
-GET /laboratory/v1/equipment/SPEC-MASS-001/experiments
-
-# Experiments can use multiple pieces of equipment  
-GET /laboratory/v1/experiments/EXP-PROTEIN-2159/equipment
-
-# Book equipment for an experiment
-POST /laboratory/v1/experiments/EXP-PROTEIN-2159/equipment
-{
-  "equipment_id": "SPEC-MASS-001",
-  "reserved_from": "2159-03-01T09:00:00Z",
-  "reserved_until": "2159-03-01T17:00:00Z",
-  "purpose": "protein_mass_analysis"
-}
+GET /api/astronauts/sarah-chen
 ```
 
-### Hierarchical Scientific Classification
-
-```http
-# Navigate taxonomic hierarchy
-GET /taxonomy/v1/kingdoms/ANIMALIA/phylums
-GET /taxonomy/v1/phylums/CHORDATA/classes  
-GET /taxonomy/v1/classes/MAMMALIA/orders
-GET /taxonomy/v1/orders/PRIMATES/families
-
-# Get species within a family
-GET /taxonomy/v1/families/HOMINIDAE/species
-```
-
-**Hierarchical Response:**
 ```json
 {
+  "id": "sarah-chen",
+  "name": "Sarah Chen", 
+  "age": 38,
+  "nationality": "Canadian",
+  "current_mission": "artemis-3",
+  "current_role": "Commander",
+  "total_space_hours": 2840,
   "_links": {
-    "self": { "href": "{baseurl}/families/HOMINIDAE/species" },
-    "parent": { "href": "{baseurl}/orders/PRIMATES/families/HOMINIDAE" },
-    "order": { "href": "{baseurl}/orders/PRIMATES" }
-  },
-  "family": "Hominidae",
-  "species_count": 8,
-  "_embedded": {
-    "species": [
-      {
-        "_links": {
-          "self": { "href": "{baseurl}/species/HOMO-SAPIENS" },
-          "subspecies": { "href": "{baseurl}/species/HOMO-SAPIENS/subspecies" }
-        },
-        "id": "HOMO-SAPIENS",
-        "scientific_name": "Homo sapiens",
-        "common_name": "Human",
-        "conservation_status": "least_concern"
-      }
-    ]
+    "self": "/api/astronauts/sarah-chen",
+    "current_mission": "/api/missions/artemis-3",
+    "mission_crew": "/api/missions/artemis-3/astronauts",
+    "training": "/api/astronauts/sarah-chen/training",
+    "medical": "/api/astronauts/sarah-chen/medical",
+    "all_missions": "/api/astronauts/sarah-chen/missions"
   }
 }
 ```
 
-## Hypermedia and HATEOAS
+---
 
-Effective relationship design relies heavily on hypermedia to guide clients through resource relationships.
+## Common Relationship Patterns
 
-### Essential Link Relations
-
-Every resource response should include:
-
-1. **self**: Link to the resource itself
-2. **parent**: Link to parent resource (for sub-resources)  
-3. **collection**: Link to the collection containing this resource
-4. **related**: Links to associated resources
-5. **actions**: Links for available operations
-
-### Example: Comprehensive Hypermedia
-
-```json
-{
-  "_links": {
-    "self": { "href": "{baseurl}/experiments/EXP-GENOME-2159" },
-    "collection": { "href": "{baseurl}/experiments" },
-    "lead_scientist": { "href": "{baseurl}/scientists/SCI-MENDEL-001" },
-    "laboratory": { "href": "{baseurl}/laboratories/LAB-GENETICS-ALPHA" },
-    "samples": { "href": "{baseurl}/experiments/EXP-GENOME-2159/samples" },
-    "results": { "href": "{baseurl}/experiments/EXP-GENOME-2159/results" },
-    "equipment": { "href": "{baseurl}/experiments/EXP-GENOME-2159/equipment" },
-    "edit": { 
-      "href": "{baseurl}/experiments/EXP-GENOME-2159",
-      "method": "PUT"
-    },
-    "start": {
-      "href": "{baseurl}/experiments/EXP-GENOME-2159/start",
-      "method": "POST"
-    }
-  },
-  "id": "EXP-GENOME-2159",
-  "title": "CRISPR Gene Expression Analysis",
-  "status": "preparing",
-  "lead_scientist_id": "SCI-MENDEL-001",
-  "laboratory_id": "LAB-GENETICS-ALPHA",
-  "created_at": "2159-02-01T10:00:00Z",
-  "estimated_duration_days": 14
-}
-```
-
-## Best Practices for Resource Relationships
-
-### 1. Limit URI Depth
+### 1. Composition (Strong Ownership)
 ```http
-# Good: Single level of nesting
-GET /expeditions/EXP-001/samples
+GET /api/missions/apollo-11/objectives
+```
+**Use when:** Child cannot exist without parent
 
-# Avoid: Deep nesting becomes unwieldy
-GET /expeditions/EXP-001/samples/SAMPLE-001/analysis/results/charts
+### 2. Association (Loose Connection)
+```http
+GET /api/astronauts/neil-armstrong/missions
+```
+**Use when:** Both can exist independently
+
+### 3. Hierarchy (Nested Structure)
+```http
+GET /api/solar-system/planets/earth/continents/north-america
+```
+**Use when:** Clear hierarchical relationships
+
+---
+
+## Best Practices
+
+### 1. Keep URLs Shallow
+```http
+# Good: One level of nesting
+GET /api/missions/artemis-3/astronauts
+
+# Avoid: Deep nesting gets confusing
+GET /api/missions/artemis-3/astronauts/sarah/training/physical/cardio
 ```
 
 ### 2. Provide Multiple Access Patterns
 ```http
-# Access experiment samples via experiment
-GET /experiments/EXP-001/samples
+# Access mission crew through mission
+GET /api/missions/artemis-3/astronauts
 
-# Access samples directly when you know the ID
-GET /samples/SAMPLE-001
+# Access astronaut directly when you know their ID
+GET /api/astronauts/sarah-chen
 
-# Access all samples with filtering
-GET /samples?experiment_id=EXP-001
+# Access astronauts with filtering
+GET /api/astronauts?current_mission=artemis-3
 ```
 
-### 3. Use Consistent Relationship Patterns
-- Always use the same relationship pattern for similar associations
-- Document your relationship conventions clearly
+### 3. Use Consistent Patterns
+- Always use the same relationship style for similar cases
+- If missions have `/astronauts`, don't use `/crew` elsewhere
 - Be consistent across your entire API
 
-### 4. Handle Cascade Operations Carefully
-```http
-# Explicit cascade deletion
-DELETE /expeditions/EXP-001?cascade=samples
+### 4. Include Navigation Links
+Always help clients discover related resources:
 
-# Safe default: prevent deletion with dependencies
-DELETE /expeditions/EXP-001
-# Returns 409 Conflict if samples exist
+```json
+{
+  "_links": {
+    "self": "/api/missions/artemis-3",
+    "astronauts": "/api/missions/artemis-3/astronauts", 
+    "spacecraft": "/api/missions/artemis-3/spacecraft",
+    "data": "/api/missions/artemis-3/data",
+    "objectives": "/api/missions/artemis-3/objectives"
+  }
+}
 ```
 
-### 5. Optimize for Common Use Cases
-Design your relationship structure around the most frequent access patterns in your domain.
+---
 
+## Quick Decision Guide
 
+**Use Sub-Resources (`/parent/{id}/children`) when:**
+- Child belongs to parent (mission crew)
+- Child depends on parent (planet's moons)
+- You usually access child through parent (mission data)
+- Child's lifecycle tied to parent
+
+**Use Independent Resources with References when:**
+- Both can exist alone (astronauts and spacecraft)
+- Relationships change frequently (astronaut assignments)
+- You need to access resource independently
+- Many-to-many relationships

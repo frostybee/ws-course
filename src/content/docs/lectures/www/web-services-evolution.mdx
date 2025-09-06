@@ -1,0 +1,823 @@
+---
+title: Evolution of Web Services - From RPC to REST
+description: The historical journey of distributed computing and web services
+sidebar:
+    label: "Web Services History"
+    order: 5
+---
+
+## Foundation: Inter-Process Communication (IPC)
+
+Before understanding web services, we need to understand the fundamental challenge they solve: **how do separate programs communicate with each other?**
+
+### Local Inter-Process Communication
+
+When multiple programs run on the same computer, they need ways to share data and coordinate actions. Operating systems provide several mechanisms:
+
+#### 1. Pipes (1970s)
+```bash
+# Command line pipes - simple data flow
+ls -la | grep .txt | wc -l
+```
+- **Use**: Simple data streaming between processes
+- **Limitation**: One-way communication, same machine only
+
+#### 2. Shared Memory (1970s)
+```c
+// Multiple processes access same memory region
+int *shared_data = (int*) shmat(shmid, NULL, 0);
+*shared_data = 42;  // Other processes can read this
+```
+- **Use**: High-performance data sharing
+- **Limitation**: Complex synchronization, same machine only
+
+#### 3. Local Sockets (1980s)
+```c
+// Unix domain sockets for local communication
+socket_fd = socket(AF_UNIX, SOCK_STREAM, 0);
+connect(socket_fd, (struct sockaddr*)&addr, sizeof(addr));
+```
+- **Use**: Bidirectional communication between local processes
+- **Limitation**: Same machine only
+
+#### 4. Message Queues (1980s)
+```c
+// Send structured messages between processes
+msgsnd(queue_id, &message, sizeof(message), 0);
+msgrcv(queue_id, &message, sizeof(message), msg_type, 0);
+```
+- **Use**: Asynchronous message passing
+- **Limitation**: Same machine only
+
+---
+
+### The Distributed Systems Challenge
+
+**What happens when processes run on different computers?**
+
+This is where things get complicated. Distributed systems introduce challenges that don't exist in local communication:
+
+#### 1. Network Unreliability
+```
+Application A (Computer 1)  ----X---- Application B (Computer 2)
+                              Network
+                              Failure
+```
+- **Problem**: Networks fail, packets get lost, connections drop
+- **Impact**: Need to handle timeouts, retries, error recovery
+
+#### 2. Latency
+```
+Local function call:     0.1 microseconds
+Network call (same DC):  1 millisecond     (10,000x slower!)
+Network call (internet): 100 milliseconds  (1,000,000x slower!)
+```
+- **Problem**: Network calls are orders of magnitude slower
+- **Impact**: Must design for asynchronous communication
+
+#### 3. Partial Failures
+```
+Client sends request → Network succeeds → Server processes → Response lost
+```
+- **Problem**: Did the operation succeed or fail? Unknown state!
+- **Impact**: Need idempotency, proper error handling
+
+#### 4. Heterogeneity
+```
+Client: Python on Linux    ←→    Server: Java on Windows
+       x86 processor                     ARM processor
+       Little-endian                     Big-endian
+```
+- **Problem**: Different languages, operating systems, architectures
+- **Impact**: Need standardized data formats and protocols
+
+#### 5. Security
+```
+Public Internet
+Client ←------ Hackers, Eavesdroppers ------→ Server
+```
+- **Problem**: Communication crosses untrusted networks
+- **Impact**: Need authentication, authorization, encryption
+
+---
+
+### The Eight Fallacies of Distributed Computing
+
+Peter Deutsch and others identified common false assumptions:
+
+1. **The network is reliable:** Networks fail constantly
+2. **Latency is zero:** Network calls are slow
+3. **Bandwidth is infinite:** Network capacity is limited
+4. **The network is secure:**  Networks are hostile environments
+5. **Topology doesn't change:** Network structure changes
+6. **There is one administrator:** Multiple organizations involved
+7. **Transport cost is zero:** Network operations have costs
+8. **The network is homogeneous:** Networks use different technologies
+
+**These fallacies explain why distributed computing is hard and why so many solutions have evolved!**
+
+---
+
+### Early Solutions and Their Problems
+
+Before standardized web services, each application created custom solutions:
+
+#### Custom Network Protocols (1980s-1990s)
+```c
+// Custom binary protocol
+struct message {
+    int message_type;
+    int data_length;
+    char data[MAX_SIZE];
+};
+
+// Send over TCP socket
+send(socket, &message, sizeof(message), 0);
+```
+
+**Problems:**
+- **Not portable**: Worked only between applications using same protocol
+- **Binary incompatibility**: Different architectures handled data differently
+- **No documentation**: Each protocol was unique and undocumented
+- **Maintenance nightmare**: Changes required coordinating all clients
+
+#### Database as Communication Hub (1990s)
+```sql
+-- Application A writes to shared database
+INSERT INTO message_queue (sender, receiver, message) 
+VALUES ('app_a', 'app_b', 'process_order');
+
+-- Application B polls for messages
+SELECT * FROM message_queue WHERE receiver = 'app_b';
+```
+
+**Problems:**
+- **Tight coupling**: All applications needed same database access
+- **Not real-time**: Polling introduces delays
+- **Scaling bottleneck**: Database becomes single point of failure
+- **Not internet-friendly**: Can't easily expose to external partners
+
+---
+
+## Message Passing: The Foundation of Distributed Communication
+
+Before diving into web services, we need to understand **message passing** - the fundamental paradigm that makes distributed communication possible.
+
+### What is Message Passing?
+
+**Message passing** is a communication model where processes exchange information by sending and receiving messages rather than sharing memory directly. This paradigm becomes essential in distributed systems where shared memory isn't possible.
+
+#### Core Concepts
+
+**Message**: A structured piece of data sent from one process to another
+```
+Message = {
+  Header: { sender, receiver, message_type, timestamp }
+  Body: { actual_data }
+}
+```
+
+**Channel**: The communication pathway between processes
+- **Local**: Unix domain sockets, named pipes
+- **Network**: TCP sockets, UDP sockets, HTTP connections
+
+---
+
+### Message Passing Models
+
+#### 1. Synchronous Message Passing
+```
+Sender                    Receiver
+  |                         |
+  |-------- Message ------->|
+  |                         | (processing)
+  |<------- Response -------|
+  |                         |
+(continues execution)
+```
+
+**Characteristics:**
+- **Blocking**: Sender waits for response
+- **Immediate feedback**: Know if operation succeeded
+- **Simple error handling**: Timeout indicates failure
+
+**Example - Local synchronous call:**
+```c
+// Client blocks until server responds
+int result = remote_add(5, 3);  // Blocks here
+printf("Result: %d\n", result); // Continues after response
+```
+
+---
+
+#### 2. Asynchronous Message Passing  
+```
+Sender                    Receiver
+  |                         |
+  |-------- Message ------->|
+  | (continues immediately) | (processing)
+  |                         |
+  |<------- Response -------|
+  | (handles response       |
+  |  when convenient)       |
+```
+
+**Characteristics:**
+- **Non-blocking**: Sender continues immediately
+- **Better performance**: No waiting
+- **Complex error handling**: Must handle responses later
+
+**Example - Asynchronous call:**
+```javascript
+// Client continues immediately
+sendMessage("process_order", orderData)
+  .then(result => console.log("Order processed:", result))
+  .catch(error => console.log("Order failed:", error));
+// Code here executes immediately, not waiting for response
+```
+
+---
+
+### Message Passing in Distributed Systems
+
+#### Network Message Passing Challenges
+
+**1. Message Serialization**
+```python
+# Before sending over network
+message = {
+    "operation": "get_planet",
+    "planet_id": 123,
+    "timestamp": datetime.now()
+}
+
+# Must convert to bytes for network transmission
+serialized = json.dumps(message).encode('utf-8')
+socket.send(serialized)
+```
+
+**2. Message Deserialization**
+```python
+# Receiver gets bytes from network
+raw_data = socket.recv(1024)
+
+# Must convert back to usable data structure
+message = json.loads(raw_data.decode('utf-8'))
+planet_id = message["planet_id"]
+```
+
+**3. Message Ordering**
+```
+Messages sent:     [A] [B] [C]
+Network delivery:  [A] [C] [B]  # Out of order!
+```
+
+**4. Message Loss**
+```
+Sender: "Please process order #123"
+Network: *message lost*
+Receiver: *never gets message*
+Sender: *waits forever*
+```
+---
+
+### Evolution of Message Passing Protocols
+
+#### 1. Simple Text Protocols (1970s-1980s)
+```
+Client: "ADD 5 3\n"
+Server: "RESULT 8\n"
+
+Client: "GET_PLANET 123\n" 
+Server: "PLANET Earth 12742\n"
+```
+
+**Pros**: Human-readable, simple to debug
+**Cons**: No structure, error-prone parsing
+
+#### 2. Binary Protocols (1980s-1990s)
+```c
+struct message {
+    uint32_t message_type;    // 4 bytes
+    uint32_t data_length;     // 4 bytes  
+    char data[data_length];   // Variable length
+};
+```
+
+**Pros**: Efficient, compact
+**Cons**: Platform-dependent, not human-readable
+
+---
+
+#### 3. Structured Message Formats (1990s-2000s)
+
+**XML Messages:**
+```xml
+<message>
+  <operation>get_planet</operation>
+  <planet_id>123</planet_id>
+  <response>
+    <name>Earth</name>
+    <diameter>12742</diameter>
+  </response>
+</message>
+```
+
+**JSON Messages:**
+```json
+{
+  "operation": "get_planet",
+  "planet_id": 123,
+  "response": {
+    "name": "Earth", 
+    "diameter": 12742
+  }
+}
+```
+---
+
+### Message Passing Patterns
+
+#### 1. Request-Response Pattern
+```
+Client                     Server
+  |                          |
+  |------- Request --------->|
+  |                          | (process)
+  |<------ Response ---------|
+  |                          |
+```
+
+**Most common pattern** - forms the basis of most web services.
+
+#### 2. Publish-Subscribe Pattern
+```
+Publisher                  Subscribers
+    |                         |
+    |------ Message --------->| Subscriber A
+    |                         | Subscriber B  
+    |                         | Subscriber C
+```
+
+**Example - Stock price updates:**
+```python
+# Publisher
+publish("STOCK_PRICE", {"symbol": "AAPL", "price": 150.00})
+
+# Subscribers automatically receive the message
+def handle_stock_update(message):
+    print(f"Stock {message['symbol']} now {message['price']}")
+```
+
+#### 3. Message Queue Pattern
+```
+Producer -> [Queue] -> Consumer
+           [Msg A ]
+           [Msg B ]
+           [Msg C ]
+```
+
+**Benefits**: Decoupling, reliability, load balancing
+
+---
+
+### Message Passing Across Networks
+
+#### The Network Protocol Stack
+```
+Application Layer:    HTTP, FTP, SMTP
+Transport Layer:      TCP, UDP  
+Network Layer:        IP
+Data Link Layer:      Ethernet, WiFi
+Physical Layer:       Cables, Radio waves
+```
+
+**Message journey:**
+1. **Application** creates message: `{"get_planet": 123}`
+2. **Transport (TCP)** ensures reliable delivery
+3. **Network (IP)** routes to correct machine
+4. **Data Link/Physical** transmits over network medium
+
+---
+
+#### Network Message Passing Example
+```python
+# Client side
+import socket
+import json
+
+# Create message
+message = {"operation": "get_planet", "id": 123}
+json_message = json.dumps(message)
+
+# Send over network
+sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+sock.connect(("server.example.com", 8080))
+sock.send(json_message.encode())
+
+# Receive response
+response_data = sock.recv(1024)
+response = json.loads(response_data.decode())
+print(f"Planet: {response['name']}")
+```
+
+---
+
+### From Message Passing to Web Services
+
+**The Key Insight**: Web services are essentially **standardized message passing over HTTP**.
+
+Instead of inventing custom protocols for each application:
+```
+Custom Protocol A: "GET_PLANET 123\n"
+Custom Protocol B: "FETCH|PLANET|123"
+Custom Protocol C: Binary format...
+```
+
+Web services use **standard HTTP message format**:
+```http
+GET /api/planets/123 HTTP/1.1
+Host: api.example.com
+Accept: application/json
+
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{"id": 123, "name": "Earth", "diameter": 12742}
+```
+
+**Why HTTP became the universal message passing protocol:**
+- **Standardized**: Everyone knows HTTP
+- **Firewall-friendly**: Port 80/443 usually open
+- **Text-based**: Human-readable and debuggable
+- **Rich semantics**: Status codes, headers, methods
+- **Widely supported**: Every platform has HTTP libraries
+
+---
+
+## What Are Web Services?
+
+**Web services** are standardized ways for applications to communicate with each other over a network, typically the internet. They enable different systems, written in different programming languages and running on different platforms, to work together seamlessly.
+
+### The Need for Web Services
+
+Before web services, integrating systems was a nightmare:
+
+- **Platform Lock-in**: Applications could only talk to other applications built with the same technology
+- **Manual Integration**: Each connection required custom, hand-coded solutions
+- **Network Complexity**: Developers had to handle low-level network programming
+- **Lack of Standards**: No common protocols for data exchange
+- **Tight Coupling**: Systems were deeply interconnected, making changes risky
+
+**Example of the problem (1990s):**
+```
+Bank System (COBOL/Mainframe)
+    ↕ Custom Protocol
+Credit Card Processor (C++/Unix)
+    ↕ Different Custom Protocol  
+E-commerce Site (Java/Windows)
+    ↕ Yet Another Protocol
+Inventory System (Visual Basic/Windows)
+```
+--- 
+
+### Benefits of Web Services
+
+Web services solved these problems by providing:
+
+1. **Interoperability:**  Different platforms can communicate
+2. **Reusability:** Same service can be used by multiple applications
+3. **Modularity:** Break complex systems into manageable pieces
+4. **Scalability:** Services can be distributed and scaled independently
+5. **Maintenance:** Update services without affecting clients
+6. **Cost Reduction:** Avoid rebuilding functionality that already exists
+
+---
+
+## The Evolution Timeline
+
+### 1970s-1980s: The Birth of RPC
+
+**The Problem**: Developers needed to write distributed applications, but network programming was complex and error-prone.
+
+**The Solution**: **ONC RPC (Open Network Computing Remote Procedure Call)** - developed at Sun Microsystems in 1984.
+
+**Key Innovation**: Make remote function calls look like local function calls.
+
+```c
+// Client code looks like local function call
+result = calculate_tax(income, tax_rate);
+
+// But actually executed on remote server
+```
+
+**Characteristics:**
+- **Language-specific** (mainly C)
+- **Binary protocols** (fast but not human-readable)
+- **Tight coupling** between client and server
+- **Platform-dependent**
+
+**Legacy**: Still used today in NFS (Network File System) and many Unix systems.
+
+---
+
+### 1990s: Object-Oriented Distribution
+
+As object-oriented programming became popular, RPC evolved to handle objects, not just functions.
+
+#### CORBA (Common Object Request Broker Architecture) - 1991
+- **Goal**: Language and platform-independent object communication
+- **Innovation**: Interface Definition Language (IDL) to describe services
+- **Problem**: Extremely complex, vendor implementations incompatible
+
+#### Microsoft DCOM (Distributed Component Object Model) - 1996
+- **Goal**: Extend COM objects across networks
+- **Innovation**: Seamless object distribution in Windows environments
+- **Problem**: Windows-only, complex configuration
+
+**The Reality**: These solutions were powerful but incredibly complex to implement and maintain.
+
+---
+
+### Late 1990s: The Web Changes Everything
+
+**The Internet Boom**: The World Wide Web demonstrated that simple, standard protocols (HTTP) could connect the entire planet.
+
+**Key Realization**: What if we could use the same simple web technologies for application integration?
+
+**The Challenge**: HTTP was designed for documents, not application communication.
+
+---
+
+### Early 2000s: SOAP Web Services Era
+
+**SOAP (Simple Object Access Protocol)** - ironically, not simple at all!
+
+#### The SOAP Stack (2000-2005)
+
+**SOAP**: XML-based messaging protocol
+```xml
+<?xml version="1.0"?>
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Body>
+    <getPlanet xmlns="http://example.com/planets">
+      <planetId>123</planetId>
+    </getPlanet>
+  </soap:Body>
+</soap:Envelope>
+```
+
+**WSDL (Web Services Description Language)**: Described what services offered
+```xml
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/">
+  <message name="getPlanetRequest">
+    <part name="planetId" type="xsd:int"/>
+  </message>
+  <portType name="PlanetService">
+    <operation name="getPlanet">
+      <input message="getPlanetRequest"/>
+      <output message="getPlanetResponse"/>
+    </operation>
+  </portType>
+</definitions>
+```
+
+**UDDI (Universal Description, Discovery, and Integration)**: Yellow pages for web services
+
+--- 
+
+#### SOAP Characteristics
+- **Platform Independent**: Could run on any system with HTTP
+- **Standardized**: W3C and industry standards
+- **Type Safety**: Strong typing through XML Schema
+- **Enterprise Features**: Security (WS-Security), transactions (WS-Transaction)
+- **Tool Support**: IDEs could generate client code automatically
+
+#### The SOAP Problem
+```xml
+<!-- Simple request becomes verbose XML -->
+<soap:Envelope>
+  <soap:Header>
+    <wsse:Security>
+      <wsse:UsernameToken>
+        <wsse:Username>admin</wsse:Username>
+        <wsse:Password>secret</wsse:Password>
+      </wsse:UsernameToken>
+    </wsse:Security>
+  </soap:Header>
+  <soap:Body>
+    <ns:getPlanet>
+      <ns:id>123</ns:id>
+    </ns:getPlanet>
+  </soap:Body>
+</soap:Envelope>
+```
+
+**Issues with SOAP:**
+- **Verbose**: Lots of XML overhead
+- **Complex**: WS-* standards were overwhelming
+- **Slow**: XML parsing and large payloads
+- **Rigid**: Difficult to evolve services
+- **Overengineered**: Most applications didn't need all the features
+
+---
+
+### Mid-2000s: The REST Revolution
+
+**The Catalyst**: Roy Fielding's 2000 PhD dissertation "Architectural Styles and the Design of Network-based Software Architectures"
+
+**Key Insight**: The web's architecture (HTTP + URLs + HTML) was incredibly successful. What if we applied the same principles to APIs?
+
+#### REST Principles (2000, popularized ~2006)
+
+1. **Client-Server Architecture**: Separation of concerns
+2. **Stateless**: Each request contains all necessary information
+3. **Cacheable**: Responses should be explicitly cacheable or non-cacheable
+4. **Uniform Interface**: Standard methods (HTTP verbs) and identifiers (URLs)
+5. **Layered System**: Architecture can have intermediate layers
+6. **Code on Demand** (optional): Server can send executable code
+
+#### The REST Breakthrough
+
+Instead of this SOAP complexity:
+```xml
+POST /PlanetService
+<soap:Envelope>...verbose XML...</soap:Envelope>
+```
+
+REST offered this simplicity:
+```http
+GET /api/planets/123
+Accept: application/json
+
+{"id": 123, "name": "Earth", "diameter": 12742}
+```
+
+--- 
+
+#### Why REST Won
+
+**Simplicity**: 
+```http
+# REST - intuitive and clean
+GET /api/planets/123
+PUT /api/planets/123
+DELETE /api/planets/123
+
+# vs SOAP - complex and verbose
+POST /PlanetService (with XML envelope for each operation)
+```
+
+**Web-Friendly**:
+- Used existing HTTP infrastructure
+- Worked with web browsers
+- Leveraged HTTP caching
+- Standard HTTP status codes
+
+**Developer Experience**:
+- Easy to test with curl or browsers
+- Human-readable URLs and JSON
+- Minimal tooling required
+- Natural mapping to CRUD operations
+
+**Performance**:
+- Lightweight JSON instead of heavy XML
+- HTTP caching reduced server load
+- Stateless design enabled better scaling
+
+---
+
+### 2010s: REST Maturity and Modern Variations
+
+#### JSON Takes Over (2010-2015)
+- XML-heavy SOAP gave way to lightweight JSON
+- JavaScript's rise made JSON the natural choice
+- Better developer experience and smaller payloads
+
+#### REST API Best Practices Emerge
+- **Resource-based URLs**: `/api/planets` not `/api/getPlanets`
+- **HTTP verb semantics**: GET (read), POST (create), PUT (update), DELETE (delete)
+- **Status code conventions**: 200 OK, 201 Created, 404 Not Found
+- **Hypermedia**: APIs that include links to related resources
+
+#### Modern Challenges and Solutions
+
+**GraphQL (2015)**: Facebook's solution to over-fetching and under-fetching
+```graphql
+query {
+  planet(id: 123) {
+    name
+    diameter
+    moons {
+      name
+    }
+  }
+}
+```
+
+**gRPC (2016)**: Google's high-performance RPC with HTTP/2
+```protobuf
+service PlanetService {
+  rpc GetPlanet (PlanetRequest) returns (Planet);
+}
+```
+
+---
+
+## Comparison Across Eras
+
+| Era | Technology | Protocol | Data Format | Complexity | Performance | Adoption |
+|-----|------------|----------|-------------|------------|-------------|-----------|
+| **1980s** | ONC RPC | Binary/UDP | Binary | Low | High | Unix Systems |
+| **1990s** | CORBA/DCOM | IIOP/DCOM | Binary | Very High | High | Enterprise |
+| **2000s** | SOAP | HTTP/XML | XML | High | Medium | Enterprise |
+| **2010s** | REST | HTTP | JSON | Low | Medium | Universal |
+| **2020s** | GraphQL/gRPC | HTTP/2 | JSON/Binary | Medium | High | Growing |
+
+---
+
+## Key Lessons from History
+
+### 1. Simplicity Usually Wins
+- Complex solutions (CORBA, SOAP) eventually gave way to simpler ones (REST)
+- Developer experience matters more than theoretical completeness
+
+### 2. Standards Enable Ecosystems
+- HTTP's universality enabled the web
+- REST's simplicity enabled mobile and web APIs
+- JSON's simplicity beat XML's power
+
+### 3. The Pendulum Swings
+- RPC → Objects → Web Services → REST → GraphQL/gRPC
+- Each generation solves the previous generation's problems
+- But often reintroduces old problems in new forms
+
+### 4. Context Matters
+- **Internal services**: gRPC's performance may matter more than simplicity
+- **Public APIs**: REST's accessibility and caching are crucial
+- **Complex queries**: GraphQL's flexibility beats multiple REST calls
+
+---
+
+## Modern Web Services Landscape (2024)
+
+### REST APIs (Dominant)
+- **Use Cases**: Public APIs, CRUD operations, web/mobile apps
+- **Examples**: Twitter API, GitHub API, Stripe API
+- **Benefits**: Simple, cacheable, universal support
+
+### GraphQL (Growing)
+- **Use Cases**: Complex data requirements, mobile apps, rapid iteration
+- **Examples**: GitHub API v4, Shopify API
+- **Benefits**: Flexible queries, strongly typed, single endpoint
+
+### gRPC (Specialized)
+- **Use Cases**: Microservices, high-performance internal communication
+- **Examples**: Google Cloud APIs, Netflix internal services
+- **Benefits**: High performance, code generation, streaming
+
+### Event-Driven APIs (Emerging)
+- **Use Cases**: Real-time updates, IoT, chat applications
+- **Examples**: WebSockets, Server-Sent Events, WebHooks
+- **Benefits**: Real-time communication, efficient for live data
+
+---
+
+## The Future of Web Services
+
+### Current Trends
+- **API-First Design**: APIs designed before implementation
+- **Microservices**: Small, focused services over monoliths
+- **Real-time APIs**: WebSockets, Server-Sent Events
+- **API Gateways**: Centralized management and security
+- **OpenAPI Specification**: Standardized API documentation
+
+### Emerging Technologies
+- **HTTP/3**: Faster, more reliable connections
+- **WebAssembly**: High-performance code in browsers
+- **Edge Computing**: APIs deployed closer to users
+- **AI/ML APIs**: Services exposing machine learning capabilities
+
+---
+
+## Conclusion: Standing on Giants' Shoulders
+
+Today's web services didn't appear overnight. They represent 50+ years of learning:
+
+- **1970s RPC** taught us remote calls could be transparent
+- **1990s CORBA** showed the importance of standards (and their limits)
+- **2000s SOAP** proved XML could enable interoperability (but at a cost)
+- **2010s REST** demonstrated that simplicity scales better than complexity
+- **2020s GraphQL/gRPC** are finding the right balance of power and simplicity
+
+Understanding this history helps us:
+- **Choose the right tool** for each situation
+- **Avoid repeating past mistakes**
+- **Appreciate why current solutions exist**
+- **Prepare for future evolution**
+
+The journey from ONC RPC to REST isn't just about technology. It's about learning what works in the real world of distributed systems, where simplicity, reliability, and developer experience often matter more than theoretical perfection.
+
+:::tip[Historical Perspective]
+Every "revolutionary" technology builds on previous work. REST succeeded not because it was entirely new, but because it learned from SOAP's complexity and RPC's principles, finding the sweet spot between power and simplicity.
+:::
