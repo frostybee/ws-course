@@ -1,6 +1,7 @@
 ---
 title: Features of REST-Based Web Services
 description: Features of REST-based Web Service
+draft: true
 sidebar:
     label: "REST Features"
     order: 5
@@ -43,16 +44,16 @@ A RESTful API (Representational State Transfer Application Programming Interface
 These features collectively contribute to the scalability, performance, and ease of use of RESTful APIs.
 :::
 
-## 📈 Benefits of Each Feature
+## Benefits of Each Feature
 
 The below table summarizes the key benefits associated with each feature of a RESTful API.
 
 | **Feature**                    | **Benefits**                                                                                                                                                                                                                                                                                                                      |
 | ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Stateless communication**    | - **Scalability**: Easier to scale horizontally as each request is independent and does not rely on server-side sessions. <br> - **Reliability**: Failures or restarts are less likely to impact clients because the server does not maintain client-specific state.  |
-| **Uniform Interface**          | - **Simplicity**: A uniform interface makes it easier for developers to understand and use the API, reducing the learning curve. <br> - **Decoupling**: Allows clients and servers to evolve independently. Changes to the server's internal implementation do not affect the client as long as the interface remains consistent. |
-| **Client-Server Architecture** | - **Separation of Concerns**: Promotes the development of independent client and server components, leading to cleaner architecture and easier maintenance. <br> - **Flexibility**: Allows for the development of different client applications (e.g., web, mobile) that interact with the same server.                           |
-| **Layered System**             | - **Scalability**: Enhances scalability by allowing the introduction of intermediary layers that can manage load and distribute requests efficiently. <br> - **Security**: Helps in securing the system by isolating sensitive components and introducing additional layers for authentication and authorization.                 |
-| **Cacheability**               | - **Performance**: Reduces the need to repeatedly fetch the same data from the server, improving response times and reducing server load. <br> - **Efficiency**: Minimizes data transfer and server processing by leveraging cached responses where appropriate.        |
-| **Resource-Based**             | - **Intuitive Design**: Resources are easily *identifiable* and *interactable* using standard HTTP verbs, making API design and use more intuitive. <br> - **Consistency**: Provides a consistent approach to interacting with different types of resources, facilitating easier integration and interaction.                     |
-| **HATEOAS**                    | - **Discoverability**: Clients can dynamically explore and interact with the API without needing to have prior knowledge of the API structure. <br> - **Flexibility**: Allows clients to adapt to changes in the API structure by following links provided in responses, reducing the need for hard-coded URIs. |
+| **Stateless communication**    | - **Scalability**: Easier to scale horizontally as each request is independent and does not rely on server-side sessions.  - **Reliability**: Failures or restarts are less likely to impact clients because the server does not maintain client-specific state.  |
+| **Uniform Interface**          | - **Simplicity**: A uniform interface makes it easier for developers to understand and use the API, reducing the learning curve. - **Decoupling**: Allows clients and servers to evolve independently. Changes to the server's internal implementation do not affect the client as long as the interface remains consistent. |
+| **Client-Server Architecture** | - **Separation of Concerns**: Promotes the development of independent client and server components, leading to cleaner architecture and easier maintenance. - **Flexibility**: Allows for the development of different client applications (e.g., web, mobile) that interact with the same server.                           |
+| **Layered System**             | - **Scalability**: Enhances scalability by allowing the introduction of intermediary layers that can manage load and distribute requests efficiently. - **Security**: Helps in securing the system by isolating sensitive components and introducing additional layers for authentication and authorization.                 |
+| **Cacheability**               | - **Performance**: Reduces the need to repeatedly fetch the same data from the server, improving response times and reducing server load. - **Efficiency**: Minimizes data transfer and server processing by leveraging cached responses where appropriate.        |
+| **Resource-Based**             | - **Intuitive Design**: Resources are easily *identifiable* and *interactable* using standard HTTP verbs, making API design and use more intuitive. - **Consistency**: Provides a consistent approach to interacting with different types of resources, facilitating easier integration and interaction.                     |
+| **HATEOAS**                    | - **Discoverability**: Clients can dynamically explore and interact with the API without needing to have prior knowledge of the API structure. - **Flexibility**: Allows clients to adapt to changes in the API structure by following links provided in responses, reducing the need for hard-coded URIs. |

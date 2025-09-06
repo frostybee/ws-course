@@ -1,0 +1,481 @@
+---
+title: Collection Resources
+description: Resource-oriented design
+sidebar:
+    label: "Collection Resource"
+    order: 2
+---
+
+## What Are Collection Resources?
+
+Collection resources in RESTful web services represent groups of related entities of the same type. They serve as containers for managing multiple individual resources through a unified interface.
+
+### Key Characteristics
+
+- **Plural naming**: Always use plural nouns (e.g., `/species`, `/plantes`)
+- **Uniform operations**: Support standard CRUD operations across all items
+- **Pagination support**: Handle large datasets efficiently
+- **Filtering capabilities**: Allow clients to retrieve specific subsets
+
+## Structure
+
+Collection resources are identified by URIs that represent logical groupings of similar entities. For instance, `/customers` represents all customer resources within the system.
+
+### Resource Naming
+
+Collection resource names must be plural nouns (e.g., `/species`, `/planets`, `/galaxies`). This naming convention clearly distinguishes collections from individual **singleton** resources.
+
+**Best Practices:**
+- Use lowercase with hyphens for multi-word resources: `/stellar-objects`
+- Avoid abbreviations: prefer `/species` over `/spc`
+- Keep names intuitive and domain-specific
+
+Refer to our [REST principles](../rest-principles/rest-principles.md) for comprehensive naming guidelines.
+
+### Retrieve Collection Resources
+
+Retrieving collections is typically the most frequently used operation. Collections should support pagination, filtering, and sorting to handle real-world datasets efficiently.
+
+#### URI Template
+
+```http
+GET /{namespace}/{version}/{resource}?page={page}&limit={limit}&sort={field}&filter={criteria}
+```
+
+#### Query Parameters
+
+| Parameter | Description | Example |
+|-----------|-------------|----------|
+| `page` | Page number (1-based) | `?page=2` |
+| `limit` | Items per page (default: 20) | `?limit=50` |
+| `sort` | Sort field with direction | `?sort=name:asc` |
+| `filter` | Filter criteria | `?filter=status:active` |
+
+#### Example Request
+
+```http
+GET /astrobiology/v1/species?page=1&limit=20&sort=scientific_name:asc&filter=habitat:aquatic
+```
+
+#### Example Response
+
+HAL (Hypertext Application Language) response format with enhanced metadata:
+
+```json
+{
+  "_links": {
+    "self": { "href": "{baseurl}/species?page=1&limit=20&filter=habitat:aquatic" },
+    "first": { "href": "{baseurl}/species?page=1&limit=20&filter=habitat:aquatic" },
+    "last": { "href": "{baseurl}/species?page=8&limit=20&filter=habitat:aquatic" },
+    "next": { "href": "{baseurl}/species?page=2&limit=20&filter=habitat:aquatic" },
+    "prev": null,
+    "find": { "href": "{baseurl}/species{?id}", "templated": true }
+  },
+  "page": 1,
+  "limit": 20,
+  "total_pages": 8,
+  "total_count": 156,
+  "has_more": true,
+  "_embedded": {
+    "species": [
+      {
+        "_links": {
+          "self": { "href": "{baseurl}/species/SPX-AQUA-001" }
+        },
+        "id": "SPX-AQUA-001",
+        "scientific_name": "Hydrozoa stellaris",
+        "common_name": "Stellar Jellyfish",
+        "habitat": "aquatic",
+        "planet_origin": "Kepler-442b",
+        "discovered_date": "2157-03-15T10:30:00Z"
+      },
+      {
+        "_links": {
+          "self": { "href": "{baseurl}/species/SPX-AQUA-002" }
+        },
+        "id": "SPX-AQUA-002",
+        "scientific_name": "Cephalopoda cosmicus",
+        "common_name": "Cosmic Octopus",
+        "habitat": "aquatic",
+        "planet_origin": "Europa",
+        "discovered_date": "2159-07-22T14:45:00Z"
+      }
+    ]
+  }
+}
+```
+
+
+
+#### HTTP Status Codes
+
+| Status Code | Scenario | Response Body |
+|-------------|----------|---------------|
+| `200 OK` | Successful retrieval | Collection with items or empty array |
+| `400 Bad Request` | Invalid query parameters | Error details |
+| `401 Unauthorized` | Authentication required | Error message |
+| `403 Forbidden` | Access denied | Error message |
+| `500 Internal Server Error` | Server error | Error details |
+
+**Important Notes:**
+- Empty collections return `200 OK` with `"total_count": 0`, never `404 Not Found`
+- Invalid pagination parameters (e.g., `page=0`) should return `400 Bad Request`
+- Include helpful error messages for debugging
+
+### Retrieve Individual Resource
+
+Individual resources typically contain more detailed information than their collection counterparts. These resources are accessed through their unique identifiers within the collection context.
+
+GET operations must be idempotent—they should never modify system state and must return consistent results across multiple requests.
+
+> Resource identifiers for sensitive entities (customers, users) should be non-sequential and preferably non-numeric to prevent enumeration attacks.
+
+When resources serve as references in other contexts, use immutable string identifiers for improved readability and debugging capabilities (e.g., "USER_ADMIN_ROLE" rather than "1421321").
+
+#### URI Template
+
+```http
+GET /{namespace}/{version}/{resource}/{resource-id}
+```
+
+#### Example Request
+
+```http
+GET /astrobiology/v1/species/SPX-TERR-004
+Accept: application/json
+Authorization: Bearer {token}
+```
+
+#### Example Response
+
+```json
+{
+  "_links": {
+    "self": { "href": "{baseurl}/species/SPX-TERR-004" },
+    "collection": { "href": "{baseurl}/species" },
+    "edit": { "href": "{baseurl}/species/SPX-TERR-004" },
+    "delete": { "href": "{baseurl}/species/SPX-TERR-004" },
+    "planet": { "href": "{baseurl}/planets/MARS" }
+  },
+  "id": "SPX-TERR-004",
+  "scientific_name": "Bacillus martianus",
+  "common_name": "Martian Rock Bacteria",
+  "classification": {
+    "kingdom": "Bacteria",
+    "phylum": "Firmicutes",
+    "class": "Bacilli"
+  },
+  "habitat": "terrestrial",
+  "planet_origin": "Mars",
+  "temperature_range": {
+    "min_celsius": -80,
+    "max_celsius": 15
+  },
+  "discovered_date": "2156-12-03T08:22:00Z",
+  "last_updated": "2159-03-01T09:15:00Z"
+}
+```
+
+#### HTTP Status Codes
+
+| Status Code | Scenario |
+|-------------|----------|
+| `200 OK` | Resource found and returned |
+| `404 Not Found` | Resource ID doesn't exist |
+| `401 Unauthorized` | Authentication required |
+| `403 Forbidden` | Access denied for this resource |
+| `410 Gone` | Resource was deleted (optional) |
+
+### Update Individual Resource
+
+Updates a complete resource using the PUT method. The request payload structure should match the GET response format for the same resource. System-generated fields (e.g., `create_time`, `last_modified`) may be omitted or ignored during processing.
+
+#### URI Template
+
+```http
+PUT /{namespace}/{version}/{resource}/{resource-id}
+```
+
+#### Example Request
+
+```http
+PUT /astrobiology/v1/species/SPX-TERR-004
+Content-Type: application/json
+Authorization: Bearer {token}
+
+{
+  "id": "SPX-TERR-004",
+  "scientific_name": "Bacillus martianus extremus",
+  "common_name": "Extreme Martian Rock Bacteria",
+  "habitat": "terrestrial",
+  "temperature_range": {
+    "min_celsius": -95,
+    "max_celsius": 25
+  }
+}
+```
+
+#### HTTP Status Codes
+
+| Status Code | Scenario | Response |
+|-------------|----------|----------|
+| `204 No Content` | Successful update | Empty body |
+| `400 Bad Request` | Validation errors, read-only field modification | Error details |
+| `404 Not Found` | Resource doesn't exist | Error message |
+| `409 Conflict` | Concurrent modification detected | Conflict details |
+| `422 Unprocessable Entity` | Business logic failures | Error details with field-level validation |
+
+**Example Error Response (400 Bad Request):**
+```json
+{
+  "error": {
+    "code": "VALIDATION_FAILED",
+    "message": "Species data validation failed",
+    "details": [
+      {
+        "field": "temperature_range.min_celsius",
+        "code": "INVALID_RANGE",
+        "message": "Minimum temperature cannot exceed maximum temperature"
+      },
+      {
+        "field": "scientific_name",
+        "code": "REQUIRED_FIELD",
+        "message": "Scientific name is required for species classification"
+      }
+    ]
+  }
+}
+```
+
+### Partial Resource Updates
+
+##### Partial update support is optional and implementation-dependent.
+
+PATCH operations modify specific fields of a resource without affecting unchanged properties. Unlike PUT operations, PATCH requests only need to include the fields being updated.
+
+The HTTP PATCH method follows [RFC 7386: JSON Merge Patch](https://tools.ietf.org/html/rfc7386) specifications.
+
+Return `204 No Content` with an empty response body to optimize bandwidth usage, particularly important for mobile applications where PATCH operations may occur frequently during interactive forms.
+
+System-generated values are typically updated automatically during PATCH operations.
+
+#### URI Template
+
+```http
+PATCH /{namespace}/{version}/{resource}/{resource-id}
+```
+
+#### Example Request
+
+```http
+PATCH /astrobiology/v1/species/SPX-AQUA-001
+Content-Type: application/json
+If-Match: "etag-value-123"
+Authorization: Bearer {token}
+
+{
+  "common_name": "Giant Stellar Jellyfish",
+  "temperature_range": {
+    "max_celsius": -2
+  }
+}
+```
+
+#### Example Response
+
+```http
+204 No Content
+ETag: "etag-value-124"
+Last-Modified: Wed, 01 Mar 2024 10:30:00 GMT
+```
+
+**Note**: ETag and If-Match headers help prevent concurrent modification conflicts.
+
+#### HTTP Status Codes
+
+PATCH operations use the same status codes as PUT operations. See the [Update Individual Resource](#update-individual-resource) section for details.
+
+### Delete Individual Resource
+
+Removes a specific resource from the collection. DELETE operations are idempotent to support retry scenarios in unreliable network conditions—always return `204 No Content` regardless of whether the resource exists.
+
+Avoid returning `404 Not Found` for missing resources, as this could confuse retry logic by suggesting the resource never existed. Use GET requests to verify resource existence before deletion if needed.
+
+#### URI Template
+
+```http
+DELETE /{namespace}/{version}/{resource}/{resource-id}
+```
+
+#### Example Request
+
+```http
+DELETE /astrobiology/v1/species/SPX-EXTINCT-999
+Authorization: Bearer {token}
+```
+
+#### Example Response
+
+```http
+204 No Content
+```
+
+#### HTTP Status Codes
+
+| Status Code | Scenario |
+|-------------|----------|
+| `204 No Content` | Resource deleted successfully (or already deleted) |
+| `404 Not Found` | Only if deletion status must be communicated |
+| `409 Conflict` | Resource cannot be deleted due to dependencies |
+
+### Create New Resource
+
+Creates a new resource within the collection. The request payload typically contains fewer fields than GET/PUT operations, as the server generates system values like identifiers and timestamps.
+
+The server usually generates unique identifiers for new resources. For client-supplied identifiers, see [Create New Resource - Consumer Supplied Identifier](#create-new-resource---consumer-supplied-identifier) below.
+
+Upon successful creation, the new resource becomes accessible through the collection URI with its assigned identifier.
+
+The response includes hypermedia links (rel: self) for the new resource and related operations. Additionally, the Location header contains the URI of the newly created resource.
+
+#### URI Template
+
+```http
+POST /{namespace}/{version}/{resource}
+```
+
+#### Example Request
+
+Server-generated fields are omitted from the request payload:
+
+```http
+POST /astrobiology/v1/species
+Content-Type: application/json
+Authorization: Bearer {token}
+
+{
+  "scientific_name": "Crystallinus luminous",
+  "common_name": "Crystal Light Organism",
+  "habitat": "crystalline",
+  "planet_origin": "Titan",
+  "classification": {
+    "kingdom": "Xenobiota",
+    "phylum": "Crystallophyta"
+  },
+  "bioluminescent": true
+}
+```
+
+#### Example Response
+
+```http
+201 Created
+Location: {baseurl}/astrobiology/v1/species/SPX-XENO-127
+ETag: "etag-new-species-001"
+
+{
+  "_links": {
+    "self": { "href": "{baseurl}/species/SPX-XENO-127" },
+    "collection": { "href": "{baseurl}/species" },
+    "planet": { "href": "{baseurl}/planets/TITAN" }
+  },
+  "id": "SPX-XENO-127",
+  "scientific_name": "Crystallinus luminous",
+  "common_name": "Crystal Light Organism",
+  "classification": {
+    "kingdom": "Xenobiota",
+    "phylum": "Crystallophyta",
+    "class": "Luminaria"
+  },
+  "habitat": "crystalline",
+  "planet_origin": "Titan",
+  "bioluminescent": true,
+  "discovery_status": "newly_catalogued",
+  "discovered_date": "2159-03-01T10:30:00Z",
+  "last_updated": "2159-03-01T10:30:00Z"
+}
+```
+
+#### HTTP Status Codes
+
+| Status Code | Scenario |
+|-------------|----------|
+| `201 Created` | Resource created successfully |
+| `400 Bad Request` | Invalid request data |
+| `409 Conflict` | Resource already exists (for unique constraints) |
+| `422 Unprocessable Entity` | Business rule violations |
+
+### Create New Resource - Client-Supplied Identifier
+
+When clients provide resource identifiers, use the PUT method since the operation becomes idempotent regardless of whether it creates or updates a resource.
+
+#### URI Template
+
+```http
+PUT /{namespace}/{version}/{resource}/{client-supplied-id}
+```
+
+#### Example Request (New Resource)
+
+```http
+PUT /astrobiology/v1/species/EARTH-LEGACY-001
+Content-Type: application/json
+Authorization: Bearer {token}
+
+{
+  "id": "EARTH-LEGACY-001",
+  "scientific_name": "Homo sapiens",
+  "common_name": "Human",
+  "habitat": "terrestrial",
+  "planet_origin": "Earth",
+  "classification": {
+    "kingdom": "Animalia",
+    "phylum": "Chordata",
+    "class": "Mammalia"
+  },
+  "intelligence_level": "sentient"
+}
+```
+
+#### Response Patterns
+
+**New Resource Created:**
+```http
+201 Created
+Location: {baseurl}/astrobiology/v1/species/EARTH-LEGACY-001
+ETag: "etag-legacy-001"
+
+{
+  "_links": {
+    "self": { "href": "{baseurl}/species/EARTH-LEGACY-001" },
+    "planet": { "href": "{baseurl}/planets/EARTH" }
+  },
+  "id": "EARTH-LEGACY-001",
+  "scientific_name": "Homo sapiens",
+  "common_name": "Human",
+  "habitat": "terrestrial",
+  "planet_origin": "Earth",
+  "intelligence_level": "sentient",
+  "discovered_date": "2159-03-01T10:30:00Z"
+}
+```
+
+**Existing Resource Updated:**
+```http
+204 No Content
+ETag: "etag-legacy-002"
+```
+
+---
+
+## Summary
+
+Collection resources provide a standardized approach to managing groups of related entities. Key principles include:
+
+- **Consistent naming**: Use plural nouns for collection URIs
+- **Standard HTTP methods**: Support GET, POST, PUT, PATCH, DELETE appropriately
+- **Proper status codes**: Return meaningful HTTP status codes
+- **Hypermedia links**: Include HATEOAS links for discoverability
+- **Pagination**: Handle large datasets efficiently
+- **Error handling**: Provide clear, actionable error messages
+

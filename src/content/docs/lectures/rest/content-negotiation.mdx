@@ -6,92 +6,581 @@ sidebar:
     order: 4
 ---
 
-Server-driven content negotiation is an important aspect of RESTful web services, enabling the server to determine the best representation of a resource based on client preferences and capabilities.  
-It enhances the interaction between clients and servers by ensuring that data is presented in the most suitable format. Understanding and implementing content negotiation correctly can lead to more flexible, user-friendly, and adaptable APIs.
+## What is Content Negotiation?
 
-### What is Content Negotiation?
+Content negotiation is the process where clients and servers communicate about the format, language, and encoding of data they want to exchange. Think of it as a polite conversation: "I'd prefer JSON, but XML is fine too" says the client, and the server responds with the best option it can provide.
 
-Content negotiation is the process by which a client and server agree on the format of the data that will be exchanged. In RESTful APIs, this typically involves the server selecting the appropriate representation of a resource (like JSON, XML, HTML, etc.) based on the client’s request headers.
+This mechanism allows **one API endpoint** to serve **multiple representations** of the same resource, making your API more flexible and accommodating to different client needs.
 
+## Why Content Negotiation Matters
 
-### Key Components of Content Negotiation
+### The Problem Without Content Negotiation
 
-1. **HTTP Accept Headers**:
-   - Clients specify their preferred media types using the `Accept` header in an HTTP request. For example:
-     ```
-     Accept: application/json, application/xml;q=0.9
-     ```
-     This indicates that the client prefers JSON but can accept XML as a secondary option.
+```http
+# Without content negotiation - need separate endpoints
+GET /astrobiology/v1/species/SPX-001.json
+GET /astrobiology/v1/species/SPX-001.xml  
+GET /astrobiology/v1/species/SPX-001.csv
+```
 
-2. **Content-Type Header**:
-   - The `Content-Type` header is used in the request to indicate the media type of the resource being sent (e.g., in a POST request). The server uses this information to process the request correctly.
+### The Solution With Content Negotiation
 
-3. **Accept-Encoding**:
-   - Clients can also indicate their preferred encoding methods (like gzip or deflate) using the `Accept-Encoding` header, which helps optimize data transfer.
+```http
+# With content negotiation - one endpoint, multiple formats
+GET /astrobiology/v1/species/SPX-001
+Accept: application/json
 
-4. **Language Negotiation**:
-   - The `Accept-Language` header allows clients to specify their preferred language for the response. For example:
-     ```
-     Accept-Language: en-US,en;q=0.9,fr;q=0.8
-     ```
+GET /astrobiology/v1/species/SPX-001
+Accept: application/xml
 
-### How Server-Driven Content Negotiation Works
+GET /astrobiology/v1/species/SPX-001
+Accept: text/csv
+```
 
-1. **Client Request**:
-   - The client sends a request to the server, including the `Accept`, `Accept-Language`, and potentially other negotiation headers.
+## HTTP Headers for Content Negotiation
 
-2. **Server Processing**:
-   - The server examines these headers to determine the client’s preferences. If multiple acceptable media types are specified, the server uses a set of rules (often based on quality values or `q` parameters) to prioritize them.
+Content negotiation uses specific HTTP headers to communicate preferences between client and server.
 
-3. **Resource Representation**:
-   - The server retrieves the requested resource and generates its representation in the format specified by the client. If none of the preferred formats are available, the server should respond with a `406 Not Acceptable` status code.
+### 1. Accept Header (Media Type Negotiation)
 
-4. **Response**:
-   - The server sends back the response with the appropriate `Content-Type` header that matches the selected representation, alongside the actual resource data.
+The `Accept` header tells the server what data formats the client can understand.
 
-### Implementation Considerations
+#### Basic Accept Header
 
-- **Multiple Representations**:
-  - A RESTful service may have multiple representations of the same resource. For example, a user profile could be available in JSON, XML, and HTML formats.
+```http
+GET /astrobiology/v1/species/SPX-MARS-001
+Accept: application/json
+```
 
-- **Error Handling**:
-  - When no acceptable representation is found, the server should return a `406 Not Acceptable` status. It may also include details in the response body about available representations.
+#### Multiple Preferences with Quality Values
 
-- **Caching**:
-  - Content negotiation can complicate caching mechanisms since different representations of the same resource may need to be cached separately. Implementing proper cache-control headers becomes crucial.
+Quality values (`q`) range from 0.0 to 1.0, with 1.0 being the highest preference:
 
-- **Versioning**:
-  - Content negotiation can also be used for API versioning, where different versions of the resource are represented by different media types.
+```http
+GET /astrobiology/v1/species/SPX-MARS-001
+Accept: application/json;q=1.0, application/xml;q=0.8, text/csv;q=0.5
+```
 
-### Example Scenario
+This means:
+- **Most preferred**: JSON (q=1.0)
+- **Second choice**: XML (q=0.8)  
+- **Acceptable**: CSV (q=0.5)
 
-1. **Client Request**:
-   ```
-   GET /api/users/123 HTTP/1.1
-   Host: example.com
-   Accept: application/json
-   Accept-Language: en-US
-   ```
+#### Server Response Example
 
-2. **Server Processing**:
-   - The server checks for the existence of the user with ID 123 and finds it. It then checks the `Accept` header and decides to respond in JSON format, as that’s the client's preference.
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
+Content-Length: 512
 
-3. **Server Response**:
-   ```http
-   HTTP/1.1 200 OK
-   Content-Type: application/json
-   Content-Language: en-US
+{
+  "_links": {
+    "self": { "href": "{baseurl}/species/SPX-MARS-001" }
+  },
+  "id": "SPX-MARS-001",
+  "scientific_name": "Bacillus martianus",
+  "common_name": "Martian Rock Bacteria",
+  "habitat": "terrestrial",
+  "planet_origin": "Mars"
+}
+```
 
-   {
-       "id": 123,
-       "name": "John Doe",
-       "email": "john.doe@example.com"
-   }
-   ```
+### 2. Accept-Language Header (Language Negotiation)
 
-### Advantages of Server-Driven Content Negotiation
+Specify preferred languages for internationalized content:
 
-- **Flexibility**: Clients can specify their preferences, allowing for a more tailored experience.
-- **Interoperability**: Different clients (web apps, mobile apps, etc.) can work with the same API while receiving data in the format they can best handle.
-- **Maintainability**: The server can manage multiple representations of resources centrally, reducing the need for multiple endpoints.
+```http
+GET /astrobiology/v1/species/SPX-MARS-001
+Accept: application/json
+Accept-Language: en-US;q=1.0, fr-FR;q=0.8, es-ES;q=0.6
+```
 
+#### Localized Response Example
+
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
+Content-Language: en-US
+
+{
+  "id": "SPX-MARS-001",
+  "scientific_name": "Bacillus martianus",
+  "common_name": "Martian Rock Bacteria",
+  "description": "A hardy bacterial species discovered in Martian soil samples",
+  "habitat": "terrestrial",
+  "discovery_notes": "First identified during the Mars Sample Return mission of 2157"
+}
+```
+
+### 3. Accept-Encoding Header (Compression Negotiation)
+
+Request compressed responses to save bandwidth:
+
+```http
+GET /astrobiology/v1/species
+Accept: application/json
+Accept-Encoding: gzip, deflate, br
+```
+
+#### Compressed Response
+
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
+Content-Encoding: gzip
+Content-Length: 256
+
+[Compressed JSON data...]
+```
+
+### 4. Accept-Charset Header (Character Encoding)
+
+Specify character encoding preferences (rarely used in modern APIs):
+
+```http
+GET /astrobiology/v1/species/SPX-UNICODE-001
+Accept: application/json
+Accept-Charset: utf-8, iso-8859-1;q=0.7
+```
+
+## Content Negotiation Flow
+
+Here's how the negotiation process works step by step:
+
+### Step 1: Client Sends Request with Preferences
+
+```http
+GET /research/v1/experiments/EXP-GENOME-2159
+Accept: application/json, application/xml;q=0.9, text/html;q=0.8
+Accept-Language: en-US, fr-FR;q=0.7
+Accept-Encoding: gzip, deflate
+Authorization: Bearer {token}
+```
+
+### Step 2: Server Analyzes Preferences
+
+The server examines the headers and determines:
+1. **Available representations**: JSON, XML, HTML
+2. **Client preferences**: JSON (q=1.0), XML (q=0.9), HTML (q=0.8)
+3. **Best match**: JSON (highest quality value and available)
+4. **Language**: English (en-US) is available
+5. **Encoding**: gzip compression supported
+
+### Step 3: Server Responds with Best Match
+
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
+Content-Language: en-US
+Content-Encoding: gzip
+Vary: Accept, Accept-Language, Accept-Encoding
+
+{
+  "_links": {
+    "self": { "href": "{baseurl}/experiments/EXP-GENOME-2159" },
+    "results": { "href": "{baseurl}/experiments/EXP-GENOME-2159/results" }
+  },
+  "id": "EXP-GENOME-2159",
+  "title": "CRISPR Gene Expression Analysis",
+  "description": "Analyzing gene expression patterns using CRISPR technology",
+  "status": "in_progress",
+  "start_date": "2159-03-01T09:00:00Z"
+}
+```
+
+## Multiple Format Examples
+
+Let's see how the same scientific data can be represented in different formats:
+
+### JSON Format
+
+```http
+GET /astrobiology/v1/expeditions/EXP-EUROPA-2159
+Accept: application/json
+```
+
+```json
+{
+  "_links": {
+    "self": { "href": "{baseurl}/expeditions/EXP-EUROPA-2159" },
+    "samples": { "href": "{baseurl}/expeditions/EXP-EUROPA-2159/samples" }
+  },
+  "id": "EXP-EUROPA-2159",
+  "mission_name": "Europa Ice Core Analysis",
+  "launch_date": "2159-01-15T10:00:00Z",
+  "status": "active",
+  "crew_size": 6,
+  "primary_objectives": [
+    "Search for microbial life in subsurface ocean",
+    "Analyze ice composition and structure",
+    "Study radiation effects on biological materials"
+  ]
+}
+```
+
+### XML Format
+
+```http
+GET /astrobiology/v1/expeditions/EXP-EUROPA-2159
+Accept: application/xml
+```
+
+```xml
+HTTP/1.1 200 OK
+Content-Type: application/xml
+
+<?xml version="1.0" encoding="UTF-8"?>
+<expedition xmlns:hal="http://example.com/hal">
+  <hal:links>
+    <hal:link rel="self" href="{baseurl}/expeditions/EXP-EUROPA-2159"/>
+    <hal:link rel="samples" href="{baseurl}/expeditions/EXP-EUROPA-2159/samples"/>
+  </hal:links>
+  <id>EXP-EUROPA-2159</id>
+  <mission_name>Europa Ice Core Analysis</mission_name>
+  <launch_date>2159-01-15T10:00:00Z</launch_date>
+  <status>active</status>
+  <crew_size>6</crew_size>
+  <primary_objectives>
+    <objective>Search for microbial life in subsurface ocean</objective>
+    <objective>Analyze ice composition and structure</objective>
+    <objective>Study radiation effects on biological materials</objective>
+  </primary_objectives>
+</expedition>
+```
+
+### CSV Format (for data analysis)
+
+```http
+GET /astrobiology/v1/expeditions/EXP-EUROPA-2159
+Accept: text/csv
+```
+
+```csv
+HTTP/1.1 200 OK
+Content-Type: text/csv
+
+id,mission_name,launch_date,status,crew_size,primary_objectives
+EXP-EUROPA-2159,"Europa Ice Core Analysis",2159-01-15T10:00:00Z,active,6,"Search for microbial life; Analyze ice composition; Study radiation effects"
+```
+
+### HTML Format (for human consumption)
+
+```http
+GET /astrobiology/v1/expeditions/EXP-EUROPA-2159
+Accept: text/html
+```
+
+```html
+HTTP/1.1 200 OK
+Content-Type: text/html
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Expedition: Europa Ice Core Analysis</title>
+</head>
+<body>
+    <h1>Europa Ice Core Analysis</h1>
+    <div class="expedition-details">
+        <p><strong>ID:</strong> EXP-EUROPA-2159</p>
+        <p><strong>Launch Date:</strong> January 15, 2159</p>
+        <p><strong>Status:</strong> Active</p>
+        <p><strong>Crew Size:</strong> 6 scientists</p>
+        
+        <h2>Primary Objectives</h2>
+        <ul>
+            <li>Search for microbial life in subsurface ocean</li>
+            <li>Analyze ice composition and structure</li>
+            <li>Study radiation effects on biological materials</li>
+        </ul>
+        
+        <div class="actions">
+            <a href="{baseurl}/expeditions/EXP-EUROPA-2159/samples">View Collected Samples</a>
+        </div>
+    </div>
+</body>
+</html>
+```
+
+## Error Handling in Content Negotiation
+
+### 406 Not Acceptable
+
+When the server cannot provide any format the client accepts:
+
+```http
+GET /astrobiology/v1/species/SPX-001
+Accept: application/pdf
+```
+
+```http
+HTTP/1.1 406 Not Acceptable
+Content-Type: application/json
+
+{
+  "error": {
+    "code": "CONTENT_NOT_ACCEPTABLE",
+    "message": "None of the requested media types are supported",
+    "supported_formats": [
+      "application/json",
+      "application/xml",
+      "text/csv",
+      "text/html"
+    ],
+    "requested_formats": [
+      "application/pdf"
+    ]
+  }
+}
+```
+
+### 415 Unsupported Media Type
+
+When the client sends data in an unsupported format:
+
+```http
+POST /astrobiology/v1/species
+Content-Type: application/yaml
+Accept: application/json
+
+name: "New Species"
+habitat: "aquatic"
+```
+
+```http
+HTTP/1.1 415 Unsupported Media Type
+Content-Type: application/json
+
+{
+  "error": {
+    "code": "UNSUPPORTED_MEDIA_TYPE",
+    "message": "The media type 'application/yaml' is not supported for this resource",
+    "supported_types": [
+      "application/json",
+      "application/xml"
+    ]
+  }
+}
+```
+
+## Advanced Content Negotiation Scenarios
+
+### API Versioning via Media Types
+
+Use custom media types to version your API:
+
+```http
+GET /astrobiology/v1/species/SPX-001
+Accept: application/vnd.astrobiology.species+json; version=2.0
+```
+
+```http
+HTTP/1.1 200 OK
+Content-Type: application/vnd.astrobiology.species+json; version=2.0
+
+{
+  "schema_version": "2.0",
+  "_links": {
+    "self": { "href": "{baseurl}/species/SPX-001" }
+  },
+  "id": "SPX-001",
+  "taxonomy": {
+    "scientific_name": "Bacillus martianus",
+    "common_name": "Martian Rock Bacteria",
+    "classification": {
+      "kingdom": "Bacteria",
+      "phylum": "Firmicutes",
+      "class": "Bacilli"
+    }
+  },
+  "habitat_details": {
+    "primary_habitat": "terrestrial",
+    "temperature_range": {
+      "min_celsius": -80,
+      "max_celsius": 15
+    },
+    "ph_tolerance": {
+      "min_ph": 6.5,
+      "max_ph": 8.2
+    }
+  }
+}
+```
+
+### Profile-Based Content Negotiation
+
+Provide different levels of detail using profiles:
+
+```http
+GET /astrobiology/v1/species/SPX-001
+Accept: application/json; profile="summary"
+```
+
+```json
+{
+  "id": "SPX-001",
+  "scientific_name": "Bacillus martianus",
+  "habitat": "terrestrial",
+  "planet_origin": "Mars"
+}
+```
+
+```http
+GET /astrobiology/v1/species/SPX-001
+Accept: application/json; profile="detailed"
+```
+
+```json
+{
+  "id": "SPX-001",
+  "scientific_name": "Bacillus martianus",
+  "common_name": "Martian Rock Bacteria",
+  "classification": {
+    "kingdom": "Bacteria",
+    "phylum": "Firmicutes",
+    "class": "Bacilli",
+    "order": "Bacillales",
+    "family": "Bacillaceae"
+  },
+  "habitat": "terrestrial",
+  "planet_origin": "Mars",
+  "physical_characteristics": {
+    "cell_shape": "rod",
+    "gram_stain": "positive",
+    "motility": true,
+    "spore_forming": true
+  },
+  "environmental_conditions": {
+    "temperature_range": {
+      "min_celsius": -80,
+      "max_celsius": 15
+    },
+    "radiation_tolerance": "high",
+    "desiccation_resistance": "extreme"
+  },
+  "discovery_info": {
+    "discovered_date": "2156-12-03T08:22:00Z",
+    "expedition": "EXP-MARS-SAMPLE-RETURN-2156",
+    "sample_location": "Gale Crater, Mars"
+  }
+}
+```
+
+## Best Practices
+
+### 1. Always Include the Vary Header
+
+The `Vary` header tells caches which request headers affect the response:
+
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
+Content-Language: en-US
+Content-Encoding: gzip
+Vary: Accept, Accept-Language, Accept-Encoding
+```
+
+### 2. Provide Meaningful Default Formats
+
+When no `Accept` header is provided, return a sensible default:
+
+```http
+GET /astrobiology/v1/species/SPX-001
+# No Accept header
+```
+
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
+# Returns JSON as default
+```
+
+### 3. Support Common Formats
+
+Prioritize widely-used formats:
+- **application/json** - Most common for APIs
+- **application/xml** - Legacy system compatibility
+- **text/html** - Human-readable browsing
+- **text/csv** - Data analysis and reporting
+
+### 4. Handle Edge Cases Gracefully
+
+```http
+# Wildcard acceptance
+Accept: */*
+
+# Complex quality values
+Accept: application/json;q=0.9, application/xml;q=0.8, */*;q=0.1
+
+# Invalid quality values (treat as q=1.0)
+Accept: application/json;q=1.5
+```
+
+### 5. Document Supported Formats
+
+Include supported formats in your API documentation:
+
+```markdown
+## Species Resource (/species/{id})
+
+**Supported Response Formats:**
+- `application/json` - Default JSON representation
+- `application/xml` - XML representation  
+- `text/csv` - CSV format for data analysis
+- `text/html` - Human-readable HTML view
+
+**Supported Languages:**
+- `en-US` - English (default)
+- `fr-FR` - French
+- `es-ES` - Spanish
+```
+
+## Implementation Tips
+
+### Server-Side Implementation Checklist
+
+1. **Parse Accept headers** correctly, including quality values
+2. **Match available formats** with client preferences
+3. **Set appropriate response headers** (Content-Type, Content-Language, Vary)
+4. **Handle error cases** with proper HTTP status codes
+5. **Support compression** when requested
+6. **Cache responses** considering negotiated content
+7. **Validate client-sent content types** in POST/PUT requests
+
+### Testing Content Negotiation
+
+Test your content negotiation with various scenarios:
+
+```bash
+# Test basic JSON response
+curl -H "Accept: application/json" http://api.example.com/species/SPX-001
+
+# Test XML preference
+curl -H "Accept: application/xml" http://api.example.com/species/SPX-001
+
+# Test quality values
+curl -H "Accept: application/json;q=0.8, application/xml;q=0.9" http://api.example.com/species/SPX-001
+
+# Test unsupported format
+curl -H "Accept: application/pdf" http://api.example.com/species/SPX-001
+
+# Test compression
+curl -H "Accept-Encoding: gzip" http://api.example.com/species/SPX-001
+```
+
+## Summary
+
+Content negotiation enables your REST API to:
+
+- **Serve multiple formats** from the same endpoint
+- **Support different client capabilities** (mobile, web, data analysis tools)
+- **Provide internationalization** through language negotiation
+- **Optimize bandwidth** with compression negotiation
+- **Version APIs** using custom media types
+
+Key implementation points:
+- Use quality values to express preferences
+- Always include the `Vary` header for caching
+- Provide meaningful error messages for unsupported formats
+- Document all supported formats and languages
+- Test with various client scenarios
