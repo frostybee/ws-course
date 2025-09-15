@@ -1,0 +1,308 @@
+---
+title: Pagination in REST Web Services
+description: Pagination in REST Web Services
+topic: lectures
+draft: true
+sidebar:
+  label: 'Pagination in REST Web Services'
+  order: 1
+  badge:
+    text: New
+    variant: danger
+---
+
+## What Is Pagination?
+
+Pagination is a technique used to divide a large dataset into smaller, more manageable chunks, allowing clients to retrieve data in a controlled manner. In RESTful web services, pagination is implemented using query parameters to specify which subset of data should be returned.
+
+## Why Pagination is Important?
+
+1. **Performance**: Large datasets can slow down API responses and consume significant bandwidth
+2. **Memory Management**: Prevents server overload by limiting data loaded into memory
+3. **User Experience**: Allows faster page loads and more responsive interfaces
+4. **Resource Optimization**: Reduces server processing time and database query load
+5. **Scalability**: Enables APIs to handle growing datasets efficiently
+
+## Common Pagination Strategies
+
+### 1. Offset-Based Pagination (Limit/Skip)
+
+The most common approach using `limit` and `offset` parameters.
+
+**Request Examples:**
+```http
+GET /api/users?limit=20&offset=0    # First page
+GET /api/users?limit=20&offset=20   # Second page
+GET /api/users?limit=20&offset=40   # Third page
+```
+
+**Response Format:**
+```json
+{
+  "data": [
+    { "id": 1, "name": "John Doe" },
+    { "id": 2, "name": "Jane Smith" }
+  ],
+  "pagination": {
+    "limit": 20,
+    "offset": 0,
+    "total": 1000,
+    "totalPages": 50,
+    "currentPage": 1,
+    "hasNext": true,
+    "hasPrevious": false
+  }
+}
+```
+
+**Pros:**
+- Easy to implement
+- Works with any dataset
+- Allows jumping to specific pages
+
+**Cons:**
+- Performance degrades with large offsets
+- Inconsistent results if data changes during pagination
+
+### 2. Cursor-Based Pagination
+
+Uses a cursor (typically an ID or timestamp) to mark position in the dataset.
+
+**Request Examples:**
+```http
+GET /api/users?limit=20                    # First page
+GET /api/users?limit=20&cursor=user_123    # Next page
+GET /api/users?limit=20&cursor=user_456    # Following page
+```
+
+**Response Format:**
+```json
+{
+  "data": [
+    { "id": "user_123", "name": "John Doe" },
+    { "id": "user_124", "name": "Jane Smith" }
+  ],
+  "pagination": {
+    "limit": 20,
+    "nextCursor": "user_143",
+    "prevCursor": "user_102",
+    "hasNext": true,
+    "hasPrevious": true
+  }
+}
+```
+
+**Pros:**
+- Consistent performance regardless of position
+- Handles real-time data changes gracefully
+- More stable for frequently updated datasets
+
+**Cons:**
+- Cannot jump to arbitrary pages
+- More complex to implement
+- Requires ordered data
+
+### 3. Page-Based Pagination
+
+Simple approach using page numbers.
+
+**Request Examples:**
+```http
+GET /api/users?page=1&size=20   # First page
+GET /api/users?page=2&size=20   # Second page
+```
+
+**Response Format:**
+```json
+{
+  "data": [...],
+  "pagination": {
+    "page": 1,
+    "size": 20,
+    "totalPages": 50,
+    "totalElements": 1000,
+    "first": true,
+    "last": false
+  }
+}
+```
+
+## Implementation Best Practices
+
+### 1. Set Reasonable Defaults and Limits
+
+```http
+# Default page size if not specified
+GET /api/users  # Returns 20 items by default
+
+# Maximum page size enforcement
+GET /api/users?limit=1000  # Automatically limited to max 100
+```
+
+### 2. Provide Metadata
+
+Always include pagination metadata in responses:
+
+```json
+{
+  "data": [...],
+  "meta": {
+    "pagination": {
+      "count": 20,
+      "total": 1000,
+      "perPage": 20,
+      "currentPage": 1,
+      "totalPages": 50,
+      "links": {
+        "first": "/api/users?page=1",
+        "last": "/api/users?page=50",
+        "prev": null,
+        "next": "/api/users?page=2"
+      }
+    }
+  }
+}
+```
+
+### 3. Use HTTP Headers (Alternative Approach)
+
+```http
+HTTP/1.1 200 OK
+X-Total-Count: 1000
+X-Page: 1
+X-Per-Page: 20
+X-Total-Pages: 50
+Link: <https://api.example.com/users?page=1>; rel="first",
+      <https://api.example.com/users?page=2>; rel="next",
+      <https://api.example.com/users?page=50>; rel="last"
+```
+
+### 4. Handle Edge Cases
+
+**Empty Results:**
+```json
+{
+  "data": [],
+  "pagination": {
+    "total": 0,
+    "totalPages": 0,
+    "currentPage": 1
+  }
+}
+```
+
+**Invalid Page Numbers:**
+```json
+{
+  "error": {
+    "code": "INVALID_PAGE",
+    "message": "Page number must be positive integer"
+  }
+}
+```
+
+## Advanced Pagination Patterns
+
+### 1. Keyset Pagination (Seek Method)
+
+For high-performance pagination on large datasets:
+
+```http
+GET /api/users?limit=20&last_id=123&created_after=2024-01-01T00:00:00Z
+```
+
+### 2. Time-Based Pagination
+
+For time-series data:
+
+```http
+GET /api/events?limit=50&before=2024-01-15T10:00:00Z
+GET /api/events?limit=50&after=2024-01-15T10:00:00Z
+```
+
+### 3. Hybrid Approaches
+
+Combining multiple strategies:
+
+```http
+GET /api/search?q=term&page=1&size=20&sort=relevance
+GET /api/feed?cursor=abc123&limit=20&since=2024-01-01
+```
+
+## Database Implementation Examples
+
+### SQL with Offset/Limit
+```sql
+SELECT * FROM users
+ORDER BY created_at DESC
+LIMIT 20 OFFSET 40;
+```
+
+### SQL with Cursor
+```sql
+SELECT * FROM users
+WHERE id > 'cursor_value'
+ORDER BY id ASC
+LIMIT 20;
+```
+
+## Client-Side Considerations
+
+### 1. URL Design
+- Use consistent parameter names across your API
+- Make URLs predictable and bookmarkable
+- Consider URL length limitations
+
+### 2. State Management
+- Cache pagination state when appropriate
+- Handle navigation between pages smoothly
+- Preserve filters and sorting across pages
+
+### 3. Loading States
+- Show loading indicators during pagination requests
+- Implement optimistic updates where possible
+- Handle network errors gracefully
+
+## Testing Pagination
+
+### Test Cases to Consider
+
+1. **Basic Functionality**
+   - First page retrieval
+   - Middle page retrieval
+   - Last page retrieval
+
+2. **Edge Cases**
+   - Empty datasets
+   - Single item datasets
+   - Invalid page numbers
+   - Exceeding maximum page size
+
+3. **Performance Testing**
+   - Large offset values
+   - Concurrent pagination requests
+   - Memory usage with large page sizes
+
+4. **Data Consistency**
+   - Items added during pagination
+   - Items removed during pagination
+   - Order stability
+
+## Common Pitfalls to Avoid
+
+1. **Not Setting Maximum Limits**: Always enforce maximum page sizes
+2. **Inconsistent Sorting**: Ensure stable sorting for reliable pagination
+3. **Missing Total Counts**: Provide total counts when possible for better UX
+4. **Poor Error Handling**: Handle invalid parameters gracefully
+5. **Ignoring Performance**: Monitor query performance, especially with large offsets
+6. **Inconsistent Parameter Names**: Standardize pagination parameters across your API
+
+## Conclusion
+
+Pagination is essential for building scalable REST APIs. Choose the right strategy based on your use case:
+
+- **Offset-based**: Good for small to medium datasets with known totals
+- **Cursor-based**: Ideal for large datasets and real-time feeds
+- **Page-based**: Simple approach for user-facing applications
+
+Always provide clear metadata, handle edge cases, and consider the user experience when implementing pagination in your REST APIs.

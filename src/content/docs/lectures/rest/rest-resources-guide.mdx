@@ -1,0 +1,614 @@
+---
+title: REST Resources - Complete Guide
+description: A comprehensive guide to designing REST resources using space exploration examples
+draft: true
+sidebar:
+    label: "REST Resources Guide"
+    order: 1
+---
+
+## What is REST?
+
+**REST (Representational State Transfer)** is an architectural style for building web services that leverages the existing infrastructure and protocols of the World Wide Web. Introduced by Roy Fielding in 2000, REST defines a set of constraints that, when applied, create scalable, maintainable, and performant web services.
+
+### Core REST Principles
+
+1. **Client-Server Architecture**: Clear separation between client and server responsibilities
+2. **Stateless**: Each request contains all information needed to process it
+3. **Cacheable**: Responses should be explicitly marked as cacheable or non-cacheable
+4. **Uniform Interface**: Standard methods and consistent resource identification
+5. **Layered System**: Architecture can include intermediate layers (proxies, gateways)
+6. **Code on Demand** (optional): Server can send executable code to extend client functionality
+
+### Why REST Became Popular
+
+- **Simplicity**: Uses familiar HTTP methods and status codes
+- **Scalability**: Stateless nature enables horizontal scaling
+- **Flexibility**: Works with any data format (JSON, XML, HTML)
+- **Web-friendly**: Leverages existing web infrastructure
+- **Discoverability**: Resources are self-descriptive through URIs
+
+:::tip[Key Insight]
+REST isn't a technology or protocol - it's an **architectural style** that guides how you design web services to be simple, scalable, and maintainable.
+:::
+
+---
+
+## What Are Resources?
+
+**A resource is simply a "thing" that your application manages** - any piece of data or functionality that clients need to interact with. Think of resources as the **nouns** in your system.
+
+### Examples in Space Exploration
+
+Instead of thinking abstractly, let's use concrete examples from a **Space Mission Management System**:
+
+- **Mission** - A space expedition (Apollo 11, Artemis 3, Mars Rover)
+- **Astronaut** - A space traveler (Neil Armstrong, Sally Ride)
+- **Planet** - A celestial body (Earth, Mars, Jupiter)
+- **Spacecraft** - A vehicle (Voyager 1, Space Station)
+- **Data** - Scientific information collected during missions
+
+### Resource Identification with URLs
+
+Each resource gets a **unique URL** that identifies it:
+
+```http
+GET /api/missions/apollo-11     # Apollo 11 mission
+GET /api/astronauts/neil        # Neil Armstrong
+GET /api/planets/mars           # Mars planet data
+GET /api/spacecraft/voyager-1   # Voyager 1 spacecraft
+```
+
+**Key insight**: The URL tells you **what** (the resource), and the HTTP verb tells you **what to do** with it.
+
+---
+
+## Types of Resources
+
+### 1. Individual Resources
+
+A **single, specific instance** of something:
+
+```http
+GET /api/missions/apollo-11         # Specific mission
+GET /api/astronauts/neil-armstrong  # Specific astronaut
+GET /api/planets/mars               # Specific planet
+```
+
+**Characteristics:**
+- Represents **one specific thing**
+- Has **unique identifier** (ID, name, etc.)
+- Contains **detailed information** about that thing
+
+### 2. Collection Resources
+
+A **group of related resources** of the same type:
+
+```http
+GET /api/missions           # All missions
+GET /api/astronauts         # All astronauts  
+GET /api/planets            # All planets
+```
+
+**Characteristics:**
+- Contains **multiple resources** of the same type
+- Usually returns a **list or array**
+- Supports operations like **create new items**
+
+:::tip[Collections are Resources Too!]
+The collection itself is a resource - you can GET it, and often POST to it to create new items.
+:::
+
+### 3. Sub-Resources
+
+Resources that **belong to** a parent resource:
+
+```http
+GET /api/missions/apollo-11/crew        # Apollo 11's crew
+GET /api/planets/mars/moons             # Mars' moons
+GET /api/astronauts/neil/missions       # Neil's mission history
+```
+
+**Why use sub-resources?**
+- Express **relationships** between resources
+- Show **ownership** or **containment**
+- Provide **scoped access** to related data
+
+---
+
+## Resource Relationships
+
+In the real world, things are connected. A space mission involves astronauts, visits planets, uses spacecraft, and collects data. In REST APIs, we need to represent these **relationships** clearly.
+
+### Types of Relationships
+
+#### 1. One-to-Many (Parent → Children)
+
+**One parent resource "owns" or "contains" many child resources.**
+
+**Example: Mission → Crew**
+```http
+GET /api/missions/apollo-11/crew
+```
+Apollo 11 has multiple crew members, but each crew assignment belongs to that mission.
+
+**Example: Planet → Moons**
+```http
+GET /api/planets/jupiter/moons
+```
+Jupiter has 79 moons, and each moon belongs to Jupiter.
+
+#### 2. One-to-One (Exclusive Relationship)
+
+**One resource has exactly one related resource.**
+
+**Example: Spacecraft → Navigation System**
+```http
+GET /api/spacecraft/voyager-1/navigation-system
+```
+Each spacecraft has one navigation system.
+
+#### 3. Many-to-Many (Multiple Relationships)
+
+**Resources can be related to multiple other resources.**
+
+**Example: Astronauts ↔ Missions**
+```http
+GET /api/astronauts/neil-armstrong/missions    # Neil's missions
+GET /api/missions/apollo-11/crew               # Apollo 11's crew
+```
+Astronauts can go on multiple missions, and missions have multiple astronauts.
+
+### When to Use Sub-Resources vs References
+
+#### Use Sub-Resources When:
+- Child **depends on** parent (mission crew)
+- Child **belongs to** parent (planet's moons)
+- You usually access child **through** parent (mission data)
+- Child's lifecycle **tied to** parent
+
+```http
+GET /api/missions/artemis-3/crew         # Get mission crew
+POST /api/missions/artemis-3/crew        # Add crew member
+GET /api/planets/saturn/moons/titan      # Get Saturn's moon Titan
+```
+
+#### Use References When:
+- Both can **exist independently** (astronauts and spacecraft)
+- Relationships **change frequently** (astronaut assignments)
+- You need to access resource **independently**
+- **Many-to-many** relationships
+
+```http
+GET /api/astronauts/buzz-aldrin
+```
+
+```json
+{
+  "id": "buzz-aldrin",
+  "name": "Edwin 'Buzz' Aldrin",
+  "current_mission": "apollo-11",
+  "current_spacecraft": "apollo-csm",
+  "_links": {
+    "current_mission": "/api/missions/apollo-11",
+    "current_spacecraft": "/api/spacecraft/apollo-csm"
+  }
+}
+```
+
+---
+
+## HTTP Operations on Resources
+
+Now let's see how to perform operations on our space resources using HTTP methods.
+
+### GET - Retrieve Resources
+
+#### Get Collection
+```http
+GET /api/missions
+```
+
+**Example Response:**
+```json
+{
+  "_links": {
+    "self": "/api/missions",
+    "next": "/api/missions?page=2"
+  },
+  "total_count": 156,
+  "page": 1,
+  "missions": [
+    {
+      "id": "apollo-11",
+      "name": "Apollo 11 - Moon Landing",
+      "launch_date": "1969-07-16",
+      "status": "completed",
+      "_links": {
+        "self": "/api/missions/apollo-11",
+        "crew": "/api/missions/apollo-11/crew"
+      }
+    },
+    {
+      "id": "artemis-3", 
+      "name": "Artemis 3 - Return to Moon",
+      "launch_date": "2025-12-01",
+      "status": "planned",
+      "_links": {
+        "self": "/api/missions/artemis-3"
+      }
+    }
+  ]
+}
+```
+
+#### Get Individual Resource
+```http
+GET /api/missions/apollo-11
+```
+
+**Example Response:**
+```json
+{
+  "id": "apollo-11",
+  "name": "Apollo 11 - Moon Landing",
+  "description": "First crewed mission to land on the Moon",
+  "launch_date": "1969-07-16T13:32:00Z",
+  "landing_date": "1969-07-20T20:17:00Z",
+  "duration_days": 8,
+  "destination": "Moon",
+  "status": "completed",
+  "crew_size": 3,
+  "_links": {
+    "self": "/api/missions/apollo-11",
+    "crew": "/api/missions/apollo-11/crew",
+    "spacecraft": "/api/missions/apollo-11/spacecraft",
+    "data": "/api/missions/apollo-11/data"
+  }
+}
+```
+
+#### Get Sub-Resource
+```http
+GET /api/missions/apollo-11/crew
+```
+
+**Example Response:**
+```json
+{
+  "_links": {
+    "self": "/api/missions/apollo-11/crew",
+    "mission": "/api/missions/apollo-11"
+  },
+  "mission_id": "apollo-11",
+  "crew_size": 3,
+  "crew": [
+    {
+      "id": "neil-armstrong",
+      "name": "Neil Armstrong",
+      "role": "Commander",
+      "_links": {
+        "profile": "/api/astronauts/neil-armstrong"
+      }
+    },
+    {
+      "id": "buzz-aldrin",
+      "name": "Edwin 'Buzz' Aldrin", 
+      "role": "Lunar Module Pilot",
+      "_links": {
+        "profile": "/api/astronauts/buzz-aldrin"
+      }
+    }
+  ]
+}
+```
+
+### POST - Create Resources
+
+#### Create New Mission
+```http
+POST /api/missions
+Content-Type: application/json
+
+{
+  "name": "Europa Explorer",
+  "description": "Search for life on Jupiter's moon Europa",
+  "launch_date": "2028-03-15T10:00:00Z",
+  "destination": "Europa",
+  "mission_type": "scientific"
+}
+```
+
+**Response:**
+```http
+201 Created
+Location: /api/missions/europa-explorer
+
+{
+  "id": "europa-explorer",
+  "name": "Europa Explorer", 
+  "description": "Search for life on Jupiter's moon Europa",
+  "launch_date": "2028-03-15T10:00:00Z",
+  "destination": "Europa",
+  "mission_type": "scientific",
+  "status": "planning",
+  "created_at": "2024-03-01T14:30:00Z",
+  "_links": {
+    "self": "/api/missions/europa-explorer",
+    "crew": "/api/missions/europa-explorer/crew"
+  }
+}
+```
+
+#### Add Crew Member to Mission
+```http
+POST /api/missions/europa-explorer/crew
+Content-Type: application/json
+
+{
+  "astronaut_id": "sarah-chen",
+  "role": "Mission Commander",
+  "specialization": "astrobiology"
+}
+```
+
+### PUT - Update/Replace Resources
+
+#### Update Entire Mission
+```http
+PUT /api/missions/europa-explorer
+Content-Type: application/json
+
+{
+  "name": "Europa Deep Explorer",
+  "description": "Extended search for life on Jupiter's moon Europa with deep drilling capability",
+  "launch_date": "2028-06-01T10:00:00Z",
+  "destination": "Europa", 
+  "mission_type": "scientific",
+  "duration_months": 18
+}
+```
+
+**Response:**
+```http
+204 No Content
+```
+
+### PATCH - Partial Updates
+
+#### Update Mission Status
+```http
+PATCH /api/missions/europa-explorer
+Content-Type: application/json
+
+{
+  "status": "in-development",
+  "budget_allocated": 2500000000
+}
+```
+
+**Response:**
+```http
+204 No Content
+```
+
+### DELETE - Remove Resources
+
+#### Delete Mission
+```http
+DELETE /api/missions/europa-explorer
+```
+
+**Response:**
+```http
+204 No Content
+```
+
+#### Remove Crew Member
+```http
+DELETE /api/missions/artemis-3/crew/backup-pilot
+```
+
+**Response:**
+```http
+204 No Content
+```
+
+---
+
+## Practical Design Process
+
+Let's walk through designing a complete Space Mission API step by step.
+
+### Step 1: Identify Your Resources
+
+**Look at your domain and find the nouns:**
+
+*"Space agencies plan missions to visit planets. Astronauts are assigned to missions and use spacecraft to collect scientific data. Each planet may have moons that are also studied."*
+
+**Resources identified:**
+- **Mission** (space expedition)
+- **Astronaut** (space traveler) 
+- **Planet** (celestial body)
+- **Spacecraft** (vehicle)
+- **Data** (scientific information)
+- **Moon** (planetary satellite)
+
+### Step 2: Determine Resource Relationships
+
+**Ask: Which resources depend on others?**
+
+**Dependent (use sub-resources):**
+- Mission crew → belongs to mission
+- Mission data → collected by mission
+- Planet moons → orbit specific planet
+- Astronaut training → belongs to astronaut
+
+**Independent (use references):**
+- Astronauts → can exist without missions
+- Planets → exist independently
+- Spacecraft → can be reassigned
+
+### Step 3: Design the URL Structure
+
+```http
+# Missions and their components
+GET /api/missions                              # All missions
+GET /api/missions/artemis-3                    # Specific mission
+GET /api/missions/artemis-3/crew               # Mission crew (sub-resource)
+GET /api/missions/artemis-3/spacecraft         # Mission vehicles (sub-resource)
+GET /api/missions/artemis-3/data               # Mission data (sub-resource)
+
+# Planets and their features  
+GET /api/planets                               # All planets
+GET /api/planets/mars                          # Mars details
+GET /api/planets/mars/moons                    # Mars' moons (sub-resource)
+GET /api/planets/mars/atmosphere               # Mars atmosphere (sub-resource)
+
+# Independent astronauts with relationships
+GET /api/astronauts                            # All astronauts
+GET /api/astronauts/neil-armstrong             # Neil's profile
+GET /api/astronauts/neil-armstrong/missions    # Neil's mission history
+GET /api/astronauts/neil-armstrong/training    # Neil's training (sub-resource)
+
+# Spacecraft (independent but referenceable)
+GET /api/spacecraft                            # All spacecraft
+GET /api/spacecraft/voyager-1                  # Voyager 1 details
+```
+
+### Step 4: Design Response Formats
+
+#### Collection Response with Pagination
+```json
+{
+  "_links": {
+    "self": "/api/missions?page=1&limit=10",
+    "first": "/api/missions?page=1&limit=10",
+    "next": "/api/missions?page=2&limit=10",
+    "last": "/api/missions?page=16&limit=10"
+  },
+  "page": 1,
+  "limit": 10,
+  "total_pages": 16,
+  "total_count": 156,
+  "missions": [
+    {
+      "id": "apollo-11",
+      "name": "Apollo 11",
+      "status": "completed",
+      "_links": {
+        "self": "/api/missions/apollo-11"
+      }
+    }
+  ]
+}
+```
+
+#### Individual Resource with Relationships
+```json
+{
+  "id": "artemis-3",
+  "name": "Artemis 3 - Return to Moon",
+  "status": "planning",
+  "launch_date": "2025-12-01T10:00:00Z",
+  "crew_size": 4,
+  "destination": "Moon",
+  "_links": {
+    "self": "/api/missions/artemis-3",
+    "crew": "/api/missions/artemis-3/crew",
+    "spacecraft": "/api/missions/artemis-3/spacecraft", 
+    "data": "/api/missions/artemis-3/data",
+    "destination": "/api/planets/moon"
+  }
+}
+```
+
+### Step 5: Plan HTTP Operations
+
+| Resource | GET | POST | PUT | DELETE | PATCH |
+|----------|-----|------|-----|---------|--------|
+| `/api/missions` | List all missions | Create new mission | ❌ Not used | ❌ Dangerous | ❌ Not used |
+| `/api/missions/{id}` | Get mission details | ❌ Not allowed | Update entire mission | Delete mission | Update specific fields |
+| `/api/missions/{id}/crew` | Get mission crew | Add crew member | ❌ Not typical | ❌ Use individual DELETE | ❌ Not typical |
+| `/api/missions/{id}/crew/{astronaut}` | Get crew member details | ❌ Not allowed | Update crew role | Remove from mission | Update crew assignment |
+
+---
+
+## Best Practices Summary
+
+### 1. Consistent Naming
+- **Collections**: Always use plural nouns (`/missions`, `/astronauts`)
+- **Individual**: Use identifier after collection (`/missions/apollo-11`)
+- **Sub-resources**: Keep it simple (`/missions/{id}/crew`)
+
+### 2. Logical Relationships
+```http
+# Good: Clear parent-child relationship
+GET /api/missions/apollo-11/crew
+
+# Good: Independent resource with references
+GET /api/astronauts/neil-armstrong
+Response: { "current_mission": "apollo-11", "_links": {...} }
+
+# Avoid: Deep nesting
+GET /api/missions/apollo-11/crew/neil/training/physical
+```
+
+### 3. Meaningful HTTP Status Codes
+- **200 OK**: Successful GET, PATCH, PUT
+- **201 Created**: Successful POST with new resource
+- **204 No Content**: Successful PUT, PATCH, DELETE
+- **404 Not Found**: Resource doesn't exist
+- **400 Bad Request**: Invalid data or parameters
+
+### 4. Include Navigation Links
+```json
+{
+  "_links": {
+    "self": "/api/missions/apollo-11",
+    "crew": "/api/missions/apollo-11/crew",
+    "spacecraft": "/api/missions/apollo-11/spacecraft",
+    "collection": "/api/missions"
+  }
+}
+```
+
+### 5. Design for Your Users
+- **Think like a client**: What would be intuitive?
+- **Common access patterns**: Support how users actually use your API
+- **Flexible querying**: Provide filtering and sorting options
+- **Clear documentation**: URLs should be self-explanatory
+
+---
+
+## Quick Decision Framework
+
+### Choosing Resource Types:
+
+**Individual Resource** when:
+- ✅ You need detailed info about one specific thing
+- ✅ The resource has a unique identifier
+- ✅ It represents a single entity
+
+**Collection Resource** when:
+- ✅ You need to list multiple similar items
+- ✅ You want to create new items
+- ✅ You need filtering, sorting, pagination
+
+**Sub-Resource** when:
+- ✅ Child belongs to parent (mission crew)
+- ✅ Child depends on parent (planet moons)  
+- ✅ You usually access child through parent
+- ✅ Child lifecycle tied to parent
+
+**Reference (not sub-resource)** when:
+- ✅ Both resources can exist independently
+- ✅ Relationships change frequently
+- ✅ Many-to-many relationships
+- ✅ You need to access resource independently
+
+By following these principles and using this systematic approach, you can design REST APIs that are intuitive, consistent, and easy for developers to understand and use. The space exploration theme helps make abstract concepts concrete, but the same principles apply to any domain - whether you're managing e-commerce orders, social media posts, or banking transactions.
+
+:::tip[Remember]
+Good REST API design is about thinking in terms of **resources** (nouns) and **operations** (HTTP verbs), not functions or procedures. Focus on **what things your system manages** rather than **what actions it can perform**.
+:::

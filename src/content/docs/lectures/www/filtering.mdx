@@ -1,0 +1,266 @@
+---
+title: Filtering
+description: Filtering in RESTful web services
+draft: true
+sidebar:
+    label: "Filtering"
+    order: 4
+    badge:
+      text: New!
+      variant: danger
+    topic: lectures
+    draft: true
+---
+
+# Filtering Collection Resources in REST Web Services
+
+Filtering is a crucial mechanism in REST APIs that allows clients to retrieve specific subsets of data from collections, improving performance and reducing bandwidth usage. This guide covers best practices for designing and implementing filtering in RESTful web services.
+
+## Core Principles
+
+### 1. Query Parameter Approach
+Use query parameters to specify filtering criteria:
+
+```
+GET /api/users?status=active
+GET /api/products?category=electronics&price_min=100
+GET /api/orders?created_after=2024-01-01&status=pending
+```
+
+### 2. Resource-Centric Design
+Filters should be intuitive and directly relate to resource attributes:
+
+```
+GET /api/books?author=tolkien&genre=fantasy&published_year=1954
+```
+
+## Common Filtering Patterns
+
+### Basic Equality Filters
+```
+GET /api/employees?department=engineering
+GET /api/tasks?priority=high
+GET /api/articles?published=true
+```
+
+### Range Filters
+```
+GET /api/products?price_min=50&price_max=200
+GET /api/events?start_date=2024-01-01&end_date=2024-12-31
+GET /api/users?age_gte=18&age_lt=65
+```
+
+### Text Search Filters
+```
+GET /api/articles?search=machine+learning
+GET /api/users?name_contains=john
+GET /api/products?description_like=%wireless%
+```
+
+### Multi-Value Filters
+```
+GET /api/products?category=electronics,books,clothing
+GET /api/users?role=admin,moderator
+GET /api/orders?status=pending,processing,shipped
+```
+
+## Filter Parameter Naming Conventions
+
+### Comparison Operators
+- `field_eq` or just `field` - Equal to
+- `field_ne` - Not equal to
+- `field_gt` - Greater than
+- `field_gte` - Greater than or equal to
+- `field_lt` - Less than
+- `field_lte` - Less than or equal to
+
+### Text Operations
+- `field_contains` - Contains substring
+- `field_starts_with` - Starts with
+- `field_ends_with` - Ends with
+- `field_like` - Pattern matching
+
+### Collection Operations
+- `field_in` - Value in list
+- `field_not_in` - Value not in list
+
+## Implementation Strategies
+
+### 1. Basic Filter Processing
+```php
+$query = "SELECT * FROM products WHERE 1=1";
+$params = [];
+
+if (!empty($_GET['category'])) {
+    $query .= " AND category = ?";
+    $params[] = $_GET['category'];
+}
+
+$stmt = $pdo->prepare($query);
+$stmt->execute($params);
+```
+
+### 2. Filter Validation
+```php
+function validateFilters($filters) {
+    $allowed = ['name', 'status', 'created_at', 'category'];
+    
+    foreach (array_keys($filters) as $field) {
+        if (!in_array($field, $allowed)) {
+            throw new Exception("Invalid filter: $field");
+        }
+    }
+}
+```
+
+## Advanced Filtering Techniques
+
+### Nested Resource Filtering
+```
+GET /api/users?orders.status=completed
+GET /api/companies?employees.department=engineering
+```
+
+### Logical Operators
+```
+GET /api/products?filter=(category:electronics OR category:books) AND price_lt:100
+```
+
+### Custom Filter Functions
+```
+GET /api/users?created=last_30_days
+GET /api/orders?delivery=today
+GET /api/products?trending=true
+```
+
+## Performance Considerations
+
+### 1. Database Indexing
+Ensure filtered fields are properly indexed:
+
+```sql
+CREATE INDEX idx_products_category ON products(category);
+CREATE INDEX idx_orders_status_created ON orders(status, created_at);
+```
+
+### 2. Query Optimization
+- Limit the number of simultaneous filters
+- Implement query result caching
+- Use database-specific optimization techniques
+
+### 3. Pagination with Filtering
+Always combine filtering with pagination:
+
+```
+GET /api/products?category=electronics&page=1&limit=20
+```
+
+## Error Handling
+
+### Invalid Filter Parameters
+```json
+{
+  "error": "invalid_filter",
+  "message": "Filter field 'invalid_field' is not supported",
+  "supported_fields": ["name", "status", "created_at"]
+}
+```
+
+### Invalid Filter Values
+```json
+{
+  "error": "invalid_filter_value",
+  "message": "Date filter 'created_after' must be in ISO 8601 format",
+  "field": "created_after",
+  "received": "invalid-date"
+}
+```
+
+## Security Best Practices
+
+### 1. Input Sanitization
+Always sanitize and validate filter parameters to prevent injection attacks:
+
+```php
+function sanitizeFilter($value) {
+    return preg_replace('/[^\w\s-]/i', '', $value);
+}
+
+// Always use prepared statements
+$stmt = $pdo->prepare("SELECT * FROM products WHERE category = ?");
+$stmt->execute([$sanitizedCategory]);
+```
+
+### 2. Access Control
+Implement field-level access control:
+
+```php
+function getFilterableFields($userRole) {
+    $baseFields = ['name', 'status', 'created_at'];
+    $adminFields = ['email', 'internal_notes'];
+    
+    return $userRole === 'admin' 
+        ? array_merge($baseFields, $adminFields) 
+        : $baseFields;
+}
+```
+
+### 3. Rate Limiting
+Apply rate limiting to prevent abuse of complex filtering operations.
+
+## Documentation and Discoverability
+
+### OpenAPI Specification
+```yaml
+paths:
+  /products:
+    get:
+      parameters:
+        - name: category
+          in: query
+          schema:
+            type: string
+            enum: [electronics, books, clothing]
+        - name: price_min
+          in: query
+          schema:
+            type: number
+            minimum: 0
+```
+
+### Filter Metadata Endpoint
+Provide an endpoint that describes available filters:
+
+```
+GET /api/products/filters
+```
+
+## Testing Strategies
+
+### Unit Tests
+```php
+public function testFilterByCategory() {
+    $response = $this->get('/api/products?category=electronics');
+    
+    $response->assertStatus(200);
+    
+    $products = $response->json('data');
+    foreach ($products as $product) {
+        $this->assertEquals('electronics', $product['category']);
+    }
+}
+```
+
+### Integration Tests
+Test the complete filtering pipeline including database queries and response formatting.
+
+## Conclusion
+
+Effective filtering in REST APIs requires careful consideration of:
+- Intuitive parameter naming
+- Performance optimization
+- Security measures
+- Comprehensive documentation
+- Thorough testing
+
+By following these patterns and best practices, you can create filtering systems that are both powerful for clients and maintainable for developers.

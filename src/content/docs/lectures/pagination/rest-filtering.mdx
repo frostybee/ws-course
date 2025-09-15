@@ -2,7 +2,6 @@
 title: Filtering Collection Resources
 description: Implementing filtering on collection resources.
 topic: lectures
-draft: true
 sidebar:
     label: "Filtering Collection Resources"
     order: 1
@@ -18,105 +17,130 @@ import { Aside } from '@astrojs/starlight/components';
 :::
 
 - **Common Use Cases:**
- > For example, if you have an API that returns a list of books, you might want to filter this list based on parameters such as genre, author, publication date, or price range.
+ For example, if you have an API that returns a list of species, you might want to filter this list based on parameters such as habitat, family, conservation status, or region.
+
+ ---
 
 ## Why Filtering Is Important?
 
 <Aside type='tip' title='Filtering Benefits' >
 - Helps avoid over-fetching data.
-- Reduces payload size and the **amount of data** transferred over the network, **improving performance** and **usability** of your web service.
-- Improves user experience by providing more **relevant information**,   especially when dealing with large datasets.
+
+**Network Efficiency:**
+- Reduces bandwidth usage by transferring only relevant data
+- Faster response times due to smaller payloads
+- Lower server-side processing overhead
+
+**User Experience:**
+- Users get exactly the data they need
+- Faster page loads and interactions
+- Reduced client-side processing requirements
+
+**Scalability:**
+- Prevents overwhelming clients with large datasets
+- Reduces server memory usage
+- Enables handling of growing data volumes
 </Aside>
+
+---
 
 ## How to Implement Filtering in RESTful Web Services?
 
-1. **Define filter criteria**:
-   - **Resource Identification**: Determine which resource the filtering applies to. For example, if you have a `products` resource, the endpoint might be `/products`.
-   - **Filtering Parameters**: Decide on the parameters that clients can use to filter the data. These parameters could include various fields of the resource such as IDs, dates, names, or any other attributes relevant to your application.
+### 1. Define filter criteria:
+- **Resource Identification**: Determine which resource the filtering applies to. For example, if you have a `species` resource, the endpoint might be `/species`.
+- **Filtering Parameters**: Decide on the parameters that clients can use to filter the data. These parameters could include various fields of the resource such as IDs, dates, names, or any other attributes relevant to your application.
 
-2. **Design the API Endpoint:**
-   Modify your API endpoints to accept filter parameters. Typically, filtering parameters are passed as query parameters in the URI of the GET request.
+**Common Filter Types:**
+- **Exact Match**: `status=active`, `category=electronics`
+- **Range Queries**: `price_min=10&price_max=100`, `date_after=2023-01-01`
+- **Pattern Matching**: `name_contains=smartphone`, `email_ends_with=@company.com`
+- **List Membership**: `category_in=electronics,books,clothing`
 
-   **Example URI for filtering:**
-   ```batch
-   GET /api/books?author=John+Doe&genre=Science+Fiction&price_max=20
-   ```
+---
 
-   **In this example:**
-   - `author` filters books by the author name.
-   - `genre` filters books by the genre.
-   - `price_max` filters books with a price less than or equal to 20.   
+### 2. Design the API Endpoint:
+Modify your API endpoints to accept filter parameters. Typically, filtering parameters are passed as query parameters in the URI of the GET request.
 
-3. **Filter logic on the server side:**
-        - **Extract Parameters**: Parse the query parameters from the request.
-        - **Validate Parameters**: Ensure that the parameters are valid and sanitize them to prevent issues such as SQL injection or other security vulnerabilities.   
-   - **Apply Filtering**: Use the parameters to filter the data. This usually involves:
-        - Querying the database with filtering conditions.
-        - Or, iterating over a collection of objects and applying filter logic programmatically.
-    
-        For example, in SQL, you might use:
-        ```sql
-        SELECT * FROM books WHERE author = 'John Doe' AND genre = 'Science Fiction' AND price <= 20;
-        ```
+**Example URI for filtering:**
+```batch
+GET /api/species?habitat=forest&family=Felidae&conservation_status=endangered
+```
 
-    - **Return the filtered data:** Respond with the filtered data in the appropriate format (e.g., JSON or XML). Ensure that the response contains only the data that matches the criteria specified.
+**In this example:**
+- `habitat` filters species by their natural habitat.
+- `family` filters species by their taxonomic family.
+- `conservation_status` filters species by their conservation status.   
 
-### Example 1: Filtering with Multiple Criteria
+---   
 
-1. **API endpoint**: `/products`
-2. **Filter parameters**: `category`, `price_range` (min and max), `availability`
+### 3. Implement Filtering Logic on the Server Side:
+- **Extract Parameters**: Parse the query parameters from the request.
+- **Validate Parameters**: Ensure that the parameters are valid and sanitize them to prevent issues such as SQL injection or other security vulnerabilities.   
+- **Apply Filtering**: Use the parameters to filter the data. This usually involves:
+- **Querying the database** with filtering conditions.
+- **Iterating over a collection of objects** and applying filter logic programmatically.
+
+For example, in SQL, you might use:
+```sql
+SELECT * FROM species WHERE habitat = 'forest' AND family = 'Felidae' AND conservation_status = 'endangered';
+```
+- Querying the database with filtering conditions.
+- Or, iterating over a collection of objects and applying filter logic programmatically.
+
+For example, in SQL, you might use:
+```sql
+SELECT * FROM species WHERE habitat = 'forest' AND family = 'Felidae' AND conservation_status = 'endangered';
+```
+
+- **Return the filtered data:** Respond with the filtered data in the appropriate format (e.g., JSON or XML). Ensure that the response contains only the data that matches the criteria specified.
+
+---
+
+## Example 1: Filtering with Multiple Criteria
+
+1. **API endpoint**: `/species`
+2. **Filter parameters**: `habitat`, `population_range` (min and max), `conservation_status`
 3. **PHP Implementation**:
 
 ```php
 <?php
 // Database connection
-$dsn = 'mysql:host=localhost;dbname=shop';
+$dsn = 'mysql:host=localhost;dbname=wildlife';
 $username = 'root';
 $password = '';
 $options = [];
 $pdo = new PDO($dsn, $username, $password, $options);
 
 // Extract and validate filter parameters
-$category = isset($_GET['category']) ? $_GET['category'] : '';
-$min_price = isset($_GET['min_price']) ? (float)$_GET['min_price'] : 0;
-$max_price = isset($_GET['max_price']) ? (float)$_GET['max_price'] : PHP_INT_MAX;
-$availability = isset($_GET['availability']) ? $_GET['availability'] : '';
+$habitat = isset($_GET['habitat']) ? $_GET['habitat'] : '';
+$min_population = isset($_GET['min_population']) ? (int)$_GET['min_population'] : 0;
+$max_population = isset($_GET['max_population']) ? (int)$_GET['max_population'] : PHP_INT_MAX;
+$conservation_status = isset($_GET['conservation_status']) ? $_GET['conservation_status'] : '';
 
 // Build the SQL query
-$sql = "SELECT * FROM products WHERE price BETWEEN :min_price AND :max_price";
+$sql = "SELECT * FROM species WHERE population BETWEEN :min_population AND :max_population";
 $params = [
-    ':min_price' => $min_price,
-    ':max_price' => $max_price
+    ':min_population' => $min_population,
+    ':max_population' => $max_population
 ];
 
-if (!empty($category)) {
-    $sql .= " AND category = :category";
-    $params[':category'] = $category;
+if (!empty($habitat)) {
+    $sql .= " AND habitat = :habitat";
+    $params[':habitat'] = $habitat;
 }
 
-if (!empty($availability)) {
-    $sql .= " AND availability = :availability";
-    $params[':availability'] = $availability;
+if (!empty($conservation_status)) {
+    $sql .= " AND conservation_status = :conservation_status";
+    $params[':conservation_status'] = $conservation_status;
 }
 
 // Prepare and execute the query
 $stmt = $pdo->prepare($sql);
 $stmt->execute($params);
-$products = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$species = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Return the results as JSON
 header('Content-Type: application/json');
-echo json_encode($products);
+echo json_encode($species);
 ?>
 ```
-
-## Key Points to Consider
-
-:::tip
-- **Security**: Always validate and sanitize input to prevent SQL injection and other security issues. Using prepared statements, as shown in the examples, helps mitigate these risks.
-- **Performance**: Ensure that your filtering logic is efficient, especially when dealing with large datasets. Indexing the database fields that are frequently filtered can improve performance.
-- **User Experience**: Provide useful error messages and handle cases where no results are found.
-- **Scalability**: As your application grows, consider more advanced filtering options to manage large results efficiently.
-- **Pagination:** If the dataset can be very large, consider implementing pagination along with filtering to manage the volume of data returned.
-- **Documentation:** Clearly document the filter parameters and their usage in your API documentation so that clients know how to use them.
-:::
