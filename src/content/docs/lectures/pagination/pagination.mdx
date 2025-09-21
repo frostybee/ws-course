@@ -59,7 +59,34 @@ GET /items?offset=10&limit=10
 
 ---
 
-### 2. Cursor-Based Pagination (aka Keyset Pagination)
+### 2. Page-Based Pagination
+
+**Concept**:
+Page-based pagination uses page numbers and page size parameters to navigate through datasets. This is the most intuitive approach for users as it mirrors how people naturally think about pagination.
+
+**How It Works**:
+- The client specifies a `page` parameter (starting from 1) and a `page_size` parameter to determine how many items per page.
+- The server internally calculates the offset as: `offset = (page - 1) × page_size`.
+- For example, to get the second page with 10 items per page, the request would be `page=2&page_size=10`, which translates to `offset=10&limit=10`.
+
+**Example Request**:
+```
+GET /items?page=2&page_size=10
+```
+
+**Pros**:
+- Most user-friendly and intuitive interface.
+- Easy to implement navigation controls (page 1, 2, 3, etc.).
+- Simple to understand and explain to end users.
+
+**Cons**:
+- Same performance issues as offset-based pagination for large page numbers.
+- Can lead to inconsistencies if data is modified between requests.
+- Still requires the database to skip over records for high page numbers.
+
+---
+
+### 3. Cursor-Based Pagination (aka Keyset Pagination)
 
 **Concept**:
 Cursor-based pagination uses a **cursor** (usually a unique identifier or a timestamp) to indicate the position of the next set of results. This approach is often more efficient and accurate for large datasets.
