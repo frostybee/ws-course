@@ -1,60 +1,62 @@
 ---
 title: Implementing Sub-Collections
 description: Implementing Sub-Collections
-draft: true
+draft: false
 sidebar:
     label: "Sub-Collection"
     order: 4
     badge:
-      text: Team Project
-      variant: tip
+      text: Assignment
+      variant: success
 ---
 
-# What Are Sub-Collections in a REST API?
+## What Are Sub-Collections in a REST API?
 - In REST API design, resources are typically organized **hierarchically**.
 - A **sub-collection** typically represents a **nested resource** under a **parent resource** (e.g., `/players/{player_id}/goals` goals scored by a specific player).  
 
----
 :::note
 - The JSON response for **a sub-collection** should represent the **parent-child** relationship clearly, provide the necessary data about the sub-collection items, and often include **metadata** for context, pagination, or navigation (with links).
 :::
+
 ---
 
 
 ## Components of a Sub-Collection JSON Response
----
+
 A well-structured JSON response for **a sub-collection** typically **includes**:
 1. **Parent context**: Details about the parent resource for clarity, if relevant. Optional but recommended. This reinforces the **hierarchical relationship** and can reduce the need for additional requests.
 2. **The sub-collection data**: An array of items representing the sub-collection.
 3. **Pagination metadata**: Information about the sub-collection, such as total count, pagination details, or filters applied.
 4. **Links**: Hypermedia links (optional but recommended) for navigation (e.g., to the parent resource or next page).
 
+---
 
+## Guidelines for Sub-Collection Responses
+1. **Use plural keys for collections**: Name the endpoint and array to reflect the collection (e.g., `players`, not `player`).
+2. **Use descriptive keys**: Name the sub-collection clearly (e.g., `"goals"` instead of just `"data"` if it adds context).
+3. **Embed parent context**: Include parent details only if necessary.
+4. **Support pagination**: For large sub-collections, add pagination metadata (e.g., `page`, `limit`, `total`).
+5. **Use standard HTTP status codes**: Return 200 for success, 404 if the parent resource isn't found, etc.
+6. **Follow a naming convention**: Stick to camelCase, snake_case, or kebab-case based on your API's style.
+7. **Error handling**: If the sub-collection is empty, return an empty array (`"data": []`) rather than `null` or an error (unless the parent resource doesn't exist, which might result in a 404 case).
 
-## Best Practices for Sub-Collection Responses
-1. **Use Plural Keys for Collections**: Name the endpoint and array to reflect the collection (e.g., `players`, not `player`).
-2. **Use Descriptive Keys**: Name the sub-collection clearly (e.g., `"goals"` instead of just `"data"` if it adds context).
-3. **Embed Parent Context**: Include parent details only if necessary.
-4. **Support Pagination**: For large sub-collections, add pagination metadata (e.g., `page`, `limit`, `total`).
-5. **Use Standard HTTP Status Codes**: Return 200 for success, 404 if the parent resource isn't found, etc.
-6. **Follow a Naming Convention**: Stick to camelCase, snake_case, or kebab-case based on your API's style.
-7. **Error Handling**: If the sub-collection is empty, return an empty array (`"data": []`) rather than `null` or an error (unless the parent resource doesn't exist, which might result in a 404 case).
+---
 
 ## How to Produce a Sub-Collection Response?
-Below is a `model method` that demonstrates an implementation of properly structured response for a sub-collection. 
+Below is a `model method` that demonstrates an implementation of properly structured response of a READ operation on a sub-collection. 
+- **Endpoint:** `GET /players/{player_id}/goals`
+- **Description:** Get the goals scored by a specific player.
 
-:::tip
-The following method was implemented in the **`PlayersModel`** class.  
-**Endpoint:** `GET /players/{player_id}/goals`
 
 ```php title="Example: Producing a structure response for a sub-collection with parent resource context"
+// This method was implemented in the PlayersModel class.  
 public function getGoalsByPlayerID(string $player_id): mixed
 {
     // 1) Fetch the details of the player parent resource.
     $player = $this->getPlayerById($player_id);
   
-//NOTE: The content of the PHP heredoc must be properly indented.
-// @see: https://www.php.net/manual/en/language.types.string.php#language.types.string.syntax.heredoc
+    //NOTE: The content of the PHP heredoc must be properly indented.
+    // @see: https://www.php.net/manual/en/language.types.string.php#language.types.string.syntax.heredoc
     $goals_query = <<<SQL
         SELECT * FROM goals g, tournaments t,
         matches m
@@ -78,38 +80,44 @@ public function getGoalsByPlayerID(string $player_id): mixed
     return $results;
 }
 ```
-:::
+
+---
 
 ## Examples: Sub-Collection Responses
----
+
 ### Empty Sub-Collection
-Endpoint: `GET /players/P-00020/goals`
+- Endpoint: `GET /players/{player_id}/goals`
+- URI: `GET /players/P-00020/goals`
 
 ```json title="Example: Structure of an empty sub-collection response with parent resource context"
 {  
-  "meta": {
+  "player": {...}, // Parent resource context
+  "meta": {        // Sub-collection pagination metadata
     "total_items": 0,
     "offset": 0,
     "current_page": 1,
     "page_size": 5,
     "total_pages": 0
   },
-  "goals": []
+  "goals": []      // Sub-collection data items
 }
 ```
 - Empty array indicates no goals.
 - **Returns 200 status (assuming the player exists).**
 
-### Example: Sub-Collection with Parent Context
 ---
-Endpoint: `GET /players/P-28154/goals`  
+
+### Example: Sub-Collection with Parent Context
+- Endpoint: `GET /players/{player_id}/goals`
+- URI: `GET /players/P-28154/goals`
+
 **Note:**
 - `"player"` provides context about the parent resource.
-- `"goals"` is the sub-collection (named specifically instead of `"data"`).
+- `"goals"` is the sub-collection (named specifically instead of `"data"`) and contains the data items.
 
 ```json title="Example: Structure of a sub-collection response with parent resource context"
 {  
-  "player": {
+  "player": {        // Parent resource context
     "key_id": 6557,
     "player_id": "P-28154",
     "family_name": "Müller",
@@ -124,14 +132,14 @@ Endpoint: `GET /players/P-28154/goals`
     "list_tournaments": "2010, 2014, 2018, 2022",
     "player_wikipedia_link": "https://en.wikipedia.org/wiki/Thomas_M%C3%BCller"
   },
-  "meta": {
+  "meta": {          // Sub-collection pagination metadata
     "total_items": 10,
     "offset": 0,
     "current_page": 1,
     "page_size": 5,
     "total_pages": 2
   },
-  "goals": [
+  "goals": [        // Sub-collection data items
     {
       "goal_id": "G-2614",
       "tournament_id": "WC-2010",
