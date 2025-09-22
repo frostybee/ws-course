@@ -1,55 +1,53 @@
 ---
-title: Structuring Error Responses
+title: Structuring REST API Error Responses
 description: Structuring Error Responses
 draft: true
 sidebar:
-    label: "Error Response"
+    label: "REST API Error Response"
     order: 2
     badge: 
         text: New
         variant: danger
 ---
 
-## Motivation
+## Why Structure Error Responses?
+
+Well-structured error responses are essential for building reliable APIs. They enable developers to:
+
+- **Handle errors consistently** across all endpoints,
+- **Debug issues faster** with clear, actionable information, 
+- **Build stable client applications** that gracefully handle failures,
+- **Reduce support burden** by providing self-explanatory error messages.
+
+When errors are structured predictably, both humans and systems can quickly understand what went wrong and how to fix it.
+
 ---
-
-:::note
-- A consistent **structure for error responses** makes it easier for developers to understand and handle errors across different API endpoints. When the **structure is predictable**, developers can quickly identify what went wrong and how to process the error.
-- When the error response is **structured properly** (including status codes, error codes, and meaningful messages), it helps both developers and systems easily pinpoint the problem during debugging.
-:::
-
-
-## Key Principles
---- 
-
-1. **Use appropriate HTTP status codes**: The status code should reflect the type of error (e.g., `400` for bad requests, `404` for not found, `500` for server errors).
-2. **Consistent Format:** Keep the error response format consistent with your successful responses (e.g., JSON), so clients can parse it uniformly.
-3. **Provide enough detail**: Include a human-readable message, an error code (if applicable), and optionally, details for debugging or next steps.
-4. **Avoid overexposure:** Don't leak sensitive information (e.g., stack traces) in production responses.
 
 ## Recommended Structure
----
 
 To **properly structure** a REST API response with an error message, you should follow a **standard format** that makes the response easy to understand and consistent. 
 :::tip
 **Don't Include Sensitive Information**: Avoid including sensitive information such as database internals, stack traces, or detailed logs in the error response.
 :::
 
-### **HTTP Status Code**  
 ---
+
+### HTTP Status Code  
 
 - Use the appropriate HTTP **status code** for the error. This helps clients quickly understand the type of issue:
     - **4xx**: Client-related errors (e.g., invalid input, not found).
     - **5xx**: Server-related errors (e.g., internal server issues).
 - **Example status codes**:
     - `400 Bad Request`: Invalid or missing parameters.
-    - `401 Unauthorized`: Authentication failure.     
+    - `401 Unauthorized`: Authentication failure.
     - `403 Forbidden`: Authentication succeeded, but the user doesn't have permission.
     - `404 Not Found`: Resource is not found.
+    - `422 Unprocessable Entity`: Request is well-formed but contains validation errors.
     - `500 Internal Server Error`: Server encountered an unexpected condition.
 
-### **Response Format**  
 ---
+
+### Response Format  
 
 Keep the error response format consistent with your successful responses (e.g., JSON), so clients can parse it uniformly.
 
@@ -58,22 +56,74 @@ A well-structured error response typically includes:
 - **message**: A concise, human-readable description of the error.
 - **code** (optional): A machine-readable error code for programmatic handling.
 - **details** (optional): Additional context, such as validation errors or specific fields that failed.
-   
-### Example of a Structured Error Response
 
-Here's a sample response for an error when a user tries to access a resource that doesn't exist:
+---
+
+## Examples of Structured Error Responses
+
+### Example 1: Validation Error (400 Bad Request)
+
+Here's a sample response for when required parameters are missing or invalid:
 
 ```json
 {
   "status": "error",
-  "code": 400,
-  "message": "Bad Request: Missing required parameter 'email'.",
+  "message": "Validation failed: Missing required fields",
   "details": [
     {
       "field": "email",
-      "issue": "Missing"
+      "issue": "This field is required"
+    },
+    {
+      "field": "password",
+      "issue": "Must be at least 8 characters long"
     }
   ],
-  "documentation_url": "https://example.com/api/docs/errors#400"
+  "documentation_url": "https://api.example.com/docs/errors#validation"
 }
 ```
+
+---
+
+### Example 2: Resource Not Found (404)
+
+For when a requested resource doesn't exist:
+
+```json
+{
+  "status": "error",
+  "message": "User not found",
+  "details": {
+    "resource_type": "user",
+    "resource_id": "12345"
+  },
+  "documentation_url": "https://api.example.com/docs/errors#not-found"
+}
+```
+
+### Example 3: Server Error (500)
+
+For internal server errors (avoid exposing sensitive details):
+
+```json
+{
+  "status": "error",
+  "message": "An unexpected error occurred. Please try again later.",
+  "error_id": "req_abc123def456",
+  "documentation_url": "https://api.example.com/docs/errors#server-error"
+}
+```
+
+---
+
+## General Guidelines
+
+1. **Match HTTP status to error type**: Use `4xx` for client errors, `5xx` for server errors
+2. **Use consistent field names**: Stick to the same field names across all error responses (e.g., always use `message`, not sometimes `error` or `description`).
+3. **Include error tracking**: For server errors, include an `error_id` or `trace_id` to help with debugging and support requests.
+4. **Include helpful context** : Add field-level validation details and documentation links when possible
+5. **Validation details**: For validation errors, provide specific field-level feedback to help users correct their input.
+6. **Documentation links**: Always include links to relevant documentation when possible to help developers understand and resolve errors quickly.
+7. **Localization support**: Consider including error codes that can be mapped to localized messages on the client side.
+8. **Rate limiting**: For rate limit errors (429), include headers like `Retry-After` and details about limits in the response body.
+

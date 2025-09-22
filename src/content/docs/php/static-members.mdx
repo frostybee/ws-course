@@ -120,7 +120,7 @@ echo DerivedClass::staticMethod(); // Outputs: DerivedClass static method
 ```
 
 
-### **1. Basic Static Method Example**
+### 1. Basic Static Method Example
 
 Here's a simple class with a static method:
 
@@ -136,7 +136,7 @@ $result = MathUtils::add(5, 10);
 echo $result; // Outputs: 15
 ```
 
-### **2. Static Method with Visibility Modifiers**
+### 2. Static Method with Visibility Modifiers
 
 Static methods can have visibility modifiers like `public`, `protected`, and `private`.
 
@@ -159,7 +159,7 @@ User::incrementCount();
 echo User::getCount(); // Outputs: 2
 ```
 
-### **3. Static Methods with Parameters**
+### 3. Static Methods with Parameters
 
 Static methods can accept parameters just like regular methods.
 
@@ -174,7 +174,7 @@ class Converter {
 echo Converter::toUpperCase("hello world"); // Outputs: HELLO WORLD
 ```
 
-### **4. Static Methods in Inheritance**
+### 4. Static Methods in Inheritance
 
 Static methods are inherited but are not polymorphic. This means that calling a static method from a subclass does not override the method in the parent class.
 
@@ -196,7 +196,7 @@ echo Animal::sound(); // Outputs: Some generic sound.
 echo Dog::sound();    // Outputs: Bark!
 ```
 
-### **5. Static Methods with `self` and `static` Keywords**
+### 5. Static Methods with `self` and `static` Keywords
 
 - `self` refers to the class in which the method is defined.
 - `static` refers to the class that was used to call the method.
@@ -224,7 +224,7 @@ echo Derived::callIdentify(); // Outputs: Derived
 
 In this example, `self::identify()` in `Base::callIdentify()` calls the `identify()` method of the `Base` class, even if called from a subclass like `Derived`.
 
-### **6. Static Methods and Constants**
+### 6. Static Methods and Constants
 
 Static methods can be used to return constant values.
 
@@ -241,7 +241,7 @@ class Config {
 echo Config::getVersion(); // Outputs: 1.0
 ```
 
-### **7. Static Methods with Static Properties**
+### 7. Static Methods with Static Properties
 
 Static methods can interact with static properties.
 
@@ -264,7 +264,7 @@ Counter::increment();
 echo Counter::getCount(); // Outputs: 2
 ```
 
-### **8. Static Methods in Namespaces**
+### 8. Static Methods in Namespaces
 
 Static methods can also be used within namespaces, just like in the global namespace.
 

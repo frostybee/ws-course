@@ -11,49 +11,35 @@ sidebar:
 
 ## What Is PHP PDO?
 
----
-
 :::note
 - PHP **PDO** (PHP Data Objects) is a **database access layer** that provides a consistent interface for accessing **various types** of databases in PHP. 
 - It provides a more modern, flexible approach, and secure approach for interacting with databases compared to older methods, such as `mysql_*` functions.
 :::
 
+---
+
 ### Key Features of PDO:
 
----
-
-1. **Database-agnostic**: PDO allows you to interact with many types of databases (MySQL, PostgreSQL, SQLite, MSSQL, etc.) using the same API. This makes it easier to switch between different database systems without having to rewrite your queries.
-   
+1. **Database-agnostic**: PDO allows you to interact with many types of databases (MySQL, PostgreSQL, SQLite, MSSQL, etc.) using the same API. This makes it easier to switch between different database systems without having to rewrite your queries.   
 2. **Prepared statements**: PDO supports **prepared statements**, which help prevent SQL injection attacks by separating SQL code from user input. Prepared statements also allow for more efficient queries because the database can optimize them ahead of time.
-
 3. **Error handling**: PDO provides various error modes, allowing you to control how errors are handled. You can set it to silently ignore errors, throw exceptions, or handle them in other ways.
-
 4. **Transactions**: PDO makes it easy to implement transactions in your code, allowing you to perform multiple database operations that either all succeed or all fail.
-
 5. **Binding parameters**: PDO allows for binding parameters in queries, which improves both security (by preventing SQL injection) and performance (by allowing query reuse).
 
-
-### Advantages of Using PDO:
-
 ---
 
-:::tip
-- **Security**: Prevents SQL injection through prepared statements.
-- **Flexibility**: Works with multiple databases, so you can change the database backend with minimal code changes.
-- **Performance**: Prepared statements can be more efficient when executing repeated queries.
-:::
-
+ 
 ## What Are Prepared Statements?
-:::note
+
 - [Prepared statements](https://www.php.net/manual/en/pdo.prepare.php) in **PDO** (PHP Data Objects) are a feature that allows you to execute SQL queries **securely** and **efficiently** by separating the **query structure** from the **actual data** being inserted or retrieved. 
 - This approach helps prevent **SQL injection attacks** and **improves performance**, especially when the same query is executed multiple times with different values.
-:::
 
 
+---
 
 ## How Prepared Statements Works?
 
----
+
 
 ### 1. Preparation Phase:
    - An SQL **query template** is created, but without the **actual data** values.
@@ -67,6 +53,8 @@ sidebar:
 ### 3. Execution Phase:
    - Once the query is prepared and the parameters are bound, the query can be executed with the actual data.
    - The database executes the query, ensuring that the input data is safely handled.
+
+---
 
 ## Example of Using Prepared Statements in PDO:
 
@@ -94,13 +82,11 @@ foreach ($results as $row) {
 }
 ```
 
-## Key Points:
-- **Security:** Prepared statements ensure that input data is treated as data, not as executable code, preventing SQL injection attacks.
-- **Efficiency:** The database can optimize queries and cache execution plans for prepared statements, improving performance when the same query is run multiple times with different parameters.
-- **Flexibility:** You can use named placeholders (e.g., `:email`) or positional placeholders (`?`), making it easier to organize and manage complex queries.
+---
 
 ## Benefits of Prepared Statements:
-1. **Protection from SQL Injection:** Input values are not directly inserted into the query, so malicious SQL code can't manipulate the query structure.
-2. **Improved Performance:** The database can reuse the query plan, making repeated executions faster.
-3. **Readability and Maintainability:** Code is cleaner and easier to manage when using placeholders instead of embedding raw data directly in SQL strings.
+1. **Protection from SQL injection:** Input values are not directly inserted into the query, so malicious SQL code can't manipulate the query structure.
+2. **Improved performance:** The database can reuse the query plan, making repeated executions faster when the same query is run multiple times with different parameters.
+3. **Readability and maintainability:** Code is cleaner and easier to manage when using placeholders instead of embedding raw data directly in SQL strings.
+4. **Flexibility:** You can use named placeholders (e.g., `:email`) or positional placeholders (`?`), making it easier to organize and manage complex queries.
 

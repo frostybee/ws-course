@@ -14,20 +14,19 @@ sidebar:
 - In REST API design, resources are typically organized **hierarchically**.
 - A **sub-collection** typically represents a **nested resource** under a **parent resource** (e.g., `/players/{player_id}/goals` goals scored by a specific player).  
 
-:::note
-- The JSON response for **a sub-collection** should represent the **parent-child** relationship clearly, provide the necessary data about the sub-collection items, and often include **metadata** for context, pagination, or navigation (with links).
-:::
-
 ---
 
-
-## Components of a Sub-Collection JSON Response
+## Response Structure of a READ operation on a Sub-Collection
 
 A well-structured JSON response for **a sub-collection** typically **includes**:
 1. **Parent context**: Details about the parent resource for clarity, if relevant. Optional but recommended. This reinforces the **hierarchical relationship** and can reduce the need for additional requests.
 2. **The sub-collection data**: An array of items representing the sub-collection.
 3. **Pagination metadata**: Information about the sub-collection, such as total count, pagination details, or filters applied.
 4. **Links**: Hypermedia links (optional but recommended) for navigation (e.g., to the parent resource or next page).
+
+:::note
+- The JSON response for **a sub-collection** should represent the **parent-child** relationship clearly, provide the necessary data about the sub-collection items, and often include **metadata** for context, pagination, or navigation (with links).
+:::
 
 ---
 

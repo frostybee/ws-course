@@ -1,0 +1,198 @@
+---
+title: HTTP Exceptions in Slim Framework
+description: Learn how to use Slim Framework's built-in HTTP exceptions and create custom ones for better API error management
+sidebar:
+    label: "Slim HTTP Exceptions"
+    order: 7
+    badge:
+        text: Code
+        variant: caution
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+## Introduction
+
+Slim Framework v4 introduced specialized HTTP exceptions that provide better error handling for web APIs. These built-in exceptions offer more context and control over error responses compared to generic PHP exceptions.
+
+<Aside type="tip">
+**Why Use Slim's HTTP Exceptions?**
+- Built-in HTTP status codes and error messages,
+- Consistent error responses across your API,
+- Integration with Slim's error handling middleware,
+- Support for custom titles and descriptions,
+- Better debugging and logging capabilities.
+</Aside>
+
+## Slim's Built-in HTTP Exceptions
+
+Slim Framework provides several specialized HTTP exceptions out of the box. These exceptions extend `HttpSpecializedException` and automatically set appropriate HTTP status codes.
+
+### Available Built-in Exceptions
+
+Here are the HTTP exceptions provided by Slim Framework:
+
+<Steps>
+1. **HttpBadRequestException (400)**: For malformed requests
+2. **HttpUnauthorizedException (401)**: For authentication failures
+3. **HttpForbiddenException (403)**: For authorization failures
+4. **HttpNotFoundException (404)**: For missing resources
+5. **HttpMethodNotAllowedException (405)**: For unsupported HTTP methods
+6. **HttpInternalServerErrorException (500)**: For server errors
+7. **HttpNotImplementedException (501)**: For unimplemented features
+</Steps>
+
+### Basic Usage
+
+Here's how to use Slim's built-in HTTP exceptions:
+
+```php
+use Psr\Http\Message\ServerRequestInterface;
+use Slim\Exception\HttpBadRequestException;
+use Slim\Exception\HttpNotFoundException;
+use Slim\Exception\HttpUnauthorizedException;
+use Slim\Exception\HttpForbiddenException;
+
+// Throw a 404 Not Found exception
+throw new HttpNotFoundException($request);
+
+// Throw a 400 Bad Request exception
+throw new HttpBadRequestException($request, 'Invalid input data');
+
+// Throw a 401 Unauthorized exception
+throw new HttpUnauthorizedException($request, 'Authentication required');
+
+// Throw a 403 Forbidden exception
+throw new HttpForbiddenException($request, 'Access denied');
+```
+
+
+
+## Creating Custom HTTP Exceptions
+
+While Slim provides many built-in exceptions, you might need custom ones for specific business logic. You can **create custom** HTTP exceptions by extending `HttpSpecializedException`.
+
+### Example: Custom Validation Exception
+
+```php title="src/Exceptions/HttpValidationException.php"
+<?php
+
+namespace App\Exceptions;
+
+use Slim\Exception\HttpSpecializedException;
+
+class HttpValidationException extends HttpSpecializedException
+{
+    protected $code = 422;
+    protected $message = 'Validation failed.';
+    protected string $title = '422 Unprocessable Entity';
+    protected string $description = 'The request data failed validation.';
+}
+```
+Throwing the custom HTTP exception:
+```php
+throw new HttpValidationException($request, 'Invalid input data');
+```
+
+
+### Example: Custom Business Logic Exception
+
+Slim's HTTP exceptions support custom titles and descriptions that can be used by error renderers:
+
+```php title="src/Exceptions/HttpInsufficientFundsException.php"
+<?php
+
+namespace App\Exceptions;
+
+use Slim\Exception\HttpSpecializedException;
+
+class HttpInsufficientFundsException extends HttpSpecializedException
+{
+    protected $code = 402;
+    protected $message = 'Insufficient funds.';
+    protected string $title = '402 Payment Required';
+    protected string $description = 'The account does not have sufficient funds for this transaction.';
+}
+```
+
+## Using HTTP Exceptions in Routes
+
+Here's how to use Slim's HTTP exceptions in your routes:
+
+### User Management Example
+
+```php title="src/Controllers/UserController.php"
+public function getUser(ServerRequestInterface $request, ResponseInterface $response, array $args): ResponseInterface
+{
+    $userId = (int) $args['id'];
+
+    // Validate user ID
+    if ($userId <= 0) {
+        throw new HttpBadRequestException($request, 'Invalid user ID: must be a positive integer');
+    }
+
+    // Simulate database lookup
+    $user = $this->findUserById($userId);
+
+    if (!$user) {
+        throw new HttpNotFoundException($request);
+    }
+
+    $response->getBody()->write(json_encode($user));
+    return $response->withHeader('Content-Type', 'application/json');
+}
+```
+
+## Exception Response Examples
+
+When using Slim's built-in error handling, HTTP exceptions will be automatically formatted into JSON responses:
+
+**Bad Request (400):**
+```json
+{
+  "message": "Bad Request.",
+  "exception": [
+    {
+      "type": "HttpBadRequestException",
+      "code": 400,
+      "message": "Invalid user ID: must be a positive integer",
+      "file": "/path/to/file.php",
+      "line": 123
+    }
+  ]
+}
+```
+
+**Not Found (404):**
+```json
+{
+  "message": "Not found.",
+  "exception": [
+    {
+      "type": "HttpNotFoundException",
+      "code": 404,
+      "message": "Not found.",
+      "file": "/path/to/file.php",
+      "line": 456
+    }
+  ]
+}
+```
+
+**Unauthorized (401):**
+```json
+{
+  "message": "Unauthorized.",
+  "exception": [
+    {
+      "type": "HttpUnauthorizedException",
+      "code": 401,
+      "message": "Authentication required to update user",
+      "file": "/path/to/file.php",
+      "line": 789
+    }
+  ]
+}
+```
+
+

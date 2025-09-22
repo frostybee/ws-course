@@ -1,0 +1,274 @@
+---
+title:  Handling Runtime Exceptions in PHP
+description:  Handling Runtime Exceptions in PHP
+sidebar:
+    label: "Runtime Exceptions"
+    order: 6
+    badge: 
+        text: New
+        variant: danger
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+## What is an Exception?
+
+Think of an exception as a **signal** that something unexpected happened in your code. Just like when you're driving and encounter a roadblock: you need to find an alternative route.
+
+**In programming terms:**
+- An exception is an **event** that occurs during program execution that disrupts the normal flow,
+- Instead of your program crashing, exceptions allow you to **handle errors gracefully**,   
+- You can **throw** exceptions when problems occur and **catch** them to handle the situation.
+
+---
+
+## Types of Exceptions
+
+PHP offers two main categories of exceptions:
+
+<Steps>
+1. **Built-in Exceptions**: PHP comes with ready-to-use exceptions for common problems:
+   - `Exception` - The base exception class
+   - `InvalidArgumentException` - When wrong data is passed to a function
+   - `RuntimeException` - When something goes wrong during execution
+   - `PDOException` - Database-related errors
+
+2. **Custom Exceptions**: You can create your own specialized exceptions for specific situations in your application **by extending** the base `Exception` class.
+</Steps>
+
+---
+
+## Basic Exception Handling
+
+Exception handling follows a simple pattern: **try** to do something, and if it fails, **catch** the problem.
+
+### The Try-Catch Pattern
+
+Think of it like this:
+- **Try**: "Let me attempt this risky operation"
+- **Catch**: "If something goes wrong, here's how I'll handle it"
+
+```php
+try {
+    // Code that might fail
+    $result = someRiskyFunction();
+    echo "Success: $result";
+} catch (Exception $e) {
+    // What to do if it fails
+    echo 'Something went wrong: ' . $e->getMessage();
+}
+```
+
+---
+
+### Throwing Your Own Exceptions
+
+When you detect a problem in your code, you can "throw" an exception to signal the issue:
+
+```php
+function divide($a, $b) {
+    // Check for invalid input
+    if ($b === 0) {
+        throw new Exception("Cannot divide by zero!");
+    }
+    return $a / $b;
+}
+
+// Using the function with exception handling
+try {
+    echo divide(10, 2); // Works fine: outputs 5
+    echo divide(10, 0); // This will throw an exception
+} catch (Exception $e) {
+    echo "Error: " . $e->getMessage();
+}
+```
+
+---
+
+### Custom Exceptions
+
+Custom exceptions help you create **meaningful error categories** for your application. Instead of using generic exceptions, you can create specific ones that make your code more readable.
+
+**Why use custom exceptions?**
+- More descriptive error handling
+- Easier to catch specific types of errors
+- Better code organization
+
+```php
+// Create meaningful exception names
+class InvalidEmailException extends Exception {}
+class UserNotFoundException extends Exception {}
+class InsufficientFundsException extends Exception {}
+
+// Example usage
+function validateEmail($email) {
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        throw new InvalidEmailException("Invalid email format: $email");
+    }
+    return true;
+}
+
+try {
+    validateEmail("not-an-email");
+} catch (InvalidEmailException $e) {
+    echo "Email validation failed: " . $e->getMessage();
+} catch (Exception $e) {
+    echo "Something else went wrong: " . $e->getMessage();
+}
+```
+
+---
+
+### The Finally Block
+
+The `finally` block is like a cleanup crew. **It always runs**, whether an exception occurred or not.
+
+**When to use finally:**
+- Closing files or database connections
+- Cleaning up temporary resources
+- Logging operations
+
+```php
+$file = null;
+try {
+    $file = fopen('data.txt', 'r');
+    // Read file content
+    $content = fread($file, 1000);
+    echo $content;
+} catch (Exception $e) {
+    echo "Error reading file: " . $e->getMessage();
+} finally {
+    // Always close the file, even if an error occurred
+    if ($file) {
+        fclose($file);
+        echo "File closed successfully.";
+    }
+}
+```
+
+<Aside type="note">
+**Remember**: The `finally` block runs even if you use `return` statements in your try or catch blocks!
+</Aside>
+
+---
+
+## Nested Try-Catch Blocks
+
+Sometimes you need **layers of error handling** - like having multiple safety nets. Nested try-catch blocks let you handle different types of problems at different levels.
+
+**When to use nested try-catch:**
+- When you have operations within operations that can each fail differently
+- To provide more specific error handling for different parts of your code
+- To handle errors locally while still allowing broader error management
+
+
+```php title="Example: Nesting try-catch blocks"
+try {
+    // Outer try block
+    echo "Outer try block\n";
+
+    try {
+        // Inner try block
+        echo "Inner try block\n";
+        throw new RuntimeException("An error occurred in the inner block");
+    } catch (RuntimeException $e) {
+        // Handle inner exception
+        echo "Caught in inner catch: " . $e->getMessage() . "\n";
+    }
+
+    // This code will still run even if inner block throws an exception
+    echo "Continuing in outer try block\n";
+    
+    // Simulate another error
+    throw new Exception("An error occurred in the outer block");
+    
+} catch (Exception $e) {
+    // Handle outer exception
+    echo "Caught in outer catch: " . $e->getMessage() . "\n";
+}
+```
+
+---
+
+### Steps to Implement Nested Try-Catch Blocks
+
+1. **Identify potential exceptions**: Determine which parts of your code may throw exceptions and whether they should be handled at different levels.
+
+2. **Wrap code in `try` blocks**: Use `try` to wrap code sections that can throw exceptions.
+
+3. **Catch specific exceptions**: Use `catch` blocks to handle exceptions. You can catch specific exception types for precise handling.
+
+4. **Handle exceptions gracefully**: Decide how to respond when an exception occurs—log it, display a user-friendly message, or rethrow it.
+
+5. **Test thoroughly**: Ensure that exceptions are raised as expected and that they are caught properly.
+
+---
+
+### Example Scenario
+
+Imagine you're processing user input and saving it to a database, which may throw exceptions at different stages.
+
+```php
+function saveUserData($data) {
+    try {
+        // Simulate data processing
+        if (empty($data['name'])) {
+            throw new InvalidArgumentException("Name cannot be empty");
+        }
+        
+        try {
+            // Simulate database operation
+            if ($data['name'] == 'error') {
+                throw new RuntimeException("Database error occurred");
+            }
+            echo "User data saved successfully\n";
+        } catch (RuntimeException $e) {
+            echo "Caught in inner catch: " . $e->getMessage() . "\n";
+        }
+        
+    } catch (InvalidArgumentException $e) {
+        echo "Caught in outer catch: " . $e->getMessage() . "\n";
+    }
+}
+
+// Test with valid and invalid input
+saveUserData(['name' => 'John']); // Successful
+saveUserData(['name' => 'error']); // Caught in inner catch
+saveUserData(['name' => '']); // Caught in outer catch
+```
+
+---
+
+### Best Practices for Exception Handling
+
+<Steps>
+1. **Keep it simple**: Don't over-nest try-catch blocks. If you have more than 2-3 levels, consider refactoring your code.
+
+2. **Be specific**: Catch specific exceptions instead of generic ones. This makes debugging much easier.
+   ```php
+   // Good
+   catch (InvalidArgumentException $e) { /* handle */ }
+   catch (DatabaseException $e) { /* handle */ }
+
+   // Less helpful
+   catch (Exception $e) { /* handle everything the same way */ }
+   ```
+
+3. **Always log errors**: Keep a record of what went wrong for debugging later.
+   ```php
+   catch (Exception $e) {
+       error_log("Error in function X: " . $e->getMessage());
+       // Then handle the error appropriately
+   }
+   ```
+
+4. **Fail gracefully**: Show user-friendly messages, not technical error details.
+   ```php
+   catch (DatabaseException $e) {
+       error_log($e->getMessage()); // Log the technical details
+       echo "Sorry, we're having trouble saving your data right now."; // User-friendly message
+   }
+   ```
+
+5. **Don't ignore exceptions**: If you can't handle an exception properly, re-throw it so something else can deal with it.
+</Steps>
