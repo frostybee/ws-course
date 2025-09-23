@@ -10,18 +10,23 @@ sidebar:
 
 ## What Is Sorting?
 
-Sorting is the process of arranging data in a specific order, typically **ascending** or **descending**, based on one or more fields.
-For example, if you have a list of items, you might want to sort them by their names in alphabetical order or by their prices in descending order.  
+Sorting arranges data in a specific order (ascending or descending) based on one or more fields. In REST APIs, sorting allows clients to retrieve data in their preferred order using query parameters.
 
-:::note
-Sorting in RESTful web services allows clients to fetch and manage data in a preferred order by using **query parameters**. Proper handling and validation of these parameters are essential for both functionality and security. By understanding and implementing sorting effectively, you can enhance the usability and efficiency of your API
+**Common sorting scenarios:**
+- Product listings by price (lowest to highest)
+- User lists by registration date (newest first)
+- Search results by relevance score
+
+:::tip
+Well-implemented sorting enhances user experience and API usability. Always validate sorting parameters to prevent security vulnerabilities and ensure reliable performance.
 :::
 
-## Why Sorting is Important?
+## Why Implement Sorting?
 
-- **User experience:** Sorting enhances the user experience by allowing users to view data in the order that is most relevant to them.
-- **Data analysis:** Sorting helps in analyzing data more effectively, such as viewing the most recent records first or finding the top-performing products.
-- **Efficiency:** Proper sorting can improve the efficiency of data processing and retrieval, especially when dealing with large datasets.
+- **Enhanced user experience** - Users can organize data to match their needs
+- **Improved data discovery** - Find relevant information faster (newest posts, cheapest products)
+- **Better performance** - Database-level sorting is more efficient than client-side sorting
+- **Reduced data transfer** - Combined with pagination, sorting helps manage large datasets efficiently
 
 ## Key Concepts of Sorting
 
@@ -65,52 +70,161 @@ On the server side, you need to handle these query parameters to adjust the data
 
    ```php
    $params = $request->getQueryParams();
-   $sortBy = isset(params['sort_by']) ? $params['sort_by'] : 'id';
+   $sortBy = isset($params['sort_by']) ? $params['sort_by'] : 'id';
    $order = isset($params['order']) ? $params['order'] : 'asc';
    ```
 
 2. **Validate and Sanitize Parameters**
 
-   Ensure that the provided parameters are valid to prevent SQL injection and other security issues. For example, check if `sort_by` is one of the allowed fields and `order` is either `asc` or `desc`.
+   Always validate sorting parameters to prevent SQL injection and ensure data integrity.
 
    ```php
-   $validSortByFields = ['id', 'name', 'price']; // Define valid fields
-   $sortBy = in_array($sortBy, $validSortByFields) ? $sortBy : 'id';
-   $order = ($order === 'desc') ? 'desc' : 'asc';
+   // Define allowed fields and validate input
+   $validSortByFields = ['id', 'name', 'price', 'created_at'];
+   $validOrders = ['asc', 'desc'];
+
+   // Validate sort field
+   if (!in_array($sortBy, $validSortByFields)) {
+       throw new InvalidArgumentException("Invalid sort field: {$sortBy}");
+   }
+
+   // Validate sort order
+   if (!in_array(strtolower($order), $validOrders)) {
+       throw new InvalidArgumentException("Invalid sort order: {$order}");
+   }
+
+   $order = strtoupper($order); // Ensure consistent case
    ```
 
-3. **Build the SQL Query**
+3. **Build the SQL Query Safely**
 
-   Construct the SQL query dynamically based on the validated parameters. 
+   Use parameterized queries and validated field names to construct safe SQL.
 
    ```php
-   $sql = "SELECT * FROM items ORDER BY $sortBy $order";
+   // Use prepared statements with validated field names
+   $sql = "SELECT * FROM items ORDER BY {$sortBy} {$order}";
+
+   // For additional safety, you can map fields to actual column names
+   $fieldMapping = [
+       'id' => 'item_id',
+       'name' => 'item_name',
+       'price' => 'item_price',
+       'created_at' => 'created_at'
+   ];
+
+   $actualField = $fieldMapping[$sortBy] ?? 'item_id';
+   $sql = "SELECT * FROM items ORDER BY {$actualField} {$order}";
    ```
 
-4. **Execute the Query and Return Results**
+4. **Execute Query with Error Handling**
 
-   Run the query and return the sorted data in the response. This is usually done in JSON format.
+   Execute the query and handle potential errors gracefully.
 
    ```php
-   $stmt = $pdo->prepare($sql);
-   $stmt->execute();
-   $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
-   header('Content-Type: application/json');
-   echo json_encode($items);
+   try {
+       $stmt = $pdo->prepare($sql);
+       $stmt->execute();
+       $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+       $response = [
+           'status' => 'success',
+           'data' => $items,
+           'sort' => [
+               'field' => $sortBy,
+               'order' => strtolower($order)
+           ]
+       ];
+
+       header('Content-Type: application/json');
+       echo json_encode($response);
+
+   } catch (PDOException $e) {
+       http_response_code(500);
+       echo json_encode([
+           'status' => 'error',
+           'message' => 'Database error occurred'
+       ]);
+   }
    ```
 
-### C. Handling Complex Sorting Scenarios
+### C. Multiple Field Sorting Implementation
 
-For more advanced sorting needs, you might need to handle:
+For advanced sorting scenarios, implement multi-field sorting:
 
-- **Multiple Sort Fields**: Allow clients to specify multiple fields for sorting. For example, `sort_by=name,price&order=asc,desc` could sort by `name` in ascending order and then by `price` in descending order.
-- **Nested sorting**: Sorting based on nested fields, especially in JSON data structures.
-- **Performance considerations**: Ensure that sorting does not significantly degrade performance, especially for large datasets. Consider indexing the database fields used for sorting.
+**URL Format:**
+```
+GET /items?sort=name:asc,price:desc,created_at:desc
+```
+
+**Implementation:**
+```php
+function parseMultipleSorts($sortParam, $validFields) {
+    $sorts = [];
+    $sortPairs = explode(',', $sortParam);
+
+    foreach ($sortPairs as $pair) {
+        $parts = explode(':', trim($pair));
+        $field = $parts[0] ?? '';
+        $direction = strtolower($parts[1] ?? 'asc');
+
+        // Validate field and direction
+        if (in_array($field, $validFields) && in_array($direction, ['asc', 'desc'])) {
+            $sorts[] = [
+                'field' => $field,
+                'direction' => strtoupper($direction)
+            ];
+        }
+    }
+
+    return $sorts;
+}
+
+// Usage
+$validFields = ['name', 'price', 'created_at'];
+$sortParam = $_GET['sort'] ?? 'id:asc';
+$sorts = parseMultipleSorts($sortParam, $validFields);
+
+// Build ORDER BY clause
+$orderClauses = [];
+foreach ($sorts as $sort) {
+    $orderClauses[] = "{$sort['field']} {$sort['direction']}";
+}
+
+$sql = "SELECT * FROM items ORDER BY " . implode(', ', $orderClauses);
+```
+
+**Performance Considerations:**
+- Create composite database indexes for frequently used sort combinations
+- Limit the number of sortable fields (max 3-5) to prevent complex queries
+- Consider caching for expensive sort operations
 
 ## Best Practices
 
-- **Documentation**: Clearly document sorting parameters and their acceptable values in your API documentation.
-- **Default sorting**: Define and document default sorting behavior if parameters are not provided.
-- **Error handling**: Handle and return errors gracefully if invalid sorting parameters are provided.
+### Security
+- **Whitelist allowed fields** - Never allow arbitrary field names to prevent SQL injection
+- **Validate input strictly** - Check both field names and sort directions
+- **Use parameterized queries** - Even for ORDER BY clauses when possible
+
+### Performance
+- **Index sortable fields** - Create database indexes for commonly sorted columns
+- **Limit sort complexity** - Restrict the number of fields that can be sorted simultaneously
+- **Set reasonable defaults** - Provide sensible default sorting when none is specified
+
+### API Design
+- **Document thoroughly** - Clearly specify available sort fields and expected formats
+- **Use consistent naming** - Stick to a consistent parameter naming convention (`sort`, `order_by`, etc.)
+- **Provide clear errors** - Return meaningful error messages for invalid sort parameters
+
+### Example Error Response
+```json
+{
+  "status": "error",
+  "message": "Invalid sort parameter",
+  "details": {
+    "invalid_field": "unknown_field",
+    "valid_fields": ["id", "name", "price", "created_at"]
+  }
+}
+```
 
 

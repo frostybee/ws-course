@@ -1,7 +1,7 @@
 ---
 title: Structuring REST API Error Responses
 description: Structuring Error Responses
-draft: true
+draft: false
 sidebar:
     label: "REST API Error Response"
     order: 2
@@ -23,15 +23,6 @@ When errors are structured predictably, both humans and systems can quickly unde
 
 ---
 
-## Recommended Structure
-
-To **properly structure** a REST API response with an error message, you should follow a **standard format** that makes the response easy to understand and consistent. 
-:::tip
-**Don't Include Sensitive Information**: Avoid including sensitive information such as database internals, stack traces, or detailed logs in the error response.
-:::
-
----
-
 ### HTTP Status Code  
 
 - Use the appropriate HTTP **status code** for the error. This helps clients quickly understand the type of issue:
@@ -47,11 +38,20 @@ To **properly structure** a REST API response with an error message, you should 
 
 ---
 
-### Response Format  
+## Recommended Error Response Structure
+
+To **properly structure** a REST API response with an error message, you should follow a **standard format** that makes the response easy to understand and consistent. 
+:::tip
+**Don't Include Sensitive Information**: Avoid including sensitive information such as database internals, stack traces, or detailed logs in the error response.
+:::
+
+---
+
+### What to Include in the Error Response
 
 Keep the error response format consistent with your successful responses (e.g., JSON), so clients can parse it uniformly.
 
-A well-structured error response typically includes:
+A **well-structured** error response typically includes:
 - **status**: Indicates the outcome (e.g., "error" or "fail").
 - **message**: A concise, human-readable description of the error.
 - **code** (optional): A machine-readable error code for programmatic handling.
