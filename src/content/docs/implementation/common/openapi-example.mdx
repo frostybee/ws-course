@@ -1,0 +1,539 @@
+---
+title: OpenAPI Example
+description: Example of an OpenAPI specification
+draft: true
+sidebar:
+    label: "OpenAPI Example"
+    order: 8
+    badge:
+      text: Team Project
+      variant: danger
+---
+
+## Example of an OpenAPI specification
+
+This example demonstrates a complete OpenAPI specification for a **Planets API** that showcases reusable components, proper schema design, and both GET and POST operations.
+
+```yaml
+openapi: 3.2.0
+info:
+  title: Planets API
+  description: |
+    A comprehensive API for managing planetary data in our solar system and beyond.
+    This API allows you to retrieve information about planets and add new planetary discoveries.
+  version: 1.0.0
+  contact:
+    name: Space Research Team
+    email: api-support@space-research.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: https://api.space-research.com/v1
+    description: Production server
+  - url: https://staging-api.space-research.com/v1
+    description: Staging server for testing
+
+paths:
+  /planets:
+    get:
+      summary: Retrieve all planets
+      description: |
+        Returns a paginated list of all planets in the database.
+        Results can be filtered and sorted using query parameters.
+      tags:
+        - Planets
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/SortParam'
+        - name: system
+          in: query
+          description: Filter planets by solar system
+          required: false
+          schema:
+            type: string
+            example: "Solar System"
+        - name: habitable
+          in: query
+          description: Filter by habitability status
+          required: false
+          schema:
+            type: boolean
+            example: true
+      responses:
+        '200':
+          description: Successfully retrieved planets
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlanetListResponse'
+              examples:
+                solar_system_planets:
+                  summary: Planets in our solar system
+                  value:
+                    planets:
+                      - id: 1
+                        name: "Earth"
+                        system: "Solar System"
+                        distanceFromStar: 149.6
+                        radius: 6371
+                        mass: 5.972e24
+                        habitable: true
+                        discoveryDate: "1970-01-01"
+                        atmosphere:
+                          composition:
+                            - gas: "Nitrogen"
+                              percentage: 78.08
+                            - gas: "Oxygen"
+                              percentage: 20.95
+                          hasAtmosphere: true
+                      - id: 2
+                        name: "Mars"
+                        system: "Solar System"
+                        distanceFromStar: 227.9
+                        radius: 3390
+                        mass: 6.39e23
+                        habitable: false
+                        discoveryDate: "1970-01-01"
+                        atmosphere:
+                          composition:
+                            - gas: "Carbon Dioxide"
+                              percentage: 95.32
+                            - gas: "Nitrogen"
+                              percentage: 2.7
+                          hasAtmosphere: true
+                    pagination:
+                      page: 1
+                      limit: 10
+                      total: 2
+                      totalPages: 1
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      summary: Add a new planet
+      description: |
+        Creates a new planet record in the database.
+        All required fields must be provided in the request body.
+      tags:
+        - Planets
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePlanetRequest'
+            examples:
+              exoplanet_example:
+                summary: Example exoplanet discovery
+                value:
+                  name: "Kepler-452b"
+                  system: "Kepler-452"
+                  distanceFromStar: 156.5
+                  radius: 8851
+                  mass: 1.9e25
+                  habitable: true
+                  discoveryDate: "2015-07-23"
+                  atmosphere:
+                    hasAtmosphere: true
+                    composition:
+                      - gas: "Hydrogen"
+                        percentage: 75.0
+                      - gas: "Helium"
+                        percentage: 24.0
+      responses:
+        '201':
+          description: Planet successfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Planet'
+              example:
+                id: 42
+                name: "Kepler-452b"
+                system: "Kepler-452"
+                distanceFromStar: 156.5
+                radius: 8851
+                mass: 1.9e25
+                habitable: true
+                discoveryDate: "2015-07-23"
+                atmosphere:
+                  hasAtmosphere: true
+                  composition:
+                    - gas: "Hydrogen"
+                      percentage: 75.0
+                    - gas: "Helium"
+                      percentage: 24.0
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+              example:
+                error: "Validation failed"
+                message: "Invalid planet data provided"
+                details:
+                  - field: "radius"
+                    issue: "Must be a positive number"
+                  - field: "discoveryDate"
+                    issue: "Must be a valid date in YYYY-MM-DD format"
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token for authenticated requests
+
+  parameters:
+    PageParam:
+      name: page
+      in: query
+      description: Page number for pagination (starts from 1)
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+        example: 1
+
+    LimitParam:
+      name: limit
+      in: query
+      description: Number of items per page
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 10
+        example: 10
+
+    SortParam:
+      name: sort
+      in: query
+      description: Sort field and direction (field:asc or field:desc)
+      required: false
+      schema:
+        type: string
+        enum: ["name:asc", "name:desc", "radius:asc", "radius:desc", "discoveryDate:asc", "discoveryDate:desc"]
+        default: "name:asc"
+        example: "name:asc"
+
+  schemas:
+    Planet:
+      type: object
+      required:
+        - id
+        - name
+        - system
+        - distanceFromStar
+        - radius
+        - mass
+        - habitable
+        - discoveryDate
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the planet
+          example: 1
+          readOnly: true
+        name:
+          type: string
+          description: Official name of the planet
+          minLength: 1
+          maxLength: 100
+          example: "Earth"
+        system:
+          type: string
+          description: Name of the solar/planetary system
+          minLength: 1
+          maxLength: 100
+          example: "Solar System"
+        distanceFromStar:
+          type: number
+          description: Distance from the host star in million kilometers
+          minimum: 0
+          example: 149.6
+        radius:
+          type: number
+          description: Planet radius in kilometers
+          minimum: 0
+          example: 6371
+        mass:
+          type: number
+          description: Planet mass in kilograms (scientific notation supported)
+          minimum: 0
+          example: 5.972e24
+        habitable:
+          type: boolean
+          description: Whether the planet is potentially habitable
+          example: true
+        discoveryDate:
+          type: string
+          format: date
+          description: Date when the planet was discovered (YYYY-MM-DD)
+          example: "1970-01-01"
+        atmosphere:
+          $ref: '#/components/schemas/Atmosphere'
+
+    CreatePlanetRequest:
+      type: object
+      required:
+        - name
+        - system
+        - distanceFromStar
+        - radius
+        - mass
+        - habitable
+        - discoveryDate
+      properties:
+        name:
+          type: string
+          description: Official name of the planet
+          minLength: 1
+          maxLength: 100
+          example: "Kepler-452b"
+        system:
+          type: string
+          description: Name of the solar/planetary system
+          minLength: 1
+          maxLength: 100
+          example: "Kepler-452"
+        distanceFromStar:
+          type: number
+          description: Distance from the host star in million kilometers
+          minimum: 0
+          example: 156.5
+        radius:
+          type: number
+          description: Planet radius in kilometers
+          minimum: 0
+          example: 8851
+        mass:
+          type: number
+          description: Planet mass in kilograms
+          minimum: 0
+          example: 1.9e25
+        habitable:
+          type: boolean
+          description: Whether the planet is potentially habitable
+          example: true
+        discoveryDate:
+          type: string
+          format: date
+          description: Date when the planet was discovered (YYYY-MM-DD)
+          example: "2015-07-23"
+        atmosphere:
+          $ref: '#/components/schemas/Atmosphere'
+
+    Atmosphere:
+      type: object
+      required:
+        - hasAtmosphere
+      properties:
+        hasAtmosphere:
+          type: boolean
+          description: Whether the planet has an atmosphere
+          example: true
+        composition:
+          type: array
+          description: Atmospheric composition breakdown
+          items:
+            $ref: '#/components/schemas/AtmosphericComponent'
+          minItems: 0
+          example:
+            - gas: "Nitrogen"
+              percentage: 78.08
+            - gas: "Oxygen"
+              percentage: 20.95
+
+    AtmosphericComponent:
+      type: object
+      required:
+        - gas
+        - percentage
+      properties:
+        gas:
+          type: string
+          description: Name of the atmospheric gas
+          minLength: 1
+          example: "Nitrogen"
+        percentage:
+          type: number
+          description: Percentage of this gas in the atmosphere
+          minimum: 0
+          maximum: 100
+          example: 78.08
+
+    PlanetListResponse:
+      type: object
+      required:
+        - planets
+        - pagination
+      properties:
+        planets:
+          type: array
+          description: List of planets
+          items:
+            $ref: '#/components/schemas/Planet'
+        pagination:
+          $ref: '#/components/schemas/PaginationInfo'
+
+    PaginationInfo:
+      type: object
+      required:
+        - page
+        - limit
+        - total
+        - totalPages
+      properties:
+        page:
+          type: integer
+          description: Current page number
+          minimum: 1
+          example: 1
+        limit:
+          type: integer
+          description: Number of items per page
+          minimum: 1
+          example: 10
+        total:
+          type: integer
+          description: Total number of items
+          minimum: 0
+          example: 25
+        totalPages:
+          type: integer
+          description: Total number of pages
+          minimum: 0
+          example: 3
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+        - message
+      properties:
+        error:
+          type: string
+          description: Error type identifier
+          example: "VALIDATION_ERROR"
+        message:
+          type: string
+          description: Human-readable error message
+          example: "The request data is invalid"
+        details:
+          type: array
+          description: Additional error details
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+                example: "name"
+              issue:
+                type: string
+                example: "Field is required"
+
+    ValidationError:
+      allOf:
+        - $ref: '#/components/schemas/ErrorResponse'
+        - type: object
+          properties:
+            details:
+              type: array
+              description: Validation error details
+              items:
+                type: object
+                required:
+                  - field
+                  - issue
+                properties:
+                  field:
+                    type: string
+                    description: Field that failed validation
+                    example: "radius"
+                  issue:
+                    type: string
+                    description: Description of the validation issue
+                    example: "Must be a positive number"
+
+  responses:
+    BadRequest:
+      description: Bad request - invalid parameters or malformed request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error: "BAD_REQUEST"
+            message: "The request parameters are invalid"
+
+    Unauthorized:
+      description: Unauthorized - authentication required
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error: "UNAUTHORIZED"
+            message: "Authentication required to access this resource"
+
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error: "INTERNAL_SERVER_ERROR"
+            message: "An unexpected error occurred while processing the request"
+
+tags:
+  - name: Planets
+    description: Operations related to planetary data management
+```
+
+## Key Features Demonstrated
+
+### 1. **Reusable Components**
+- **Parameters**: `PageParam`, `LimitParam`, `SortParam` for consistent pagination
+- **Schemas**: `Planet`, `Atmosphere`, `AtmosphericComponent` for data modeling
+- **Responses**: `BadRequest`, `Unauthorized`, `InternalServerError` for error handling
+
+### 2. **Schema Composition**
+- **Object References**: Using `$ref` to reference reusable schemas
+- **Nested Objects**: `Atmosphere` contains an array of `AtmosphericComponent`
+- **Inheritance**: `ValidationError` extends `ErrorResponse` using `allOf`
+
+### 3. **Comprehensive Data Validation**
+- **Required Fields**: Clearly marked in each schema
+- **Data Types**: Proper typing with constraints (min/max, length limits)
+- **Format Validation**: Date format for `discoveryDate`
+- **Array Validation**: Min/max items for atmospheric composition
+
+### 4. **Real-world Examples**
+- **Multiple Examples**: Different scenarios for GET and POST operations
+- **Realistic Data**: Actual planetary data (Earth, Mars, Kepler-452b)
+- **Error Scenarios**: Validation errors with detailed field-level feedback
+
+### 5. **Professional API Design**
+- **Authentication**: JWT Bearer token for POST operations
+- **Pagination**: Standard page/limit pattern with metadata
+- **Error Handling**: Consistent error response structure
+- **Documentation**: Clear descriptions and helpful examples throughout

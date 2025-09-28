@@ -1,0 +1,407 @@
+---
+title: OpenAPI
+description: Guide to Creating OpenAPI Specification YAML Files
+sidebar:
+    label: "OpenAPI"
+    order: 7
+    badge:
+      text: Team Project
+      variant: danger
+---
+
+## What is OpenAPI?
+
+- OpenAPI (formerly known as Swagger) is a specification **for describing** REST APIs. 
+- It's like a blueprint that tells developers exactly how your API works: what endpoints are available, what data they expect, and what they return. 
+- Think of it as a user manual for your API that both humans and computers can understand.
+- OpenAPI specifications are written in **YAML** (or JSON) format and follow a specific structure. YAML is human-readable and uses indentation to represent hierarchy, making it ideal for API documentation.
+
+---
+
+## Resources for Further Learning
+
+- [OpenAPI Specification](https://spec.openapis.org/oas/v3.2.0.html) - Official documentation.
+- [Swagger Documentation](https://swagger.io/docs/) - Comprehensive guides and tutorials.
+
+---
+
+## Development & Quality Checklist
+
+### Getting Started (First-time creation)
+- [ ] Define your API's basic info (title, version, description).
+- [ ] List your server URIs.
+- [ ] Document at least one GET endpoint.
+- [ ] Create schemas for your main data models.
+- [ ] Add request/response examples.
+- [ ] Test your specification in Swagger Editor.
+
+### Quality Assurance (Before submission)
+- [ ] All endpoints have clear descriptions and examples.
+- [ ] Every response code is documented with appropriate schemas.
+- [ ] Data models are complete with proper types and validations.
+- [ ] Authentication requirements are clearly specified.
+- [ ] File validates without errors in VS Code extension.
+- [ ] Specification renders properly in OpenAPI Playground. 
+- [ ] Examples are realistic and helpful for implementation.
+- [ ] Error responses include meaningful error messages.
+- [ ] Generate documentation to share with others.
+---
+
+### Naming Conventions
+- Use clear, descriptive names for endpoints and parameters.
+- Follow RESTful naming (nouns for resources, verbs for actions).
+- Use consistent casing (camelCase for properties, kebab-case for paths)
+
+### Documentation Quality
+- Write clear, concise descriptions for every element.
+- Include realistic examples in requests and responses.
+- Explain what each status code means in context.
+- Document error scenarios and their causes.
+---
+
+## Progressive Development Strategy
+
+1. **Start simple:** Begin with basic info and one or two endpoints.
+2. **Add gradually:** Expand endpoints one at a time.
+3. **Test frequently:** Validate after each major addition.
+4. **Refine and polish:** Add examples and improve descriptions.
+5. **Final review:** Check completeness and consistency.
+
+---
+
+## Success Tips
+
+- **Plan before writing:** Sketch out your API structure first.  
+- **Use references:** Study well-documented APIs for inspiration.
+- **Iterate often:** Don't try to perfect everything in one pass.
+- **Get feedback:** Have peers review your specification.
+- **Think like a user:** Write documentation that helps someone implement your API
+
+---
+
+## Basic YAML Syntax Rules
+- **Indentation matters:** Use 2 spaces (not tabs) for each level.  
+- **Key-value pairs:** `key: value`
+- **Lists:** Use hyphens (`-`) for array items.
+- **Strings:** Can be quoted or unquoted (quote when containing special characters).
+- **Comments:** Start with `#`
+
+---
+
+## OpenAPI File Structure Overview
+
+Every OpenAPI specification follows this basic structure:
+
+```yaml
+openapi: 3.2.0
+info:
+  # Basic API information
+servers:
+  # Server configurations
+paths:
+  # API endpoints
+components:
+  # Reusable components
+```
+
+---
+
+## Example of a Basic Structure of an OpenAPI File
+
+An OpenAPI specification is written in YAML or JSON format. Here's the basic structure:
+
+```yaml
+openapi: 3.2.0
+info:
+  title: My Planets API
+  description: A simple API for managing planetary data
+  version: 1.0.0
+servers:
+  - url: https://api.space-research.com/v1
+    description: Production server
+paths:
+  /planets:
+    get:
+      summary: Get all planets
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Planet'
+components:
+  schemas:
+    Planet:
+      type: object
+      required:
+        - id
+        - name
+        - system
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: "Earth"
+        system:
+          type: string
+          example: "Solar System"
+```
+
+---
+
+## Key Sections Explained
+
+### 1. Info Section
+```yaml
+info:
+  title: Your API Name
+  description: What your API does
+  version: 1.0.0
+  contact:
+    name: Your Name
+    email: your.email@example.com
+```
+---
+
+### 2. Servers Section
+```yaml
+servers:
+  - url: https://api.example.com/v1
+    description: Production server
+  - url: https://staging-api.example.com/v1
+    description: Staging server
+```
+---
+
+### 3. Paths Section (Your Endpoints)
+```yaml
+paths:
+  /planets/{id}:
+    get:
+      summary: Get planet by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Planet found
+        '404':
+          description: Planet not found
+```
+---
+
+### 4. Components Section (Reusable Schemas)
+```yaml
+components:
+  schemas:
+    Planet:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        system:
+          type: string
+```
+---
+
+## Step-by-Step Creation Process
+
+### Step 1: Document Header and Info Section
+Start with the OpenAPI version and basic information about your API:
+- **Version:** Always specify OpenAPI 3.0.3 or higher.  
+- **Title:** Clear, descriptive name for your API.
+- **Description:** Brief overview of what your API does.
+- **Version:** Your API's version (use semantic versioning like 1.0.0).
+- **Contact:** Optional contact information.
+
+### Step 2: Define Servers
+Specify where your API will be hosted:
+- **Development server:** Local development URI.
+- **Production server:** Live deployment URI.
+- **Description:** Brief note about each server's purpose.
+
+---
+
+### Step 3: Create Path Definitions
+This is the core of your specification. For each endpoint:
+
+**Path Structure:**
+- Start with the URI path (e.g., `/planets`, `/planets/{id}`)
+- Define HTTP methods (get, post, put, delete, etc.).
+- Add descriptions and summaries.   
+
+**Parameters:**
+- **Path parameters:** Variables in the URI (like `{id}`)
+- **Query parameters:** Optional filters or pagination.
+- **Request body:** For POST/PUT operations.
+
+**Responses:**
+- Define all possible HTTP status codes.
+- Specify response content types.
+- Include example responses.
+
+---
+
+### Step 4: Define Data Models (Schemas)
+Create reusable data structures in the components section:
+- **Object properties:** Define each field with type and description
+- **Required fields:** Specify which fields are mandatory.
+- **Data types:** Use standard types (string, integer, boolean, array, object).
+- **Validation rules:** Add constraints like minimum/maximum values.
+
+### Step 5: Add Security Schemes (If Needed)
+Define authentication methods:
+- **API Keys:** For simple token-based auth.
+- **Bearer tokens:** For JWT or OAuth.
+- **Basic auth:** For username/password authentication.
+
+---
+
+## Common HTTP Methods in OpenAPI
+
+### GET - Retrieve Data
+```yaml
+/books:
+  get:
+    summary: Get all books
+    parameters:
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          default: 10
+```
+
+---
+
+### POST - Create New Resource
+```yaml
+/books:
+  post:
+    summary: Create a new book
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Book'
+```
+---
+
+### PUT - Update Entire Resource
+```yaml
+/books/{id}:
+  put:
+    summary: Update a book
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+```
+
+---
+
+### DELETE - Remove Resource
+```yaml
+/books/{id}:
+  delete:
+    summary: Delete a book
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+```
+
+---
+
+## Data Types and Validation
+
+OpenAPI supports various data types with validation rules:
+
+```yaml
+properties:
+  age:
+    type: integer
+    minimum: 0
+    maximum: 150
+  email:
+    type: string
+    format: email
+  website:
+    type: string
+    format: uri
+  birthDate:
+    type: string
+    format: date
+  rating:
+    type: number
+    minimum: 1.0
+    maximum: 5.0
+  tags:
+    type: array
+    items:
+      type: string
+```
+---
+
+## Authentication in OpenAPI
+
+### API Key Authentication
+```yaml
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+
+security:
+  - ApiKeyAuth: []
+```
+---
+
+### Bearer Token (JWT)
+```yaml
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+```
+---
+
+## Common Mistakes to Avoid
+
+### YAML Formatting Issues
+- **Inconsistent indentation:** Always use 2 spaces.
+- **Missing colons:** Every key needs a colon.
+- **Incorrect list formatting:** Use proper hyphen alignment.
+
+### Content Problems
+- **Missing required fields:** Always mark required fields in your schemas.
+- **Inconsistent data types:** Use the same type for the same data across endpoints.    
+- **Missing examples:** Always provide realistic examples.
+- **Incomplete error handling:** Document all possible error scenarios.
+- **Vague descriptions:** Write clear, specific descriptions for endpoints and parameters.
+- **Ignoring status codes:** Document all possible HTTP response codes.
+
+### Design Issues
+- **Non-RESTful patterns:** Follow REST principles for consistency.
+- **Overly complex schemas:** Keep data models simple and focused.  
+- **Missing versioning:** Always include API version information.
+- **Inconsistent naming:** Use consistent naming conventions (camelCase or snake_case).
