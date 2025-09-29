@@ -9,6 +9,8 @@ sidebar:
     variant: danger
 ---
 
+import { Steps} from '@astrojs/starlight/components';
+
 ## What Is AJAX?
 
 - **AJAX (Asynchronous JavaScript and XML)** is a web development technique that allows web applications to send and retrieve data from a server **asynchronously** without reloading the entire webpage. 
@@ -27,36 +29,38 @@ sidebar:
 
 ## How AJAX Works:
 
+<Steps>
 1. **Triggering event**: The user interacts with the web page (clicking a button, typing in a search field, keypress, page scroll, etc.).
 2. **AJAX request**: JavaScript uses XMLHttpRequest or Fetch API to send an HTTP request to the server asynchronously.
 3. **Server processing**: The server receives and processes the request, then sends back a response (typically JSON).
-4. **Page update**: JavaScript receives the response and updates the relevant part of the webpage via DOM manipulation.
+4. **Page update**: JavaScript receives the response and updates the relevant part of the webpage via **DOM manipulation**.
+</Steps>
 
 ---
 
 ## Example of AJAX Flow
 
 **Search without page reload:**
-1. You type a search query and click "Search" 
-2. JavaScript sends (sometimes as you type) the search term to the server via AJAX
-3. The server processes the search and returns results in JSON format
-4. JavaScript updates the page to display the search results
+1. You type a search query and click "Search". 
+2. JavaScript sends (sometimes as you type) the search term to the server via AJAX.
+3. The server processes the search and returns results in JSON format.
+4. JavaScript updates the page to display the search results.
 
 
 ---
 
 ## Benefits of AJAX:
-- **Faster interactions**: Only required data is retrieved, eliminating full page reloads
-- **Better user experience**: Real-time updates and seamless interactions without page freezing
-- **Reduced server load**: Smaller data packets instead of entire page assets
-- **Dynamic updates**: Specific page sections update independently
+- **Faster interactions**: Only required data is retrieved, eliminating full page reloads.
+- **Better user experience**: Real-time updates and seamless interactions without page freezing.
+- **Reduced server load**: Smaller data packets instead of entire page assets.
+- **Dynamic updates**: Specific page sections update independently.
 
 ---
 
 ## Common Use Cases of AJAX
 
-- **Real-time data fetching**: Google Maps, weather apps, and live dashboards
-- **Live search**: Search suggestions that appear as you type
-- **Form validation**: Real-time checking (email availability, password strength)
-- **Chat applications**: Sending and receiving messages without page refresh
-- **Social media feeds**: Infinite scrolling and live-updating content
+- **Real-time data fetching**: Google Maps, weather apps, and live dashboards.
+- **Live search**: Search suggestions that appear as you type.
+- **Form validation**: Real-time checking (email availability, password strength).
+- **Chat applications**: Sending and receiving messages without page refresh.
+- **Social media feeds**: Infinite scrolling and live-updating content.
