@@ -10,36 +10,38 @@ sidebar:
 
 ## What Is Sorting?
 
-Sorting arranges data in a specific order (ascending or descending) based on one or more fields. In REST APIs, sorting allows clients to retrieve data in their preferred order using query parameters.
+Sorting arranges data in a **specific order** (ascending or descending) based on one or more fields. In REST APIs, sorting allows clients to retrieve data in their preferred order using query parameters.
 
 **Common sorting scenarios:**
-- Product listings by price (lowest to highest)
-- User lists by registration date (newest first)
-- Search results by relevance score
+- Product listings by price (lowest to highest).    
+- User lists by registration date (newest first).
+- Search results by relevance score.
 
-:::tip
-Well-implemented sorting enhances user experience and API usability. Always validate sorting parameters to prevent security vulnerabilities and ensure reliable performance.
-:::
+---
 
 ## Why Implement Sorting?
 
-- **Enhanced user experience** - Users can organize data to match their needs
-- **Improved data discovery** - Find relevant information faster (newest posts, cheapest products)
-- **Better performance** - Database-level sorting is more efficient than client-side sorting
-- **Reduced data transfer** - Combined with pagination, sorting helps manage large datasets efficiently
+- **Enhanced user experience:** Users can organize data to match their needs.
+- **Improved data discovery:** Find relevant information faster (newest posts, cheapest products).
+- **Better performance:** Database-level sorting is more efficient than client-side sorting.
+- **Reduced data transfer:** Combined with pagination, sorting helps manage large datasets efficiently.
+
+---
 
 ## Key Concepts of Sorting
 
 1. **Order**: Sorting can be done in various orders:
-   - **Ascending**: From the lowest to the highest value (e.g., A-Z, 0-9).
-   - **Descending**: From the highest to the lowest value (e.g., Z-A, 9-0).
+   - **Ascending:** From the lowest to the highest value (e.g., A-Z, 0-9).
+   - **Descending:** From the highest to the lowest value (e.g., Z-A, 9-0).
 
 2. **Fields**: The data can be sorted based on specific fields or attributes, such as:
-   - Strings (e.g., names)
-   - Numbers (e.g., prices)
-   - Dates (e.g., timestamps)
+   - Strings: (e.g., names).
+   - Numbers: (e.g., prices).
+   - Dates: (e.g., timestamps).
 
-3. **Multiple sorts**: You can sort by multiple fields, where the first field is the primary sort, and the subsequent fields are used as tiebreakers.
+3. **Multiple sorts:** You can sort by multiple fields, where the first field is the primary sort, and the subsequent fields are used as tiebreakers.
+
+---
 
 ## How Sorting is Implemented in RESTful Web Services
 
@@ -47,8 +49,8 @@ Well-implemented sorting enhances user experience and API usability. Always vali
 
 In RESTful APIs, sorting is usually implemented through query parameters. Clients can specify sorting preferences in their request. Common query parameters for sorting might include:
 
-- **`sort_by`**: Indicates the field by which to sort.
-- **`order`**: Indicates the sort order, such as ascending (`asc`) or descending (`desc`).
+- **`sort_by`:** Indicates the field by which to sort.
+- **`order`:** Indicates the sort order, such as ascending (`asc`) or descending (`desc`).
 
 Example URL with sorting parameters:
 
@@ -59,6 +61,8 @@ GET /items?sort_by=name&order=asc
 In this example:
 - `sort_by=name` indicates that the results should be sorted by the `name` field.
 - `order=asc` specifies that the sorting should be in ascending order.
+
+---
 
 ### B. Handling Sorting Parameters on the Server-Side
 
@@ -147,73 +151,20 @@ On the server side, you need to handle these query parameters to adjust the data
    }
    ```
 
-### C. Multiple Field Sorting Implementation
+---
 
-For advanced sorting scenarios, implement multi-field sorting:
-
-**URL Format:**
-```
-GET /items?sort=name:asc,price:desc,created_at:desc
-```
-
-**Implementation:**
-```php
-function parseMultipleSorts($sortParam, $validFields) {
-    $sorts = [];
-    $sortPairs = explode(',', $sortParam);
-
-    foreach ($sortPairs as $pair) {
-        $parts = explode(':', trim($pair));
-        $field = $parts[0] ?? '';
-        $direction = strtolower($parts[1] ?? 'asc');
-
-        // Validate field and direction
-        if (in_array($field, $validFields) && in_array($direction, ['asc', 'desc'])) {
-            $sorts[] = [
-                'field' => $field,
-                'direction' => strtoupper($direction)
-            ];
-        }
-    }
-
-    return $sorts;
-}
-
-// Usage
-$validFields = ['name', 'price', 'created_at'];
-$sortParam = $_GET['sort'] ?? 'id:asc';
-$sorts = parseMultipleSorts($sortParam, $validFields);
-
-// Build ORDER BY clause
-$orderClauses = [];
-foreach ($sorts as $sort) {
-    $orderClauses[] = "{$sort['field']} {$sort['direction']}";
-}
-
-$sql = "SELECT * FROM items ORDER BY " . implode(', ', $orderClauses);
-```
-
-**Performance Considerations:**
-- Create composite database indexes for frequently used sort combinations
-- Limit the number of sortable fields (max 3-5) to prevent complex queries
-- Consider caching for expensive sort operations
-
-## Best Practices
+## Things to Consider
 
 ### Security
-- **Whitelist allowed fields** - Never allow arbitrary field names to prevent SQL injection
-- **Validate input strictly** - Check both field names and sort directions
-- **Use parameterized queries** - Even for ORDER BY clauses when possible
-
-### Performance
-- **Index sortable fields** - Create database indexes for commonly sorted columns
-- **Limit sort complexity** - Restrict the number of fields that can be sorted simultaneously
-- **Set reasonable defaults** - Provide sensible default sorting when none is specified
+- **Whitelist allowed fields:** Never allow arbitrary field names to prevent SQL injection.
+- **Validate input strictly:** Check both field names and sort directions.
+- **Use parameterized queries:** Even for ORDER BY clauses when possible.
 
 ### API Design
-- **Document thoroughly** - Clearly specify available sort fields and expected formats
-- **Use consistent naming** - Stick to a consistent parameter naming convention (`sort`, `order_by`, etc.)
-- **Provide clear errors** - Return meaningful error messages for invalid sort parameters
+- **Document thoroughly:** Clearly specify available sort fields and expected formats.
+- **Use consistent naming:** Stick to a consistent parameter naming convention (`sort`, `order_by`, etc.).
+- **Provide clear errors:** Return meaningful error messages for invalid sort parameters.
+
 
 ### Example Error Response
 ```json
