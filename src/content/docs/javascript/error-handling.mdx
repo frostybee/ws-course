@@ -1,16 +1,14 @@
 ---
 title: Exception Handling in JavaScript
 description: Working with Exceptions in JavaScript
-draft: true
+draft: false
 sidebar:
   label: 'Exception Handling'
   order: 3
   badge:
-    text: New
+    text: Assignment 2
     variant: tip
 ---
-
-import { Aside } from '@astrojs/starlight/components';
 
 ## How to Handle Exceptions in JavaScript?
 
@@ -30,23 +28,15 @@ try {
   // Optional code that runs regardless of success or failure
 }
 ```
+---
 
 ## How to Create Custom Exceptions in JavaScript
-:::tip
-Creating a custom exception class that accepts **custom data** involves using ES6 classes and extending the **built-in** `Error` **class**. This allows you to create more informative and structured error handling for your applications.  
-:::
-Here's a step-by-step guide with examples:
-### Step 1: Create a Custom Exception Class
 
-To define a custom exception class, use the `class` syntax in JavaScript and extend it from the `Error` class. By doing so, your custom class will inherit the standard error properties (`message`, `name`, `stack`) while allowing you to add custom properties.
+You can create custom exception classes by extending JavaScript's built-in `Error` class. This allows you to add custom properties like error codes and additional details, making your error handling more informative and structured.
 
-### Step 2: Define a Constructor for Custom Properties
+### Creating a Custom Exception Class
 
-In the constructor, call the `super` method to initialize the `Error` class with a `message` and optionally other data. You can add any additional properties that you want your custom exception to carry, like `code`, `details`, etc.
-
-### Example: Implementing a Custom Exception Class in JavaScript
-
-The following is an examples of a custom exception class named `CustomError` that accepts a `message`, an error `code`, and a `details` object that can be used to store custom data.
+The following example shows a `CustomError` class that accepts a `message`, an error `code`, and a `details` object for storing custom data. The class extends `Error` and uses the `super()` method to initialize the parent class while adding custom properties.
 
 ```javascript
 /**
@@ -79,11 +69,12 @@ class CustomError extends Error {
 }
 
 ```
-### Extending Further
 
-If you want to handle different custom errors (e.g., `NotFoundError`, `ValidationError`), you can create more specific subclasses of `CustomError`.
+---
 
-For example:
+### Extending Custom Exceptions
+
+You can create more specific error classes by extending `CustomError`. This is useful for handling different error scenarios:
 
 ```javascript
 class NotFoundError extends CustomError {
@@ -99,15 +90,11 @@ class ValidationError extends CustomError {
 }
 ```
 
-<Aside type="tip" title="Best Practices">
-- **Only catch what you can handle**: Don't catch errors that you cannot properly handle. If you can’t recover from an error, it’s often better to let it propagate.
-- **Provide meaningful error messages**: When throwing or logging errors, make sure the error message helps diagnose the problem.
-- **Use specific error types**: If you're throwing errors, consider using custom error classes (e.g., `ValidationError`, `NetworkError`) to make debugging easier.
-</Aside>
+---
 
-### Step 3: Throw and Catch the Custom Exception
+### Using Custom Exceptions
 
-You can now throw instances of `CustomError` with any specific data you need. For example:
+Once you've created a custom exception class, you can throw instances of it with specific data:
 
 ```javascript
 try {
@@ -124,8 +111,7 @@ try {
 }
 ```
 
-### Throwing Different Exceptions: 
-You can now throw instances of `ValidationError` and `NotFoundError` in different scenarios.
+The same approach works with specialized error classes like `ValidationError` and `NotFoundError`:
 
 ```javascript
 try {
@@ -141,9 +127,12 @@ try {
   }
 }
 ```
-### Using **instanceof** to Differentiate Errors
-**Handling specific errors:** 
-In the following example, we throw multiple types of exceptions and use `instanceof` to handle **each one specifically**.
+
+---
+
+### Handling Multiple Error Types
+
+When dealing with multiple error types, use `instanceof` to handle each one specifically:
 
 ```javascript
 function simulateError(errorType) {
@@ -179,4 +168,13 @@ try {
 }
 ```
 
+---
+
+## To Note
+
+:::note[Handling Exceptions]
+- **Only catch what you can handle**: Don't catch errors that you cannot properly handle. If you can't recover from an error, it's often better to let it propagate.
+- **Provide meaningful error messages**: When throwing or logging errors, make sure the error message helps diagnose the problem.
+- **Use specific error types**: If you're throwing errors, consider using custom error classes (e.g., `ValidationError`, `NetworkError`) to make debugging easier.
+:::
 
