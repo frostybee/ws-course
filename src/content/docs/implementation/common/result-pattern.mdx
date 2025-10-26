@@ -1,202 +1,240 @@
 ---
 title: The Result Pattern
 description: Implementing the Result Pattern in PHP.
-draft: true
 sidebar:
     label: "Result Pattern"
     order: 1
+    badge:
+      text: Team Project
+      variant: tip
 ---
 
-import { Steps, Aside } from '@astrojs/starlight/components';
-import ExternalLink from "../../../../components/ExternalLink.astro";
+import { Steps} from '@astrojs/starlight/components';
 
-## 👩‍💻 What is the Result Pattern?
-:::note
-- The **Result pattern** is a design pattern used to handle the **outcome of operations** in a way that **explicitly communicates** success or failure, and potentially carries **additional information** about the result or the error.
-:::
-It provides a structured way to handle the outcomes of functions or methods, especially in languages that lack built-in support for tuples or multiple return values. The key idea is to return an object (often called `Result`, `Outcome`, `Response`, etc.) that contains information about whether the operation was successful and, if not, what went wrong.
 
-## 💢 Components of the Result Pattern
+## What is the Result Pattern?
 
-The Result pattern encapsulates the outcome of a function or operation into a structured object, rather than using exceptions for error handling. This pattern typically includes:
+- The **Result pattern** is a design pattern used to handle the **outcome of operations** in a way that **explicitly communicates** success or failure, and carries **additional information** about the result or error. 
+- The key idea is to return an object (often called `Result`, `Outcome`, `Response`, etc.) that **encapsulates** whether the operation succeeded and relevant **data** or **error** details.
 
-1. **Success/Failure Indicator:**
-   - Typically, a boolean flag (`$success` or similar) that indicates whether the operation was successful (`true`) or not (`false`).
+---
 
-2. **Result Data:**: The actual data returned if the operation succeeded.
+## Components of the Result Pattern
 
-3. **Error Information:** An error message, exception object, or any other relevant information explaining why the operation failed.
+1. **Success/failure indicator:**
+   - A boolean flag (`$success` or similar) indicating whether the operation succeeded (`true`) or failed (`false`).
 
-4. **Methods to Access Results:**
-   - **Success/Failure Checkers:** Methods (`isSuccess()` and `isFailure()`) to check whether the operation succeeded or failed.
-   - **Data Access:** Method (`getData()`) to retrieve the result data when the operation is successful.
-   - **Error Access:** Method (`getError()`) to retrieve the error message or object when the operation fails.
+2. **Result data:** The actual data returned if the operation succeeded.
 
-## 📈 Benefits of the Result Pattern vs. Exceptions
+3. **Error information:** An error message, exception object, or any other relevant information explaining why the operation failed.
 
-1. **Control Over Flow**: The Result pattern provides a more explicit way to handle success and failure. It does not disrupt the flow of the program as exceptions do, making the handling of different outcomes more straightforward and predictable.
+4. **Methods to access results:**
+   - **Success/failure checkers:** Methods (`isSuccess()` and `isFailure()`) to check whether the operation succeeded or failed.
+   - **Data access:** Method (`getData()`) to retrieve the result data when the operation is successful.
+   - **Error access:** Method (`getError()`) to retrieve the error message or object when the operation fails.
 
-2. **Performance**: Exceptions can be more expensive to handle than simple return values, especially in performance-critical sections of code. Using the Result pattern can be more efficient when performance is a concern.
+---
 
-3. **Error Context**: The Result pattern allows for more detailed error reporting and handling. You can attach additional context to the error, whereas exceptions usually require more effort to provide context or custom error information.
+## Benefits of the Result Pattern vs. Exceptions
 
-4. **Avoids Exception Overuse**: Exceptions should be used for exceptional situations, not for regular control flow. The Result pattern keeps the normal flow of control clear and explicit, using return values for regular outcomes.
+1. **Explicit control flow**: Provides a more explicit and predictable way to handle success and failure without disrupting program flow like exceptions do. Code becomes easier to read and understand by avoiding the complexity of try/catch blocks.
 
-5. **Enhanced Readability**: Code that uses the Result pattern can be easier to read and understand because it avoids the complexity of try/catch blocks and makes it clear when an operation might fail.
+2. **Performance**: More efficient than exceptions, especially in performance-critical sections where exceptions would be expensive to handle.
 
-6. **Testing and Debugging**: It can be easier to test and debug code that uses the Result pattern because it avoids the need to simulate exceptional conditions and handle them with try/catch blocks.
+3. **Rich error context and better testing**: Allows for detailed error reporting with additional context, and makes testing/debugging easier by avoiding the need to simulate exceptional conditions with try/catch blocks.
 
-7. **Composability:** Result objects can be easily passed around and composed with other functions or methods, promoting code reuse and maintainability.
+4. **Avoids exception overuse**: Exceptions should be reserved for exceptional situations, not regular control flow. The Result pattern keeps normal outcomes clear and explicit using return values.
 
-## 📅 When to Use Each
+5. **Composability:** Result objects can be easily passed around and composed with other functions or methods, promoting code reuse and maintainability.
+
+---
+
+## When to Use Each
 
 1. **Result Pattern**: Ideal for cases where you expect failures as part of normal operation (e.g., user input validation, simple computations).
   
 2. **Exceptions**: More appropriate for truly exceptional, unexpected conditions that should not occur under normal operation (e.g., file system errors, database connectivity issues).
 
-<Aside type="tip">
+:::tip
 The Result pattern provides a good alternative to exceptions for handling predictable failure conditions, making the code more readable, maintainable, and often more performant.
-</Aside>
+:::
 
-## 🚀 Using the Result Pattern in PHP 
+---
+
+## Implementing the Result Pattern in PHP
  
-<Steps>
+The following example illustrates how you can implement the Result pattern in PHP:
 
-1. 
-    ```php title="PHP implementation of the Result pattern"
-    class Result
+```php title="PHP implementation of the Result pattern"
+class Result
+{
+    private bool $is_success = false;
+    private string $message;
+    private $data;
+    private $errors;
+
+    private function __construct(bool $success, string $message, mixed $data = null, mixed $errors = null)
     {
-        private bool $is_success = false;
-        private string $message;
-        private $data;
-        private $errors;
-
-        private function __construct(bool $success, string $message, mixed $data = null, mixed $errors = null)
-        {
-            $this->is_success = $success;
-            $this->message = $message;
-            $this->data = $data;
-            $this->errors = $errors;
-        }
-
-        public static function success($message, mixed $data = null): Result
-        {
-            return new Result(true, $message, $data);
-        }
-
-        public static function failure($message, mixed $errors = null): Result
-        {
-            return new Result(false, $message, null, $errors);
-        }
-
-        public function isSuccess(): bool
-        {
-            return $this->is_success;
-        }
-
-        public function isFailure(): bool
-        {
-            return !$this->is_success;
-        }
-
-        public function getData(): mixed
-        {
-            if (!$this->is_success) {
-                throw new Exception("Cannot get data from a failed result.");
-            }
-            return $this->data;
-        }
-
-        public function getErrors(): mixed
-        {
-            if ($this->is_success) {
-                throw new Exception("Cannot get errors from a successful result.");
-            }
-            return $this->errors;
-        }
-
-        public function getMessage(): string
-        {
-            return $this->message;
-        }
-
-        public function __toString(): string
-        {
-            if ($this->is_success) {
-                $data = $this->data !== null ? 'Data: ' . json_encode($this->data) : 'No data';
-                return "Success: {$this->message}, {$data}";
-            } else {
-                $errors = $this->errors !== null ? 'Errors: ' . json_encode($this->errors) : 'No errors';
-                return "Failure: {$this->message}, {$errors}";
-            }
-        }
+        $this->is_success = $success;
+        $this->message = $message;
+        $this->data = $data;
+        $this->errors = $errors;
     }
-    ```
 
-2. 
-    ```php title="Example #1: Using the Result pattern"
-    <?php
-
-    // Include the Result class code here
-    class UserService
+    public static function success($message, mixed $data = null): Result
     {
-        private $users = [
-            'john_doe' => 'password123',
-            'alice_smith' => 'alicepassword',
-        ];
-        
-        public function login(string $username, string $password): Result
-        {
-            // Check if the user exists
-            if (!isset($this->users[$username])) {
-                return Result::failure("User not found.");
-            }
+        return new Result(true, $message, $data);
+    }
 
-            // Check if the password is correct
-            if ($this->users[$username] !== $password) {
-                return Result::failure("Incorrect password.");
-            }
+    public static function failure($message, mixed $errors = null): Result
+    {
+        return new Result(false, $message, null, $errors);
+    }
 
-            // Successful login
-            return Result::success("Login successful.", ["username" => $username]);
+    public function isSuccess(): bool
+    {
+        return $this->is_success;
+    }
+
+    public function isFailure(): bool
+    {
+        return !$this->is_success;
+    }
+
+    public function getData(): mixed
+    {
+        if (!$this->is_success) {
+            throw new Exception("Cannot get data from a failed result.");
+        }
+        return $this->data;
+    }
+
+    public function getErrors(): mixed
+    {
+        if ($this->is_success) {
+            throw new Exception("Cannot get errors from a successful result.");
+        }
+        return $this->errors;
+    }
+
+    public function getMessage(): string
+    {
+        return $this->message;
+    }
+
+    public function __toString(): string
+    {
+        if ($this->is_success) {
+            $data = $this->data !== null ? 'Data: ' . json_encode($this->data) : 'No data';
+            return "Success: {$this->message}, {$data}";
+        } else {
+            $errors = $this->errors !== null ? 'Errors: ' . json_encode($this->errors) : 'No errors';
+            return "Failure: {$this->message}, {$errors}";
         }
     }
+}
+```
+---
 
-    // Example usage:
-    $userService = new UserService();
+## Example: Using the Result pattern
+```php title="Example #1: Using the Result pattern for input validation"
+<?php
 
-    // Test successful login
-    $result = $userService->login('john_doe', 'password123');
+class PlanetValidator
+{
+    private const VALID_TYPES = ['Terrestrial', 'Gas Giant', 'Ice Giant', 'Dwarf'];
 
-    if ($result->isSuccess()) {
-        echo "Success: " . $result->getMessage() . "<br/>";
-        echo "User data: " . json_encode($result->getData()) . "<br/>";
-    } else {
-        echo "Failure: " . $result->getMessage() . "<br/>";
-        echo "Errors: " . json_encode($result->getErrors()) . "<br/>";
+    public function validate(array $planetData): Result
+    {
+        $errors = [];
+
+        // Validate planet name.
+        if (empty($planetData['name']) || !is_string($planetData['name'])) {
+            $errors[] = "Planet name is required and must be a string.";
+        } elseif (strlen($planetData['name']) < 2) {
+            $errors[] = "Planet name must be at least 2 characters long.";
+        }
+
+        // Validate planet type.
+        if (empty($planetData['type'])) {
+            $errors[] = "Planet type is required.";
+        } elseif (!in_array($planetData['type'], self::VALID_TYPES)) {
+            $errors[] = "Invalid planet type. Must be one of: " . implode(', ', self::VALID_TYPES);
+        }
+
+        // Validate radius.
+        if (!isset($planetData['radius'])) {
+            $errors[] = "Planet radius is required.";
+        } elseif (!is_numeric($planetData['radius']) || $planetData['radius'] <= 0) {
+            $errors[] = "Planet radius must be a positive number.";
+        }
+
+        // Validate moons count.
+        if (!isset($planetData['moons'])) {
+            $errors[] = "Number of moons is required.";
+        } elseif (!is_int($planetData['moons']) || $planetData['moons'] < 0) {
+            $errors[] = "Number of moons must be a non-negative integer.";
+        }
+
+        // Return result based on validation.
+        if (!empty($errors)) {
+            return Result::failure("Planet data validation failed.", $errors);
+        }
+
+        return Result::success("Planet data is valid.", $planetData);
     }
+}
 
-    // Test failed login (incorrect password)
-    $result = $userService->login('john_doe', 'wrongpassword');
+// Example usage:
+$validator = new PlanetValidator();
 
-    if ($result->isSuccess()) {
-        echo "Success: " . $result->getMessage() . "<br/>";
-        echo "User data: " . json_encode($result->getData()) . "<br/>";
-    } else {
-        echo "Failure: " . $result->getMessage() . "<br/>";
-        echo "Errors: " . json_encode($result->getErrors()) . "<br/>";
-    }
+// Test 1: Valid planet data.
+$result = $validator->validate([
+    'name' => 'Mars',
+    'type' => 'Terrestrial',
+    'radius' => 3389,
+    'moons' => 2
+]);
 
-    // Test failed login (user not found)
-    $result = $userService->login('non_existent_user', 'any_password');
+if ($result->isSuccess()) {
+    echo "Success: " . $result->getMessage() . "<br/>";
+    echo "Planet data: " . json_encode($result->getData()) . "<br/>";
+} else {
+    echo "Failure: " . $result->getMessage() . "<br/>";
+    echo "Errors: " . json_encode($result->getErrors()) . "<br/>";
+}
 
-    if ($result->isSuccess()) {
-        echo "Success: " . $result->getMessage() . "<br/>";
-        echo "User data: " . json_encode($result->getData()) . "<br/>";
-    } else {
-        echo "Failure: " . $result->getMessage() . "<br/>";
-        echo "Errors: " . json_encode($result->getErrors()) . "<br/>";
-    }
-    ?>
-    ```
-</Steps>
+// Test 2: Invalid planet type.
+$result = $validator->validate([
+    'name' => 'Unknown',
+    'type' => 'Rocky',
+    'radius' => 5000,
+    'moons' => 1
+]);
+
+if ($result->isSuccess()) {
+    echo "Success: " . $result->getMessage() . "<br/>";
+    echo "Planet data: " . json_encode($result->getData()) . "<br/>";
+} else {
+    echo "Failure: " . $result->getMessage() . "<br/>";
+    echo "Errors: " . json_encode($result->getErrors()) . "<br/>";
+}
+
+// Test 3: Multiple validation errors.  
+$result = $validator->validate([
+    'name' => '',
+    'type' => 'Invalid',
+    'radius' => -100,
+    'moons' => -5
+]);
+
+if ($result->isSuccess()) {
+    echo "Success: " . $result->getMessage() . "<br/>";
+    echo "Planet data: " . json_encode($result->getData()) . "<br/>";
+} else {
+    echo "Failure: " . $result->getMessage() . "<br/>";
+    echo "Errors: " . json_encode($result->getErrors()) . "<br/>";
+}
+?>
+```
+

@@ -1,5 +1,5 @@
 {
-  "name": "web-dev",
+  "name": "Web Services course",
   "type": "module",
   "version": "0.0.1",
   "scripts": {
@@ -11,16 +11,16 @@
   },
   "author": "Frostybee",
   "license": "MIT",
-  "description": "A website for the web development course",
+  "description": "A website for the Web Services course",
   "packageManager": "pnpm@10.1.0",
   "dependencies": {
-    "@astrojs/check": "^0.9.4",
-    "@astrojs/markdown-remark": "^6.3.7",
-    "@astrojs/mdx": "^4.3.6",
-    "@astrojs/starlight": "^0.36.0",
+    "@astrojs/check": "^0.9.5",
+    "@astrojs/markdown-remark": "^6.3.8",
+    "@astrojs/mdx": "^4.3.8",
+    "@astrojs/starlight": "^0.36.1",
     "@expressive-code/core": "^0.41.3",
     "@expressive-code/plugin-line-numbers": "^0.41.3",
-    "astro": "^5.14.1",
+    "astro": "^5.15.1",
     "astro-nebula-ui": "^0.4.2",
     "expressive-code-fullscreen": "^1.0.0",
     "fuse.js": "^7.1.0",
@@ -31,14 +31,14 @@
     "remark-mermaidjs": "^7.0.0",
     "remark-toc": "^9.0.0",
     "sharp": "^0.34.4",
-    "starlight-image-zoom": "^0.13.0",
-    "starlight-links-validator": "^0.18.0",
+    "starlight-image-zoom": "^0.13.2",
+    "starlight-links-validator": "^0.19.0",
     "starlight-scroll-to-top": "^0.4.0",
-    "starlight-sidebar-topics": "^0.6.1",
-    "starlight-theme-galaxy": "^0.5.1",
-    "svelte": "^5.39.6"
+    "starlight-sidebar-topics": "^0.6.2",
+    "starlight-theme-galaxy": "^0.5.2",
+    "svelte": "^5.42.2"
   },
   "devDependencies": {
-    "typescript": "^5.9.2"
+    "typescript": "^5.9.3"
   }
 }

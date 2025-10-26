@@ -1,0 +1,244 @@
+---
+title: Using Valitron for Input Validation
+description: Using Valitron for input validation
+sidebar:
+    label: "Using Valitron for Input Validation"
+    order: 3
+    badge:
+      text: Team Project
+      variant: tip
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+## What is Valitron?
+
+Valitron is a simple, stand-alone validation library with **no dependencies**. It's perfect for validating input data in your REST API built with Slim framework.
+
+**Key benefits:**
+- Lightweight and easy to use
+- Chainable validation rules
+- Clear error messages
+- No external dependencies
+
+:::note
+- For more information about Valitron and its validation rules, visit the [Valitron documentation](https://github.com/vlucas/valitron).
+- Valitron's complete list of [built-in validation rules](https://github.com/vlucas/valitron#built-in-validation-rules)
+:::
+
+---
+
+## Installation
+
+Install Valitron using Composer:
+
+```bash
+composer require vlucas/valitron
+```
+- However, Valitron is already included in the provided Slim template. So you can skip this step.
+
+---
+
+## Using Valitron with Slim Framework
+
+<Steps>
+
+1. **Import Valitron in your route handler**
+
+   ```php
+   use Valitron\Validator;
+   ```
+
+2. **Get request data and create validator**
+
+   ```php
+   $app->post('/api/planets', function ($request, $response) {
+       // Get the associative array of data from request.
+       $data = $request->getParsedBody();
+
+       // Instantiate a validator and initialize it with the data to be validated.
+       $v = new Validator($data);
+   });
+   ```
+
+3. **Define validation rules as an array organized by field**
+
+   ```php
+   // Array with field names as keys.
+   $rules = [
+       'name' => ['required', ['lengthMin', 2]],
+       'type' => ['required', ['in', ['Terrestrial', 'Gas Giant', 'Ice Giant', 'Dwarf']]],
+       'radius' => ['required', 'numeric', ['min', 0]],
+       'moons' => ['required', 'integer', ['min', 0]]
+   ];
+
+   // Apply the rules using mapFieldsRules.
+   $v->mapFieldsRules($rules);
+   ```
+
+4. **Validate and handle errors**
+
+   ```php
+   if ($v->validate()) {
+       // Validation passed - process data.
+       $response->getBody()->write(json_encode([
+           'success' => true,
+           'message' => 'Planet created successfully'
+       ]));
+       return $response->withStatus(201);
+   } else {
+       // Validation failed - return errors.
+       $response->getBody()->write(json_encode([
+           'success' => false,
+           'errors' => $v->errors()
+       ]));
+       return $response->withStatus(400);
+   }
+   ```
+
+</Steps>
+
+---
+
+## Specifying Validation Rules as Arrays
+
+Valitron provides two ways to specify validation rules as arrays:
+1. Field-based array (field names as keys)
+    ```php
+    $rules = [
+        'name' => ['required', ['lengthMin', 2]]
+    ];
+    $v->mapFieldsRules($rules);
+    ```
+2. Rule-based array (rule names as keys)
+    ```php
+    $rules = [
+        'required' => [['name']],
+        'lengthMin' => [['name', 2]]
+    ];
+    $v->rules($rules);
+    ```
+ 
+
+:::tip[Two Ways to Define Rules as Arrays]
+- The field-based array is **more intuitive** when organizing by field. 
+- The rule-based array is **more useful** when applying the same rule to many fields.
+:::
+
+---
+
+## Common Validation Rules
+The following table contains some of the most common validation rules that you can use with Valitron. For a **complete list** of validation rules, visit the [Valitron documentation](https://github.com/vlucas/valitron#built-in-validation-rules).
+
+| Rule | Example | Description |
+|------|---------|-------------|
+| `required` | `$v->rule('required', 'name')` | Field must be present and not empty |
+| `numeric` | `$v->rule('numeric', 'radius')` | Must be a number |
+| `integer` | `$v->rule('integer', 'moons')` | Must be an integer |
+| `lengthMin` | `$v->rule('lengthMin', 'name', 2)` | Minimum string length |
+| `lengthMax` | `$v->rule('lengthMax', 'name', 50)` | Maximum string length |
+| `min` | `$v->rule('min', 'radius', 0)` | Minimum numeric value |
+| `max` | `$v->rule('max', 'radius', 100000)` | Maximum numeric value |
+| `email` | `$v->rule('email', 'contact')` | Valid email format |
+| `url` | `$v->rule('url', 'website')` | Valid URL format |
+| `in` | `$v->rule('in', 'type', ['Terrestrial', 'Gas Giant'])` | Value must be in list |
+
+:::tip
+You can chain multiple rules for the same field to create comprehensive validation.
+:::
+
+---
+
+## Complete Example
+
+```php title="POST /api/planets endpoint with field-based array validation"
+use Valitron\Validator;
+
+$app->post('/api/planets', function ($request, $response) {
+    // Associative array of data to validate.
+    $data = $request->getParsedBody();
+    // Example: ['name' => 'Mars', 'type' => 'Terrestrial', 'radius' => 3389, 'moons' => 2]
+
+    // Instantiate a validator and initialize it with the data to be validated.
+    $v = new Validator($data);
+
+    // Array of validation rules organized by field name.
+    $rules = [
+        'name' => ['required', ['lengthMin', 2]],
+        'type' => ['required', ['in', ['Terrestrial', 'Gas Giant', 'Ice Giant', 'Dwarf']]],
+        'radius' => ['required', 'numeric', ['min', 0]],
+        'moons' => ['required', 'integer', ['min', 0]]
+    ];
+
+    // Apply the rules.
+    $v->mapFieldsRules($rules);
+
+    // Validate.
+    if ($v->validate()) {
+        // Success - process the data.
+        $response->getBody()->write(json_encode([
+            'success' => true,
+            'message' => 'Planet data is valid',
+            'data' => $data
+        ]));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
+    } else {
+        // Failure - return errors.
+        $response->getBody()->write(json_encode([
+            'success' => false,
+            'message' => 'Validation failed',
+            'errors' => $v->errors()
+        ]));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+    }
+});
+```
+
+---
+
+## Alternative: Chaining Rule Calls
+
+You can also define validation rules by chaining `rule()` method calls. This approach is useful for simple validations or when you prefer a more explicit style:
+
+```php title="Example using chained rule() calls"
+use Valitron\Validator;
+
+$app->post('/api/planets', function ($request, $response) {
+    $data = $request->getParsedBody();
+    $v = new Validator($data);
+
+    // Chain multiple rule() calls together.    
+    $v->rule('required', 'name')
+      ->rule('lengthMin', 'name', 2)
+      ->rule('required', 'type')
+      ->rule('in', 'type', ['Terrestrial', 'Gas Giant', 'Ice Giant', 'Dwarf'])
+      ->rule('required', 'radius')
+      ->rule('numeric', 'radius')
+      ->rule('min', 'radius', 0)
+      ->rule('required', 'moons')
+      ->rule('integer', 'moons')
+      ->rule('min', 'moons', 0);
+
+    if ($v->validate()) {
+        $response->getBody()->write(json_encode([
+            'success' => true,
+            'message' => 'Planet data is valid'
+        ]));
+        return $response->withStatus(200);
+    } else {
+        $response->getBody()->write(json_encode([
+            'success' => false,
+            'errors' => $v->errors()
+        ]));
+        return $response->withStatus(400);
+    }
+});
+```
+
+:::tip[When to Use Chaining]
+Chaining is convenient for:
+- Quick, simple validations,
+- When you prefer a more fluent, readable syntax,
+- When defining rules inline without separate arrays.
+:::
+
