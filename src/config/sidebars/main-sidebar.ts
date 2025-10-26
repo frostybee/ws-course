@@ -42,6 +42,12 @@ export default
           }
         },
         {
+          label: "Input Validation",
+          autogenerate: {
+            directory: "implementation/input-validation",
+          }
+        },
+        {
           label: "Error Handling",
           autogenerate: {
             directory: "implementation/error-handling",
