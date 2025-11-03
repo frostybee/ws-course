@@ -1,7 +1,7 @@
 ---
 title: Validating Inputs in a REST API
 description: Validating Inputs in a REST API
-draft: true
+draft: false
 sidebar:
     label: "Inputs Validation"
     order: 1
@@ -12,21 +12,21 @@ sidebar:
 
 ## What is Input Validation?
 
-- Input Validation is the process of **verifying** that user or client-provided data meets **expected formats**, types, and **constraints** before processing it.  
-- REST APIs handle **requests from clients** (e.g., POST, GET, PUT, DELETE), and unvalidated inputs can lead to **vulnerabilities** like SQL injection, XSS, or simply broken functionality.
-- **Validation goal**: Ensures that incoming requests (e.g., JSON payloads, query parameters) **are secure** and **functional**, preventing errors, security vulnerabilities, and unexpected behavior.   
+- Input validation is the process of **verifying** that client-provided data **meets** expected **formats**, **types**, and **constraints** before processing it.
+- Without validation, REST APIs are vulnerable to **security threats** (e.g., SQL injection, command injection) and broken functionality.
+- The goal is to ensure that incoming requests (e.g., JSON payloads, query parameters) are secure and work as expected.   
     - **Example:**  
         - Valid: `{"user_id": 123, "name": "Quacker"}`  
         - Invalid: `{"user_id": "abc", "name": "##123@@"}`  
 
 ---
 
-## Why Input Validation Matters?
+## Why Input Validation Matters
 
-1. **Security**: Prevents **malicious data** from compromising your application, preventing against **injection attacks** (e.g., SQL injection, command injection).
-2. **Data integrity**: Ensures inputs **match expected** types, formats, and constraints (e.g., email format, non-negative numbers).
-3. **User experience**: Provides clear **error messages** to API consumers when inputs are invalid.
-4. **Reliability & stability**: Prevents crashes, runtime errors, or unexpected behavior due to malformed or invalid data.
+1. **Security**: Protects against malicious data and injection attacks (e.g., SQL injection, command injection).
+2. **Data integrity**: Ensures inputs match expected types, formats, and constraints (e.g., valid email addresses, positive numbers).
+3. **User experience**: Provides clear error messages to API consumers when inputs are invalid.
+4. **Reliability**: Prevents crashes, runtime errors, and unexpected behavior from malformed data.
 
 
 ---
@@ -35,37 +35,44 @@ sidebar:
 
 
 ### Input Sources
-For a REST API, inputs typically come from:
-1. **Query Parameters** (e.g., `GET /species?limit=10`)
-2. **URL Path Parameters** (e.g., `GET /players/123`)
-3. **Request Body** (e.g., JSON in a POST or PUT request)
-4. **Request Headers** (e.g., `Accept`, `Authorization`)
+For a REST API, inputs can be provided by the client request in the following ways:
+- **Query string parameters** (e.g., `GET /species?limit=10`)
+- **URL path parameters** (e.g., `GET /players/123`)
+- **Request body** (e.g., JSON in a POST, PUT, or PATCH request)
+- **Request headers** (e.g., `Accept`, `Authorization`)
 
 ---
 
-### Validation Rules
+### Typical Validation Rules
 
-You'll need to validate:
+When processing user or client-provided data in a REST API, you'll need to validate:
 - **Presence**: Is a required field provided?
 - **Type**: Is the input an integer, string, boolean, etc.?
-- **Format**: Does it match a pattern (e.g., email, date, phone number, etc.)?
-- **Range/Length**: Is it within acceptable bounds (e.g., age between 18-100)?
-- **Business rules**: Does it make sense in your domain (e.g., order quantity > 0)?
-
-**Examples of validation rules:**
-- `name`: Required, string, 2-50 characters.
-- `email`: Required, valid email format.
-- `age`: Optional, integer, 18-100.
+- **Format**: Does it match a pattern (e.g., UUID for resource IDs, ISO 8601 for timestamps, valid enum values for status fields)?
+- **Range/Length**: Is it within acceptable bounds (e.g., pagination limit 1-100, offset >= 0, price > 0)?
+- **Business rules**: Does it make sense in your domain (e.g., stock quantity available, valid status transitions)?  
 
 ---
 
-## Tools and Approaches in PHP
+## How to Validate Inputs in PHP?
 
-- **Native PHP functions**:
-  - `filter_var()` for sanitizing and validating common types (e.g., email, URL).
-  - `isset()`, `empty()` for checking presence.
-  - Type casting/checking with `is_int()`, `is_string()`, etc.
-- **Third-party libraries**: **[Valitron](https://github.com/vlucas/valitron)**: A simple, stand-alone validation library with no dependencies.
+There are two main approaches to validating inputs in PHP:
+1. **Native PHP functions**:   
+   - `filter_var()` for **sanitizing** and **validating** common types (e.g., email, URL).
+   - `isset()`, `empty()` for checking presence.
+   - Type casting/checking with `is_int()`, `is_string()`, etc.
+   - **Example:**
+      ```php
+      $email = 'test@example.com';
+      if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+      echo 'Invalid email format';
+      }
+      ```
+2. **Third-party libraries**: **[Valitron](https://github.com/vlucas/valitron)**: A simple, stand-alone validation library with no dependencies.
+
+**Resources:**
+- [Variable Handling Functions](https://www.php.net/manual/en/ref.var.php)
+- [Character type (Ctype) checking functions](https://www.php.net/manual/en/ref.ctype.php)
 
 ---
 ## Handling Validation Errors
