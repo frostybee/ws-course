@@ -1,0 +1,361 @@
+---
+title: Using Monolog for Logging
+description: Using Monolog for logging in Slim Framework
+draft: true
+sidebar:
+    label: "Using Monolog for Logging"
+    order: 8
+    badge:
+        text: Team Project
+        variant: tip
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+## What is Monolog?
+
+Monolog is a comprehensive logging library for PHP that sends your logs to files, sockets, inboxes, databases and various web services. It's perfect for tracking application behavior, debugging issues, and monitoring your REST API built with Slim framework.
+
+**Key benefits:**
+- PSR-3 compliant logging interface
+- Multiple handlers for different output destinations
+- Processors to add extra information to log records
+- Flexible formatting options
+- Support for log levels from DEBUG to EMERGENCY
+
+:::note
+- For more information about Monolog and its features, visit the [Monolog documentation](https://github.com/Seldaek/monolog)
+- Monolog's complete list of [available handlers](https://github.com/Seldaek/monolog/blob/main/doc/02-handlers-formatters-processors.md)
+:::
+
+---
+
+## Installation
+
+Install Monolog using Composer:
+
+```bash
+composer require monolog/monolog
+```
+- However, Monolog is already included in the provided Slim template. So you can skip this step.
+
+---
+
+## Using Monolog with Slim Framework
+
+<Steps>
+
+1. **Import Monolog classes in your application**
+
+   ```php
+   use Monolog\Logger;
+   use Monolog\Handler\StreamHandler;
+   ```
+
+2. **Create a logger instance with a channel name**
+
+   ```php
+   // Create a logger with a channel name (e.g., 'app', 'api', 'database').
+   $logger = new Logger('app');
+   ```
+
+3. **Add one or more handlers to define where logs go**
+
+   ```php
+   // Log to a file - INFO level and above.
+   $logger->pushHandler(new StreamHandler(__DIR__ . '/logs/app.log', Logger::INFO));
+
+   // You can add multiple handlers for different purposes.
+   // For example, log errors to a separate file.
+   $logger->pushHandler(new StreamHandler(__DIR__ . '/logs/errors.log', Logger::ERROR));
+   ```
+
+4. **Use the logger throughout your application**
+
+   ```php
+   $app->post('/api/planets', function ($request, $response) use ($logger) {
+       $data = $request->getParsedBody();
+
+       // Log the incoming request.
+       $logger->info('Creating new planet', ['data' => $data]);
+
+       // Your business logic here...
+
+       return $response->withStatus(201);
+   });
+   ```
+
+</Steps>
+
+---
+
+## Understanding Log Levels
+
+Monolog implements the PSR-3 logging standard with eight severity levels. Use the appropriate level based on the type of information you're logging:
+
+| Level | Method | When to Use | Example |
+|-------|--------|-------------|---------|
+| **DEBUG** | `$logger->debug()` | Detailed debug information | Variable values, loop iterations |
+| **INFO** | `$logger->info()` | Interesting events | User login, API requests |
+| **NOTICE** | `$logger->notice()` | Normal but significant events | Configuration changes |
+| **WARNING** | `$logger->warning()` | Exceptional occurrences that are not errors | Use of deprecated APIs, poor API usage |
+| **ERROR** | `$logger->error()` | Runtime errors that don't require immediate action | Database connection failed |
+| **CRITICAL** | `$logger->critical()` | Critical conditions | Application component unavailable |
+| **ALERT** | `$logger->alert()` | Action must be taken immediately | Entire website down |
+| **EMERGENCY** | `$logger->emergency()` | System is unusable | Database unavailable, system crash |
+
+:::tip[Choosing the Right Log Level]
+- Use **INFO** for tracking normal application flow
+- Use **WARNING** when something unexpected happened but the app continues
+- Use **ERROR** when functionality is affected but the app can continue
+- Use **CRITICAL** and above for severe issues requiring immediate attention
+:::
+
+---
+
+## Common Logging Patterns
+
+### Logging Request Information
+
+```php
+$app->post('/api/planets', function ($request, $response) use ($logger) {
+    $data = $request->getParsedBody();
+
+    $logger->info('POST /api/planets', [
+        'ip' => $request->getServerParams()['REMOTE_ADDR'] ?? 'unknown',
+        'data' => $data
+    ]);
+
+    // Process request...
+});
+```
+
+### Logging Validation Errors
+
+```php
+if (!$v->validate()) {
+    $logger->warning('Validation failed', [
+        'endpoint' => '/api/planets',
+        'errors' => $v->errors()
+    ]);
+
+    $response->getBody()->write(json_encode([
+        'success' => false,
+        'errors' => $v->errors()
+    ]));
+    return $response->withStatus(400);
+}
+```
+
+### Logging Database Operations
+
+```php
+try {
+    $stmt = $pdo->prepare('INSERT INTO planets (name, type) VALUES (?, ?)');
+    $stmt->execute([$name, $type]);
+
+    $logger->info('Planet created successfully', ['name' => $name]);
+} catch (PDOException $e) {
+    $logger->error('Database error', [
+        'message' => $e->getMessage(),
+        'query' => 'INSERT INTO planets'
+    ]);
+}
+```
+
+### Logging Exceptions
+
+```php
+try {
+    // Your code that might throw an exception.
+} catch (Exception $e) {
+    $logger->error('Unexpected error', [
+        'exception' => get_class($e),
+        'message' => $e->getMessage(),
+        'file' => $e->getFile(),
+        'line' => $e->getLine()
+    ]);
+
+    return $response->withStatus(500);
+}
+```
+
+---
+
+## Adding Context to Logs
+
+Monolog allows you to add contextual information to your log messages using arrays:
+
+```php
+// Simple context.
+$logger->info('User logged in', ['user_id' => 123]);
+
+// Rich context.
+$logger->error('Payment processing failed', [
+    'user_id' => 123,
+    'amount' => 99.99,
+    'currency' => 'USD',
+    'error_code' => 'CARD_DECLINED',
+    'timestamp' => time()
+]);
+```
+
+:::tip[Best Practices for Context]
+- Include relevant identifiers (user ID, transaction ID, etc.)
+- Add data that helps reproduce or understand the issue
+- Avoid logging sensitive information (passwords, credit cards, etc.)
+- Keep context arrays structured and consistent
+:::
+
+---
+
+## Configuring Time Zone and Log Format
+
+### Setting the Time Zone
+
+By default, Monolog uses UTC for timestamps. You can change this globally for all loggers:
+
+```php
+use Monolog\Logger;
+
+// Set the default timezone for all Monolog loggers.
+Logger::setTimezone(new \DateTimeZone('America/New_York'));
+
+// Now all loggers will use this timezone.
+$logger = new Logger('app');
+```
+
+:::tip[Common Time Zones]
+- `'America/New_York'` - Eastern Time
+- `'America/Chicago'` - Central Time
+- `'America/Denver'` - Mountain Time
+- `'America/Los_Angeles'` - Pacific Time
+- `'UTC'` - Coordinated Universal Time (default)
+
+View the [full list of time zones](https://www.php.net/manual/en/timezones.php) in the PHP documentation.
+:::
+
+### Customizing Log Format
+
+Monolog uses formatters to control how log records appear. The default `LineFormatter` can be customized:
+
+```php
+use Monolog\Handler\StreamHandler;
+use Monolog\Formatter\LineFormatter;
+
+$handler = new StreamHandler(__DIR__ . '/logs/app.log', Logger::INFO);
+
+// Create a custom format.
+// Available placeholders: %datetime%, %channel%, %level_name%, %message%, %context%, %extra%
+$dateFormat = "Y-m-d H:i:s";
+$outputFormat = "[%datetime%] %channel%.%level_name%: %message% %context%\n";
+
+$formatter = new LineFormatter($outputFormat, $dateFormat);
+$handler->setFormatter($formatter);
+
+$logger = new Logger('app');
+$logger->pushHandler($handler);
+```
+
+**Example output:**
+```
+[2025-11-10 14:30:45] app.INFO: User logged in {"user_id":123}
+[2025-11-10 14:31:12] app.ERROR: Database connection failed {"error":"Connection timeout"}
+```
+
+:::note[Format Customization]
+- `%datetime%` - The timestamp of the log entry
+- `%channel%` - The logger channel name (e.g., 'app', 'database')
+- `%level_name%` - Log level (DEBUG, INFO, ERROR, etc.)
+- `%message%` - The log message
+- `%context%` - Contextual data passed to the log method
+- `%extra%` - Additional data added by processors
+:::
+
+### Complete Configuration Example
+
+```php
+use Monolog\Logger;
+use Monolog\Handler\StreamHandler;
+use Monolog\Formatter\LineFormatter;
+
+// Set global timezone.
+Logger::setTimezone(new \DateTimeZone('America/New_York'));
+
+// Create logger.
+$logger = new Logger('app');
+
+// Create handler.
+$handler = new StreamHandler(__DIR__ . '/logs/app.log', Logger::DEBUG);
+
+// Create and apply custom formatter.
+$dateFormat = "Y-m-d H:i:s";
+$outputFormat = "[%datetime%] %level_name%: %message% %context%\n";
+$formatter = new LineFormatter($outputFormat, $dateFormat);
+$handler->setFormatter($formatter);
+
+// Add handler to logger.
+$logger->pushHandler($handler);
+
+// Use the logger.
+$logger->info('Application started');
+```
+
+---
+
+## Using Multiple Handlers
+
+You can configure Monolog to send logs to multiple destinations simultaneously:
+
+```php
+$logger = new Logger('app');
+
+// Log everything (DEBUG and above) to main log file.
+$logger->pushHandler(
+    new StreamHandler(__DIR__ . '/logs/app.log', Logger::DEBUG)
+);
+
+// Log only errors (ERROR and above) to separate error file.
+$logger->pushHandler(
+    new StreamHandler(__DIR__ . '/logs/errors.log', Logger::ERROR)
+);
+
+// In production, you might also send critical errors to email or Slack.
+```
+
+---
+
+## Integrating Monolog with Slim's Container
+
+For better organization, add the logger to Slim's dependency injection container:
+
+```php
+use DI\Container;
+use Monolog\Logger;
+use Monolog\Handler\StreamHandler;
+
+$container = new Container();
+
+$container->set('logger', function () {
+    $logger = new Logger('app');
+    $logger->pushHandler(
+        new StreamHandler(__DIR__ . '/logs/app.log', Logger::INFO)
+    );
+    return $logger;
+});
+
+// Then use it in your routes.
+$app->get('/api/planets', function ($request, $response) {
+    $logger = $this->get('logger');
+    $logger->info('Fetching all planets');
+    // ...
+});
+```
+
+---
+
+## Resources
+
+- [Monolog GitHub Repository](https://github.com/Seldaek/monolog)
+- [Monolog Handlers, Formatters and Processors](https://github.com/Seldaek/monolog/blob/main/doc/02-handlers-formatters-processors.md)
+- [PSR-3 Logger Interface](https://www.php-fig.org/psr/psr-3/)
