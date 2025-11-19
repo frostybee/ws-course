@@ -1,7 +1,7 @@
 ---
-title: 🛠 Composite REST Resource
+title: Composite REST Resource
 description: Introducing composite resources
-draft: true
+draft: false
 sidebar:
     label: "Composite Resource"
     order: 4
@@ -10,16 +10,18 @@ sidebar:
       variant: tip
 ---
 
-## 💥 What Is a Composite Resource?
+## What Is a Composite Resource?
 
-In RESTful web services, a composite resource refers to a resource that is a **combination of multiple other resources**. This is useful when you need to **aggregate** data from different sources into a single cohesive response. 
+In REST-based web services, a composite resource refers to a resource that is a **combination of multiple other resources**. This is useful when you need to **aggregate** data from different sources into a single cohesive response. 
 
-:::note
+
 - A composite resource allows you to present a unified interface to the client while fetching and combining data from various **data sources** and **remote APIs** behind the scenes.
 - Composite resources are essentially a way to aggregate and present data from multiple endpoints in a cohesive manner.
-:::
 
-### 🤖 Example Scenario
+
+---
+
+### Example Scenario
 
 Imagine an online travel booking service that provides information about flights, hotels, and car rentals. Each of these services could be managed by different APIs:
 
@@ -29,7 +31,9 @@ Imagine an online travel booking service that provides information about flights
 
 A **composite resource** could be created to offer a unified search feature, allowing users to find flights, hotels, and car rentals in a single query. Here's how it might work:
 
-### 🧪 Aggregating Data Example
+---
+
+### Data Aggregation: Typical Workflow Example
 
 1. **Composite Resource Endpoint**: `/api/v1/travel-options`
 
@@ -101,13 +105,15 @@ A **composite resource** could be created to offer a unified search feature, all
    }
    ```
 
-:::tip
+:::note
 In this example, the client benefits from a simplified interface (one endpoint to call) and a comprehensive response, while the server handles the complexity of interacting with multiple APIs and aggregating the data.
 
 This approach is common in applications that need to combine information from various services, providing a seamless user experience.
 :::
 
-## 🚀 Implementing a Composite Resource 
+---
+
+## Implementing a Composite Resource 
 
  ```php title="Example of a composite resource implementation using Slim Framework:"
     /**
@@ -161,7 +167,7 @@ public function getListOfLeagues() : mixed
         https://www.thesportsdb.com/api/v1/json/3/search_all_leagues.php?c=England&s=Soccer
         Use Guzzle HTTP client to fetch data from the remote 
         API that you've selected.
-        * Refer to Lab #5, Step #3).
+        * NOTE: Refer to Lab #5, Step #3).
     */
     return [];
 }

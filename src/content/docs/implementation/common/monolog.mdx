@@ -1,7 +1,7 @@
 ---
 title: Using Monolog for Logging
 description: Using Monolog for logging in Slim Framework
-draft: true
+draft: false
 sidebar:
     label: "Using Monolog for Logging"
     order: 8
@@ -14,7 +14,7 @@ import { Steps, Aside } from '@astrojs/starlight/components';
 
 ## What is Monolog?
 
-Monolog is a comprehensive logging library for PHP that sends your logs to files, sockets, inboxes, databases and various web services. It's perfect for tracking application behavior, debugging issues, and monitoring your REST API built with Slim framework.
+Monolog is a comprehensive logging library for PHP that sends your log records to files, sockets, inboxes, databases and various web services. It's perfect for tracking application behavior, debugging issues, and monitoring your REST API built with Slim framework.
 
 **Key benefits:**
 - PSR-3 compliant logging interface
@@ -55,8 +55,8 @@ composer require monolog/monolog
 2. **Create a logger instance with a channel name**
 
    ```php
-   // Create a logger with a channel name (e.g., 'app', 'api', 'database').
-   $logger = new Logger('app');
+   // Create a logger with a channel name (e.g., 'app_access', 'api', 'database').
+   $logger = new Logger('app_access');
    ```
 
 3. **Add one or more handlers to define where logs go**
@@ -115,70 +115,13 @@ Monolog implements the PSR-3 logging standard with eight severity levels. Use th
 
 ## Common Logging Patterns
 
-### Logging Request Information
+- Logging Request Information 
+- Logging Database Operations
+- Logging API Calls
+- Logging Exceptions
+- Logging Authentication Events
 
-```php
-$app->post('/api/planets', function ($request, $response) use ($logger) {
-    $data = $request->getParsedBody();
-
-    $logger->info('POST /api/planets', [
-        'ip' => $request->getServerParams()['REMOTE_ADDR'] ?? 'unknown',
-        'data' => $data
-    ]);
-
-    // Process request...
-});
-```
-
-### Logging Validation Errors
-
-```php
-if (!$v->validate()) {
-    $logger->warning('Validation failed', [
-        'endpoint' => '/api/planets',
-        'errors' => $v->errors()
-    ]);
-
-    $response->getBody()->write(json_encode([
-        'success' => false,
-        'errors' => $v->errors()
-    ]));
-    return $response->withStatus(400);
-}
-```
-
-### Logging Database Operations
-
-```php
-try {
-    $stmt = $pdo->prepare('INSERT INTO planets (name, type) VALUES (?, ?)');
-    $stmt->execute([$name, $type]);
-
-    $logger->info('Planet created successfully', ['name' => $name]);
-} catch (PDOException $e) {
-    $logger->error('Database error', [
-        'message' => $e->getMessage(),
-        'query' => 'INSERT INTO planets'
-    ]);
-}
-```
-
-### Logging Exceptions
-
-```php
-try {
-    // Your code that might throw an exception.
-} catch (Exception $e) {
-    $logger->error('Unexpected error', [
-        'exception' => get_class($e),
-        'message' => $e->getMessage(),
-        'file' => $e->getFile(),
-        'line' => $e->getLine()
-    ]);
-
-    return $response->withStatus(500);
-}
-```
+ 
 
 ---
 
@@ -222,14 +165,15 @@ use Monolog\Logger;
 Logger::setTimezone(new \DateTimeZone('America/New_York'));
 
 // Now all loggers will use this timezone.
-$logger = new Logger('app');
+$logger = new Logger('access');
 ```
 
 :::tip[Common Time Zones]
-- `'America/New_York'` - Eastern Time
-- `'America/Chicago'` - Central Time
-- `'America/Denver'` - Mountain Time
-- `'America/Los_Angeles'` - Pacific Time
+- `'America/New_York'` - Eastern Time Zone
+- `'America/Toronto'` - Eastern Time Zone
+- `'America/Chicago'` - Central Time Zone
+- `'America/Denver'` - Mountain Time Zone
+- `'America/Los_Angeles'` - Pacific Time Zone
 - `'UTC'` - Coordinated Universal Time (default)
 
 View the [full list of time zones](https://www.php.net/manual/en/timezones.php) in the PHP documentation.
@@ -272,87 +216,8 @@ $logger->pushHandler($handler);
 - `%extra%` - Additional data added by processors
 :::
 
-### Complete Configuration Example
-
-```php
-use Monolog\Logger;
-use Monolog\Handler\StreamHandler;
-use Monolog\Formatter\LineFormatter;
-
-// Set global timezone.
-Logger::setTimezone(new \DateTimeZone('America/New_York'));
-
-// Create logger.
-$logger = new Logger('app');
-
-// Create handler.
-$handler = new StreamHandler(__DIR__ . '/logs/app.log', Logger::DEBUG);
-
-// Create and apply custom formatter.
-$dateFormat = "Y-m-d H:i:s";
-$outputFormat = "[%datetime%] %level_name%: %message% %context%\n";
-$formatter = new LineFormatter($outputFormat, $dateFormat);
-$handler->setFormatter($formatter);
-
-// Add handler to logger.
-$logger->pushHandler($handler);
-
-// Use the logger.
-$logger->info('Application started');
-```
-
 ---
 
-## Using Multiple Handlers
-
-You can configure Monolog to send logs to multiple destinations simultaneously:
-
-```php
-$logger = new Logger('app');
-
-// Log everything (DEBUG and above) to main log file.
-$logger->pushHandler(
-    new StreamHandler(__DIR__ . '/logs/app.log', Logger::DEBUG)
-);
-
-// Log only errors (ERROR and above) to separate error file.
-$logger->pushHandler(
-    new StreamHandler(__DIR__ . '/logs/errors.log', Logger::ERROR)
-);
-
-// In production, you might also send critical errors to email or Slack.
-```
-
----
-
-## Integrating Monolog with Slim's Container
-
-For better organization, add the logger to Slim's dependency injection container:
-
-```php
-use DI\Container;
-use Monolog\Logger;
-use Monolog\Handler\StreamHandler;
-
-$container = new Container();
-
-$container->set('logger', function () {
-    $logger = new Logger('app');
-    $logger->pushHandler(
-        new StreamHandler(__DIR__ . '/logs/app.log', Logger::INFO)
-    );
-    return $logger;
-});
-
-// Then use it in your routes.
-$app->get('/api/planets', function ($request, $response) {
-    $logger = $this->get('logger');
-    $logger->info('Fetching all planets');
-    // ...
-});
-```
-
----
 
 ## Resources
 
