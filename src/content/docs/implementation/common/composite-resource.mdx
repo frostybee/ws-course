@@ -172,3 +172,70 @@ public function getListOfLeagues() : mixed
     return [];
 }
  ```
+
+### Example JSON Output
+
+The following example shows what the composite resource response would look like after aggregating player data from the database with league data from the SportsDB API:
+
+:::note
+Notice how the response combines **local database data** (players with pagination) and **external API data** (leagues) into a single, **unified** JSON response. This provides the client with all the necessary information in one request.
+:::
+
+
+```json title="Example response from GET /players endpoint"
+{
+  "players": { // 👈 Your collection resource's data (e.g., players)
+    "meta": {
+      "current_page": 1,
+      "page_size": 10,
+      "total_pages": 5,
+      "total_records": 47
+    },
+    "data": [ 
+      {
+        "player_id": "1",
+        "name": "John Doe",
+        "position": "Forward",
+        "team": "Manchester United",
+        "jersey_number": 10
+      },
+      {
+        "player_id": "2",
+        "name": "Jane Smith",
+        "position": "Midfielder",
+        "team": "Chelsea FC",
+        "jersey_number": 8
+      },
+      {
+        "player_id": "3",
+        "name": "Mike Johnson",
+        "position": "Defender",
+        "team": "Arsenal FC",
+        "jersey_number": 5
+      }
+    ]    
+  },
+  "leagues": [ // 👈 Resource data from the external API (e.g., leagues)
+    {
+      "idLeague": "4328",
+      "strLeague": "English Premier League",
+      "strSport": "Soccer",
+      "strLeagueAlternate": "Premier League"
+    },
+    {
+      "idLeague": "4329",
+      "strLeague": "English League Championship",
+      "strSport": "Soccer",
+      "strLeagueAlternate": "The Championship"
+    },
+    {
+      "idLeague": "4330",
+      "strLeague": "Scottish Premier League",
+      "strSport": "Soccer",
+      "strLeagueAlternate": "SPL"
+    }
+  ]
+}
+```
+
+

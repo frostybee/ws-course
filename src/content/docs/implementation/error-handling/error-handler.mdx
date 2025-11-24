@@ -1,7 +1,7 @@
 ---
 title: Implementing a Custom Error Handler
 description: Implementing a Custom Error Handler
-draft: true
+draft: false
 sidebar:
     label: "Custom Error Handler"
     order: 5
@@ -13,10 +13,15 @@ sidebar:
 import { Steps, Aside } from '@astrojs/starlight/components';
 
 ## Error Handling in Slim Framework
+How error handling works in Slim Framework?
 
-In Slim Framework, you can implement a custom error handler by leveraging the middleware and error-handling features provided by the framework. Slim allows you to customize how errors are handled globally by modifying the `ErrorHandler` class, or by defining a custom error handler function.
+- In Slim Framework, you can implement a **custom error handler** by leveraging the middleware and error-handling features provided by the framework. 
+- Slim allows you to customize how errors are handled globally by extending the `ErrorHandler` class, or by defining a custom error handler function.
+
+---
 
 ## Steps to Implement a Custom Error Handler in Slim 4
+To implement a custom error handler in Slim 4, you need to follow the steps below:
 
 <Steps>
 1. **Create a custom error handler:**   Slim 4 uses the `ErrorHandler` class to catch errors and exceptions. You can extend or replace the default error handler to implement custom error handling logic, such as **logging errors** or **formatting** them in a specific way for API responses.
@@ -25,9 +30,11 @@ In Slim Framework, you can implement a custom error handler by leveraging the mi
    Once you've created the custom error handler, you need to register it with the Slim application so that it will handle errors.
 </Steps>
 
-:::tip
+:::note
 The use of a custom error handler ensures that all exceptions and errors in your Slim application are handled consistently and in a way that aligns with your application's needs.
 :::
+
+---
 
 ## Example Implementation
 
@@ -67,10 +74,11 @@ class CustomErrorHandler extends ErrorHandler
 
         //TODO: Use your LogHelper class to log the error details.
         
-        // The exception message and the stack trace should be included in the log record along with the request details:
-        //Use:       
-        //    $exception->getMessage();
-        //    $exception->getTraceAsString();
+        //NOTE: The exception message and the stack trace should be included in the log record along with the request details.
+
+        // Hints, you can use the following methods:       
+        // $exception->getMessage();
+        // $exception->getTraceAsString();
     }
 
     /**
@@ -121,8 +129,10 @@ class CustomErrorHandler extends ErrorHandler
     }
 }
 ```
-- The `log` method is where you can log the error to a file or third-party service.
+- The `logErrorDetails` method is where you can log the error to a file or third-party service.
 - The `respond` method customizes the response that will be sent back to the client. In this example, it's structured as a JSON response.
+
+---
 
 ### 2. Register the Custom Error Handler in Slim
 
@@ -132,26 +142,32 @@ In your Slim application, register the custom error handler with the error middl
 This should be done in your application's bootstrap file **`config/middleware.php`** as shown below.
 
 ```php title="Registering the Custom Error Handler"
-// 1) Add the error middleware to your application
+// 1) Add the error middleware to your application (already done in the config/middleware.php file).
 $errorMiddleware = $app->addErrorMiddleware(true, true, true);
 
-errors.
 $callableResolver = $app->getCallableResolver();
 $responseFactory = $app->getResponseFactory();
-// 2) Instantiate your custom error handler to be used for handling runtime 
+// 2) Instantiate your custom error handler to be used for handling runtime errors.
 $customErrorHandler = new CustomErrorHandler($callableResolver, $responseFactory);
 // 3) Override the default error handler: use your custom error handler instead.
 $errorMiddleware->setDefaultErrorHandler($customErrorHandler);
 ```
+
+---
+
 ### Step 3: Test the Custom Error Handler
 
 To test the custom error handler, try accessing a route that doesn't exist or trigger an exception within a route. The `CustomErrorHandler` should now respond with a JSON error message.
+
+In addition, you should now see the error details in your `error.log` file.
+
 
 **Or simply add the following code snippet to your list of routes (RECOMMENDED)**
 
 ```php title="Callback for testing error handling"   
 // Example route to test error handling
 $app->get('/error', function (Request $request, Response $response) {
+    // By doing this, you will be able to raise various types of HttpSpecializedExceptions.
     throw new \Slim\Exception\HttpNotFoundException($request, "Oi! Something went wrong");
 });
 ```    

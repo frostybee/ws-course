@@ -143,7 +143,7 @@ $logger->error('Payment processing failed', [
 ]);
 ```
 
-:::tip[Best Practices for Context]
+:::note[Best Practices for Context]
 - Include relevant identifiers (user ID, transaction ID, etc.)
 - Add data that helps reproduce or understand the issue
 - Avoid logging sensitive information (passwords, credit cards, etc.)
@@ -168,7 +168,7 @@ Logger::setTimezone(new \DateTimeZone('America/New_York'));
 $logger = new Logger('access');
 ```
 
-:::tip[Common Time Zones]
+:::note[Common Time Zones]
 - `'America/New_York'` - Eastern Time Zone
 - `'America/Toronto'` - Eastern Time Zone
 - `'America/Chicago'` - Central Time Zone
