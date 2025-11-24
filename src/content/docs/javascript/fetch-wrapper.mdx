@@ -161,12 +161,24 @@ async function fetchData() {
 ```
 ### Usage: Example of a POST request
 
-The wrapper can be customized with different HTTP methods (`POST`, `PUT`, etc.), headers, and a body (useful for sending JSON or form data), as shown in the example below.
+You can pass an options object to the `sendRequest` method to customize the request. The options object can contain the following properties (as shown in the example below):
+- `method`: The HTTP method (`POST`, `PUT`, etc.) to use for the request.
+- `headers`: An object containing the headers to be sent with the request (`Content-Type`, `Accept`, `Authorization`, etc.).
+- `body`: The body of the request. This can be a JSON string, a form data object, or a Blob object.
 
 ```js
 // Sending a POST request with custom request options including headers and body
 async function postData() {
     try {
+        //NOTE: The body of the request is the JSON data that will be sent to the server.
+
+        //TODO: You need to use the DOM API to: 
+        //-------------------------------------
+        // 1) get the data from the form fields.
+        // 2) Store values you retrieved in a JavaScript object or array of objects, depending on the structure of the data required to be passed as input when your create new resources (POST request).
+        // 3) Convert the JavaScript object or array to a JSON string using JSON.stringify().
+
+        //NOTE: This is a simple example of a JSON object. You need to REPLACE IT.Use the DOM API to get the data from the form fields and store it in a JavaScript object or array of objects.
         const person = {
                 firstName: 'Ladybug', 
                 lastName: 'Red',
