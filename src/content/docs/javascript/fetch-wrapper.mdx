@@ -21,18 +21,23 @@ To create a reusable `fetch` wrapper that accepts request options as inputs, we 
 The following fetch wrapper simplifies HTTP requests while giving you flexibility and control over the request configuration.
 :::
 
+
+## Advantages of the Fetch Wrapper
+
+The wrapper should be implemented as an **ES6 module**. This means that the code is stored in a file named `fetchWrapper.js` and can be imported into other files using the `import` statement.
+
+
+- You can use this ES module throughout your application for any type of HTTP request.
+- Error handling is in one place, which makes your code easier to maintain and debug.
+- Set defaults for common parameters like `method`, `headers`, and `mode`, while still allowing customization when needed.
+- JSON responses are parsed automatically, with graceful handling of non-JSON content like plain text or HTML.
+
+
+
+
 ## Fetch Wrapper Example 
 
-Here's a basic example of such a wrapper implemented as an **ES module**:
-
-<Aside type="tip" title="Advantages of this Wrapper:">
-- **Reusability**: You can use this same function across your application to make different types of requests.
-- **Centralized error handling**: Common error handling logic is centralized, making it easier to maintain and debug.
-- **Default options**: You can set sensible defaults for common parameters like `method`, `headers`, and `mode`, but still allow them to be customized when needed.
-- **Response parsing**: It automatically handles JSON responses and gracefully handles non-JSON responses (e.g., plain text or HTML).
-</Aside>
-
-The following code must be stored in a file named `fetchWrapper.js`.
+Here's a basic example of such a wrapper implemented as an **ES module**. The following code must be stored in a file named `fetchWrapper.js`:
 
 ```javascript title="fetchWrapper.js"
 /**
@@ -152,7 +157,7 @@ async function fetchData() {
     try {
         const uri = 'https://api.example.com/data';
         const fetchWrapper = new FetchWrapper();
-        const data = await fetchWrapper(uri);
+        const data = await fetchWrapper.sendRequest(uri);
         console.log(data); // Process the response data
     } catch (error) {
         console.error('Fetch error:', error);
@@ -196,7 +201,7 @@ async function postData() {
             body: JSON.stringify(person),
         }
         const fetchWrapper = new FetchWrapper();
-        const response = await fetchWrapper(uri, options);
+        const response = await fetchWrapper.sendRequest(uri, options);
         console.log(response); // Process the response
     } catch (error) {
         console.error('Post request error:', error);

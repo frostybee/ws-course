@@ -161,11 +161,9 @@ By default, Monolog uses UTC for timestamps. You can change this globally for al
 ```php
 use Monolog\Logger;
 
-// Set the default timezone for all Monolog loggers.
-Logger::setTimezone(new \DateTimeZone('America/New_York'));
-
-// Now all loggers will use this timezone.
 $logger = new Logger('access');
+// Set the default timezone for this logger.
+$logger->setTimezone(new \DateTimeZone('America/New_York'));
 ```
 
 :::note[Common Time Zones]
