@@ -121,6 +121,176 @@ eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4
 
 JWTs are typically used for authentication and authorization. Here's how the flow works:
 
+<svg viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg" style="max-width: 100%; height: auto; margin: 2rem 0;">
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#4a5568" />
+    </marker>
+    <marker id="arrowhead-green" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#10b981" />
+    </marker>
+    <style>
+      {`
+        @keyframes fadeInOut1 {
+          0%, 4% { opacity: 0; }
+          8%, 100% { opacity: 1; }
+        }
+        @keyframes drawLine1 {
+          0%, 2% { stroke-dashoffset: 390; }
+          10%, 100% { stroke-dashoffset: 0; }
+        }
+        @keyframes fadeInOut2 {
+          0%, 12% { opacity: 0; }
+          16%, 100% { opacity: 1; }
+        }
+        @keyframes pulseLoop2 {
+          0%, 12% { opacity: 0; }
+          16%, 18% { opacity: 1; }
+          19% { opacity: 0.4; }
+          20%, 21% { opacity: 1; }
+          22% { opacity: 0.4; }
+          23%, 100% { opacity: 1; }
+        }
+        @keyframes fadeInOut3 {
+          0%, 25% { opacity: 0; }
+          29%, 100% { opacity: 1; }
+        }
+        @keyframes drawLine3 {
+          0%, 27% { stroke-dashoffset: 390; }
+          35%, 100% { stroke-dashoffset: 0; }
+        }
+        @keyframes fadeInOut4 {
+          0%, 37% { opacity: 0; }
+          41%, 100% { opacity: 1; }
+        }
+        @keyframes pulseLoop4 {
+          0%, 37% { opacity: 0; }
+          41%, 43% { opacity: 1; }
+          44% { opacity: 0.4; }
+          45%, 46% { opacity: 1; }
+          47% { opacity: 0.4; }
+          48%, 100% { opacity: 1; }
+        }
+        @keyframes fadeInOut5 {
+          0%, 50% { opacity: 0; }
+          54%, 100% { opacity: 1; }
+        }
+        @keyframes drawLine5 {
+          0%, 52% { stroke-dashoffset: 390; }
+          60%, 100% { stroke-dashoffset: 0; }
+        }
+        @keyframes fadeInOut6 {
+          0%, 62% { opacity: 0; }
+          66%, 100% { opacity: 1; }
+        }
+        @keyframes pulseLoop6 {
+          0%, 62% { opacity: 0; }
+          66%, 68% { opacity: 1; }
+          69% { opacity: 0.4; }
+          70%, 71% { opacity: 1; }
+          72% { opacity: 0.4; }
+          73%, 100% { opacity: 1; }
+        }
+        @keyframes fadeInOut7 {
+          0%, 75% { opacity: 0; }
+          79%, 100% { opacity: 1; }
+        }
+        @keyframes drawLine7 {
+          0%, 77% { stroke-dashoffset: 390; }
+          85%, 100% { stroke-dashoffset: 0; }
+        }
+
+        .step1 { animation: fadeInOut1 10s ease-in infinite; opacity: 0; }
+        .step1-line {
+          stroke-dasharray: 390;
+          stroke-dashoffset: 390;
+          animation: drawLine1 10s ease-out infinite;
+        }
+        .step2 { animation: fadeInOut2 10s ease-in infinite; opacity: 0; }
+        .step2-pulse { animation: pulseLoop2 10s ease-in-out infinite; }
+        .step3 { animation: fadeInOut3 10s ease-in infinite; opacity: 0; }
+        .step3-line {
+          stroke-dasharray: 390;
+          stroke-dashoffset: 390;
+          animation: drawLine3 10s ease-out infinite;
+        }
+        .step4 { animation: fadeInOut4 10s ease-in infinite; opacity: 0; }
+        .step4-pulse { animation: pulseLoop4 10s ease-in-out infinite; }
+        .step5 { animation: fadeInOut5 10s ease-in infinite; opacity: 0; }
+        .step5-line {
+          stroke-dasharray: 390;
+          stroke-dashoffset: 390;
+          animation: drawLine5 10s ease-out infinite;
+        }
+        .step6 { animation: fadeInOut6 10s ease-in infinite; opacity: 0; }
+        .step6-pulse { animation: pulseLoop6 10s ease-in-out infinite; }
+        .step7 { animation: fadeInOut7 10s ease-in infinite; opacity: 0; }
+        .step7-line {
+          stroke-dasharray: 390;
+          stroke-dashoffset: 390;
+          animation: drawLine7 10s ease-out infinite;
+        }
+      `}
+    </style>
+  </defs>
+
+  {/* Client Box */}
+  <rect x="50" y="50" width="150" height="80" fill="#e6f3ff" stroke="#3b82f6" stroke-width="2" rx="8"/>
+  <text x="125" y="95" text-anchor="middle" font-size="18" font-weight="bold" fill="#1e40af">Client</text>
+
+  {/* Server Box */}
+  <rect x="600" y="50" width="150" height="80" fill="#fef3e6" stroke="#f59e0b" stroke-width="2" rx="8"/>
+  <text x="675" y="95" text-anchor="middle" font-size="18" font-weight="bold" fill="#b45309">Server</text>
+
+  {/* Step 1: Login Request */}
+  <g class="step1">
+    <line class="step1-line" x1="200" y1="170" x2="590" y2="170" stroke="#4a5568" stroke-width="2" marker-end="url(#arrowhead)"/>
+    <text x="395" y="160" text-anchor="middle" font-size="14" fill="#1f2937">1. POST /login</text>
+    <text x="395" y="185" text-anchor="middle" font-size="12" fill="#6b7280">(username, password)</text>
+  </g>
+
+  {/* Step 2-3: Verify & Generate */}
+  <g class="step2">
+    <rect class="step2-pulse" x="620" y="210" width="110" height="60" fill="#fff7ed" stroke="#fb923c" stroke-width="1" rx="4" stroke-dasharray="4,4"/>
+    <text x="675" y="235" text-anchor="middle" font-size="12" fill="#9a3412">2. Verify credentials</text>
+    <text x="675" y="255" text-anchor="middle" font-size="12" fill="#9a3412">3. Generate JWT</text>
+  </g>
+
+  {/* Step 4: Return JWT */}
+  <g class="step3">
+    <line class="step3-line" x1="590" y1="310" x2="200" y2="310" stroke="#10b981" stroke-width="2" marker-end="url(#arrowhead-green)"/>
+    <text x="395" y="300" text-anchor="middle" font-size="14" fill="#1f2937">4. JWT Token</text>
+    <text x="395" y="325" text-anchor="middle" font-size="11" fill="#059669">eyJhbGci...</text>
+  </g>
+
+  {/* Step 5: Store Token */}
+  <g class="step4">
+    <rect class="step4-pulse" x="70" y="350" width="110" height="40" fill="#f0f9ff" stroke="#3b82f6" stroke-width="1" rx="4" stroke-dasharray="4,4"/>
+    <text x="125" y="375" text-anchor="middle" font-size="12" fill="#1e40af">5. Store token</text>
+  </g>
+
+  {/* Step 6: Request with JWT */}
+  <g class="step5">
+    <line class="step5-line" x1="200" y1="440" x2="590" y2="440" stroke="#4a5568" stroke-width="2" marker-end="url(#arrowhead)"/>
+    <text x="395" y="430" text-anchor="middle" font-size="14" fill="#1f2937">6. GET /api/resource</text>
+    <text x="395" y="455" text-anchor="middle" font-size="11" fill="#6b7280">Authorization: Bearer &lt;token&gt;</text>
+  </g>
+
+  {/* Step 7-8: Verify JWT */}
+  <g class="step6">
+    <rect class="step6-pulse" x="620" y="480" width="110" height="60" fill="#fff7ed" stroke="#fb923c" stroke-width="1" rx="4" stroke-dasharray="4,4"/>
+    <text x="675" y="505" text-anchor="middle" font-size="12" fill="#9a3412">7. Verify signature</text>
+    <text x="675" y="525" text-anchor="middle" font-size="12" fill="#9a3412">8. Check expiration</text>
+  </g>
+
+  {/* Step 9: Return Data */}
+  <g class="step7">
+    <line class="step7-line" x1="590" y1="565" x2="200" y2="565" stroke="#10b981" stroke-width="2" marker-end="url(#arrowhead-green)"/>
+    <text x="395" y="555" text-anchor="middle" font-size="14" fill="#1f2937">9. Protected resource</text>
+    <text x="395" y="580" text-anchor="middle" font-size="11" fill="#059669">Success: 200 OK</text>
+  </g>
+</svg>
+
 ```
 Client                                Server
   |                                     |
